@@ -111,7 +111,23 @@ function creer_direct(array $s): string {
   ]);
   $flux = yt_flux();
   yt('POST', '/liveBroadcasts/bind?part=id,contentDetails&id=' . urlencode($emission['id']) . '&streamId=' . urlencode($flux['id']));
+  yt_miniature($emission['id']);
   return 'https://www.youtube.com/watch?v=' . $emission['id'];
+}
+
+// Miniature : logo CAMI (public/miniature-direct.jpg). Un échec n'empêche pas le direct.
+function yt_miniature(string $id): void {
+  $image = __DIR__ . '/../miniature-direct.jpg';
+  if (!is_file($image)) return;
+  $ch = curl_init('https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId=' . urlencode($id));
+  curl_setopt_array($ch, [
+    CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 30,
+    CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . yt_jeton(), 'Content-Type: image/jpeg'],
+    CURLOPT_POSTFIELDS => file_get_contents($image),
+  ]);
+  $reponse = curl_exec($ch);
+  $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+  if ($code < 200 || $code >= 300) error_log("YouTube miniature $id → $code : $reponse");
 }
 
 // Adresse et clé du flux, pour le logiciel de diffusion (administrateur)
