@@ -5,9 +5,8 @@
 # elle ne peut écrire que dans ce dossier, les chemins sont relatifs à lui.
 # Le dossier donnees/ (fichiers créés par le site) est protégé de --delete.
 #
-# Pour l'instant : lancement manuel uniquement (onglet Actions > Déploiement > Run workflow),
-# en mode test (dry-run) par défaut : rsync liste ce qu'il ferait sans rien écrire.
-# Une fois validé, décommenter le bloc « push » pour déployer à chaque git push sur main.
+# Déclenchement : à chaque git push sur main touchant site/ (déploiement réel),
+# ou à la main (onglet Actions > Déploiement > Run workflow), en mode test par défaut.
 #
 # Secrets à créer dans GitHub (Settings > Secrets and variables > Actions) :
 #   ALWAYSDATA_SSH_KEY  : clé privée SSH autorisée sur le compte Alwaysdata
@@ -22,9 +21,9 @@ on:
         description: 'Mode test (rien n’est écrit sur le serveur)'
         type: boolean
         default: true
-  # push:
-  #   branches: [main]
-  #   paths: ['site/**']
+  push:
+    branches: [main]
+    paths: ['site/**']
 
 concurrency: deploiement
 

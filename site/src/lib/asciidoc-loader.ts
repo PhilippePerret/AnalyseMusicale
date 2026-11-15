@@ -2,7 +2,7 @@
 // en HTML avec Asciidoctor.js. Les attributs d'en-tête du document
 // (:description:, :objet-contact:, :bande:) deviennent les données de l'entrée.
 import { readdir, readFile } from 'node:fs/promises';
-import { join, basename, resolve, relative } from 'node:path';
+import { join, resolve, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { load, convert } from '@asciidoctor/core';
 import type { Loader, LoaderContext } from 'astro/loaders';
@@ -13,9 +13,11 @@ export function asciidocLoader({ base }: { base: string }): Loader {
     load: async (context: LoaderContext) => {
       const root = fileURLToPath(context.config.root);
       const dir = resolve(root, base);
+      // Identifiant = chemin relatif sans extension : jeudis-analyse/detail.adoc → jeudis-analyse/detail
+      const idDe = (path: string) => relative(dir, path).replace(/\.adoc$/, '').split(sep).join('/');
 
       const loadFile = async (path: string) => {
-        const id = basename(path, '.adoc');
+        const id = idDe(path);
         const source = await readFile(path, 'utf-8');
         const digest = context.generateDigest(source);
         const existing = context.store.get(id);
@@ -44,7 +46,7 @@ export function asciidocLoader({ base }: { base: string }): Loader {
       };
 
       context.store.clear();
-      for (const name of await readdir(dir)) {
+      for (const name of await readdir(dir, { recursive: true })) {
         if (name.endsWith('.adoc')) await loadFile(join(dir, name));
       }
 
@@ -58,7 +60,7 @@ export function asciidocLoader({ base }: { base: string }): Loader {
         if (path.startsWith(dir) && path.endsWith('.adoc')) await loadFile(path);
       });
       context.watcher.on('unlink', (path) => {
-        if (path.startsWith(dir) && path.endsWith('.adoc')) context.store.delete(basename(path, '.adoc'));
+        if (path.startsWith(dir) && path.endsWith('.adoc')) context.store.delete(idDe(path));
       });
     },
   };

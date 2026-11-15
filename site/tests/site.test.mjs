@@ -23,7 +23,7 @@ function resolveLocal(href) {
   return join(DIST, path);
 }
 
-const PAGES = ['/', '/jeudis-analyse/', '/cours-particuliers/', '/pedagogue/', '/contact/', '/contact/merci/', '/contact/erreur/', '/table-analyse/'];
+const PAGES = ['/', '/jeudis-analyse/', '/jeudis-analyse/detail/', '/cours-particuliers/', '/pedagogue/', '/contact/', '/contact/merci/', '/contact/erreur/', '/table-analyse/'];
 
 test('toutes les pages attendues sont construites', () => {
   for (const page of PAGES) assert.ok(existsSync(resolveLocal(page)), `page manquante : ${page}`);
@@ -31,6 +31,9 @@ test('toutes les pages attendues sont construites', () => {
   assert.ok(existsSync(join(DIST, 'contact.php')));
   assert.ok(existsSync(join(DIST, 'telechargement.php')));
   assert.ok(existsSync(join(DIST, '.htaccess')));
+  for (const api of ['_cami', 'etat', 'compte', 'confirmer', 'presence', 'seance']) {
+    assert.ok(existsSync(join(DIST, 'api', `${api}.php`)), `api manquante : ${api}`);
+  }
 });
 
 test('aucun lien interne cassé', () => {
@@ -73,14 +76,24 @@ test('formulaire de contact : champs, cible et champ piège', () => {
 
 test('les pages Jeudis et Cours préremplissent l’objet du contact', () => {
   assert.match(readFileSync(resolveLocal('/jeudis-analyse/'), 'utf-8'), /href="\/contact\/\?objet=jeudis"/);
+  assert.match(readFileSync(resolveLocal('/jeudis-analyse/detail/'), 'utf-8'), /href="\/contact\/\?objet=jeudis"/);
   assert.match(readFileSync(resolveLocal('/cours-particuliers/'), 'utf-8'), /href="\/contact\/\?objet=cours"/);
 });
 
-test('le contenu AsciiDoc est converti', () => {
-  const html = readFileSync(resolveLocal('/jeudis-analyse/'), 'utf-8');
+test('le contenu AsciiDoc est converti (sous-dossier compris)', () => {
+  const html = readFileSync(resolveLocal('/jeudis-analyse/detail/'), 'utf-8');
   assert.match(html, /<h1 class="row titre-page">Les Jeudis de l’Analyse \(musicale\)<\/h1>/);
   assert.match(html, /<h2 id="[^"]*">C’est quand \?<\/h2>/);
   assert.doesNotMatch(html, /^== /m);
+});
+
+test('page calendrier : structure et lien vers le détail', () => {
+  const html = readFileSync(resolveLocal('/jeudis-analyse/'), 'utf-8');
+  assert.match(html, /<h1 class="titre-page">Les jeudis de l’analyse<\/h1>/);
+  assert.match(html, /Session d’analyses musicales en direct/);
+  for (const id of ['cal', 'detail', 'barreCompte', 'formConnexion', 'formInscription']) assert.match(html, new RegExp(`id="${id}"`));
+  assert.match(html, /<a href="\/jeudis-analyse\/detail\/">Détail des jeudis de l’analyse<\/a>/);
+  for (const g of ['F', 'H', 'N']) assert.match(html, new RegExp(`name="genre" value="${g}"`));
 });
 
 // --- Script PHP du formulaire (ignoré si PHP n'est pas utilisable) ---

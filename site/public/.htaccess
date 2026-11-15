@@ -1,3 +1,8 @@
 Options -Indexes
 DirectoryIndex index.html
 ErrorDocument 404 /404.html
+
+# Bibliothèques PHP internes (_*.php) : jamais servies directement
+<FilesMatch "^_">
+  Require all denied
+</FilesMatch>

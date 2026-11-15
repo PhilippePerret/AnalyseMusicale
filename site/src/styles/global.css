@@ -1,9 +1,12 @@
 /* Cours d'Analyse Musicale (CAMI) — styles communs */
 
 :root {
-  --vert-titre: #306a30;
-  --vert-lien: rgb(10, 111, 10);
-  --vert-survol: rgb(10, 211, 110);
+  --principal: #3e4a54;   /* ardoise : titres, liens, bordures */
+  --survol: #3d6a96;      /* bleu : survol */
+  --courant: #2f7a3e;     /* vert : séance du jour uniquement */
+  --vert-titre: var(--principal);
+  --vert-lien: var(--principal);
+  --vert-survol: var(--survol);
   --rouge-exergue: #ae1919;
   --gris-logo: #999999;
   --gris-bande: #eeeeee;
@@ -163,6 +166,9 @@ h1.titre-page {
   padding: 2em;
   font-size: 1.5em;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Formulaire */

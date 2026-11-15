@@ -1,0 +1,73 @@
+---
+// Les jeudis de l'analyse : calendrier des séances.
+// Données (séances, visiteur, présences) chargées depuis /api/etat.php par src/scripts/calendrier.js.
+import Base from '../../layouts/Base.astro';
+import '../../styles/calendrier.css';
+---
+<Base
+  title="Les jeudis de l’analyse"
+  description="Calendrier des jeudis de l’analyse : sessions d’analyses musicales en direct sur YouTube."
+  objetContact="jeudis"
+>
+  <div class="row calendrier-page">
+    <h1 class="titre-page">Les jeudis de l’analyse</h1>
+    <p class="sous-titre">Session d’analyses musicales en direct</p>
+
+    <div class="entete-rubrique">
+      <div class="rubrique">Calendrier</div>
+      <p>Les <strong>sessions d’analyses en direct</strong> permettent d’assister, en auditeur ou auditrice libre ou active, à des analyses musicales rapides consistant principalement au chiffrage des partitions, à la recherche de forme et à l’analyse des éléments principaux.</p>
+    </div>
+
+    <div class="barre-compte" id="barreCompte"></div>
+
+    <div class="cadre">
+      <div id="cal"><p class="vide">Chargement du calendrier…</p></div>
+      <div class="detail" id="detail"><span class="vide">Cliquer sur un jeudi encadré pour voir la séance…</span></div>
+    </div>
+
+    <p class="lien-detail"><a href="/jeudis-analyse/detail/">Détail des jeudis de l’analyse</a></p>
+  </div>
+
+  <div class="voile" id="voile">
+    <div class="fenetre">
+      <div id="fConnexion">
+        <h3>S’identifier</h3>
+        <form id="formConnexion">
+          <label>Adresse e-mail <input type="email" name="email" required maxlength="200" autocomplete="email"></label>
+          <label>Mot de passe <input type="password" name="mdp" required autocomplete="current-password"></label>
+          <p class="message" hidden></p>
+          <div class="boutons">
+            <a href="#" class="bascule" data-vers="inscription" data-g="Pas encore inscrit[|e] ? S’inscrire"></a>
+            <button class="bouton">Valider</button>
+          </div>
+        </form>
+      </div>
+      <div id="fInscription" hidden>
+        <h3>S’inscrire</h3>
+        <form id="formInscription">
+          <label>Adresse e-mail <input type="email" name="email" required maxlength="200" autocomplete="email"></label>
+          <label>Pseudo (facultatif) <input type="text" name="pseudo" maxlength="60" autocomplete="nickname"></label>
+          <label>Mot de passe <input type="password" name="mdp" required minlength="8" autocomplete="new-password"></label>
+          <div class="genre">Vous êtes…
+            <label><input type="radio" name="genre" value="F"> une femme</label>
+            <label><input type="radio" name="genre" value="H"> un homme</label>
+            <label><input type="radio" name="genre" value="N" checked> discret</label>
+          </div>
+          <div class="cases">
+            <label><input type="checkbox" name="avertir" checked> <span data-g="M’avertir des prochains jeudis"></span></label>
+            <label><input type="checkbox" name="auditeur"> <span data-g="Je compte venir en audit[eur|rice] libre"></span></label>
+          </div>
+          <div class="piege" aria-hidden="true"><label>Ne pas remplir <input type="text" name="site_web" tabindex="-1" autocomplete="off"></label></div>
+          <p class="message" hidden></p>
+          <div class="boutons">
+            <a href="#" class="bascule" data-vers="connexion" data-g="Déjà inscrit[|e] ? S’identifier"></a>
+            <button class="bouton">Valider</button>
+          </div>
+        </form>
+      </div>
+      <div class="boutons"><span></span><button type="button" class="fermer" id="fermer">Fermer</button></div>
+    </div>
+  </div>
+
+  <script src="../../scripts/calendrier.js"></script>
+</Base>

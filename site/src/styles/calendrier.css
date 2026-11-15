@@ -1,0 +1,105 @@
+/* Page /jeudis-analyse/ : calendrier des séances */
+
+.calendrier-page { font-size: 0.85em; }
+
+.calendrier-page .sous-titre { text-align: center; font-size: 1.15em; color: #555; margin: 0.2em 0 2em; font-style: italic; }
+.calendrier-page .vide { color: var(--gris-logo); font-style: italic; }
+
+.entete-rubrique { display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5em; margin-bottom: 0.8em; }
+.rubrique { color: var(--principal); font-size: 2em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; line-height: 1; }
+.entete-rubrique p { width: 62%; margin: 0; font-size: 0.9em; }
+
+.barre-compte { text-align: right; font-size: 0.8em; min-height: 1.5em; margin-bottom: 0.3em; }
+
+.cadre { border: 1px solid #ccc; padding: 1.2rem; overflow-x: auto; }
+
+h2.annee { color: var(--principal); font-size: 1.7em; font-weight: 700; margin: 0.6em 0 0.2em; border-bottom: 1px solid #ddd; }
+h2.annee:first-child { margin-top: 0; }
+
+table.grille { border-collapse: separate; border-spacing: 0.4em; width: 100%; min-width: 40em; table-layout: fixed; }
+table.grille th.mois { color: var(--principal); font-weight: 700; text-align: left; white-space: nowrap; width: 8.5em; vertical-align: middle; letter-spacing: 0.04em; font-size: 0.9em; }
+table.grille td { vertical-align: top; }
+
+.jeudi { position: relative; display: block; width: 100%; min-height: 3.6em; text-align: left; border: 1px solid transparent; border-radius: 4px; padding: 0.3em 0.5em; color: var(--gris-logo); transition: background 0.15s, color 0.15s; }
+.jeudi .num { font-size: 0.95em; white-space: nowrap; }
+.jeudi .piece { display: block; font-size: 0.75em; line-height: 1.25; color: var(--principal); padding-right: 1.4em; }
+.jeudi.seance { color: var(--texte); border-color: var(--principal); cursor: pointer; }
+.jeudi.prochain { border-width: 2px; }
+.jeudi.passe { opacity: 0.55; }
+.jeudi.courant { background: var(--courant); border-color: var(--courant); color: #fff; opacity: 1; }
+.jeudi.courant .piece { color: #e6f2e8; }
+.jeudi.editable { cursor: pointer; border-style: dashed; border-color: #ccc; }
+/* Survol : bleu */
+.jeudi.seance:hover, .jeudi.editable:hover { background: var(--survol); border-color: var(--survol); color: #fff; opacity: 1; }
+.jeudi.seance:hover .piece, .jeudi.editable:hover .piece { color: #e3ecf5; }
+.jeudi.choisi { box-shadow: 0 0 0 3px var(--survol); }
+
+/* Œil : revoir (passé) ou suivre (en cours) */
+.oeil { position: absolute; right: 0.3em; bottom: 0.25em; line-height: 0; color: var(--principal); padding: 0.15em; }
+.oeil svg { width: 1.1em; height: 1.1em; }
+.jeudi.courant .oeil, .jeudi:hover .oeil { color: #fff; }
+
+/* Fiche du jeudi */
+.detail { position: relative; margin-top: 1rem; padding: 0.9em 1.1em; border-left: 4px solid var(--principal); background: #f6f7f6; min-height: 3.2em; }
+.detail .date { font-weight: 700; padding-right: 4em; text-transform: uppercase; letter-spacing: 0.03em; }
+.detail .date sup { text-transform: none; }
+.detail .actions { margin-top: 0.7em; display: flex; flex-wrap: wrap; gap: 0.8em 1.4em; align-items: center; }
+.detail .editer { position: absolute; top: 0.7em; right: 1em; font-size: 0.85em; }
+.detail .message { color: var(--courant); font-weight: 700; }
+.detail .erreur { color: #a33; }
+.direct::before { content: '● '; }
+.direct.inactif { color: #bbb; cursor: not-allowed; }
+.direct.actif { color: var(--courant); font-weight: 700; }
+button.bouton { font: inherit; padding: 0.35em 1.2em; border: 1px solid var(--principal); background: var(--fond); color: var(--principal); cursor: pointer; border-radius: 3px; }
+button.bouton:hover { background: var(--survol); border-color: var(--survol); color: #fff; }
+.inscrit-ok { color: var(--principal); font-weight: 700; }
+
+/* Formulaire d'édition (administrateur) */
+form.edition { display: grid; gap: 0.8em; margin-top: 0.8em; }
+form.edition .rang { display: flex; flex-wrap: wrap; gap: 0.7em 1.2em; align-items: end; }
+form.edition label { display: grid; gap: 0.15em; font-size: 0.85em; }
+form.edition label.en-ligne { display: flex; gap: 0.6em; align-items: center; }
+form.edition input, form.edition select { font: inherit; font-size: 0.95em; padding: 0.3em 0.5em; border: 1px solid #aaa; border-radius: 3px; background: var(--fond); }
+form.edition .petit { width: 10em; }
+form.edition .petit input { width: 100%; }
+form.edition .grand { flex: 1 1 22em; }
+form.edition .grand input { width: 100%; }
+form.edition .une-ligne { flex-wrap: nowrap; align-items: center; gap: 1.6em; }
+form.edition .une-ligne label.en-ligne { white-space: nowrap; }
+form.edition input.analyste { width: 9em; }
+form.edition .lien input { width: 24em; max-width: 100%; }
+form.edition .aide { font-size: 0.75em; color: #888; }
+form.edition .boutons { display: flex; gap: 1.2em; align-items: center; justify-content: flex-end; margin-top: 0.3em; }
+/* Suppression : à l'écart, avec confirmation */
+.zone-suppression { margin-top: 1.6em; padding-top: 0.6em; border-top: 1px dashed #ccc; font-size: 0.8em; }
+.zone-suppression .confirmer { color: #a33; }
+.zone-suppression button { font: inherit; padding: 0.2em 0.8em; margin-left: 0.6em; cursor: pointer; border-radius: 3px; border: 1px solid #a33; background: #a33; color: #fff; }
+.zone-suppression button.supprimer { margin-left: 0; background: var(--fond); color: #a33; }
+.zone-suppression button.supprimer:hover { background: #a33; color: #fff; }
+.zone-suppression button.non { background: var(--fond); color: var(--texte); border-color: #aaa; }
+
+.lien-detail { margin-top: 2.5em; text-align: center; }
+
+/* Fenêtre d'identification / inscription */
+.voile { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: none; align-items: center; justify-content: center; padding: 1rem; z-index: 10; }
+.voile.ouvert { display: flex; }
+.fenetre { background: var(--fond); max-width: 26em; width: 100%; padding: 1.4em 1.6em; border-top: 5px solid var(--principal); max-height: 100%; overflow-y: auto; }
+.fenetre h3 { color: var(--principal); margin: 0 0 0.6em; }
+.fenetre form { display: grid; gap: 0.7em; }
+.fenetre label { display: grid; gap: 0.2em; font-size: 0.9em; }
+.fenetre input[type=email], .fenetre input[type=password], .fenetre input[type=text] { font: inherit; padding: 0.35em 0.5em; border: 1px solid #aaa; border-radius: 3px; }
+.fenetre .genre { font-size: 0.9em; display: flex; flex-wrap: wrap; gap: 0.3em 1em; align-items: baseline; }
+.fenetre .genre label, .fenetre .cases label { display: inline-flex; gap: 0.4em; align-items: baseline; }
+.fenetre .cases { display: grid; gap: 0.2em; }
+.fenetre .boutons { display: flex; justify-content: space-between; align-items: center; margin-top: 0.4em; }
+.fenetre .bascule { font-size: 0.85em; }
+.fenetre .message { margin: 0; font-size: 0.9em; color: #a33; }
+.fenetre .message.ok { color: var(--courant); }
+.fenetre .fermer { font: inherit; border: none; background: none; color: var(--gris-logo); cursor: pointer; }
+.fenetre .piege { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+@media (max-width: 700px) {
+  .entete-rubrique { flex-direction: column; align-items: flex-start; }
+  .entete-rubrique p { width: auto; }
+  form.edition .une-ligne { flex-wrap: wrap; }
+}
