@@ -7,6 +7,9 @@
 
 declare(strict_types=1);
 date_default_timezone_set('Europe/Paris');
+// Avertissements PHP : dans le journal, jamais dans les réponses JSON
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
 
 const ADMINS     = ['philippe.perret@analyse-musicale.fr'];
 const EXPEDITEUR = 'contact@analyse-musicale.fr';

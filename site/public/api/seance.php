@@ -20,6 +20,8 @@ $heure = function ($h, string $min, string $max) {
 $debut = $heure($e['debut'] ?? null, '09:00', '21:00');
 $fin = $heure($e['fin'] ?? null, '09:00', '23:00');
 $youtube = trim((string) ($e['youtube'] ?? ''));
+// Lien de YouTube Studio collé : remplacé par l'adresse publique du direct
+if (preg_match('#^https://studio\.youtube\.com/video/([\w-]+)#', $youtube, $m)) $youtube = 'https://www.youtube.com/watch?v=' . $m[1];
 if (!$debut || !$fin || $fin <= $debut) repondre(['ok' => false, 'erreur' => 'heures'], 422);
 if ($youtube !== '' && !preg_match('#^https://[^\s"<>]+$#', $youtube)) repondre(['ok' => false, 'erreur' => 'youtube'], 422);
 $partition = trim((string) ($e['partition'] ?? ''));

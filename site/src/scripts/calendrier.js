@@ -193,6 +193,14 @@ const ERREURS_DIRECT = {
 
 async function enregistrer(k, form) {
   const champs = Object.fromEntries(new FormData(form));
+  // Message d'attente (la création du direct prend quelques secondes)
+  form.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+  const attente = document.createElement('p');
+  attente.className = 'attente';
+  attente.textContent = champs.creer_direct
+    ? 'Enregistrement de la séance et création du direct sur YouTube… (quelques secondes)'
+    : 'Enregistrement…';
+  form.querySelector('.boutons').before(attente);
   const r = await api('seance.php', { action: 'enregistrer', jour: k, ...champs, creer_direct: !!champs.creer_direct });
   if (!r.ok) return editer(k, ERREURS_SEANCE[r.erreur] || 'Enregistrement impossible.');
   message = 'Séance enregistrée.';

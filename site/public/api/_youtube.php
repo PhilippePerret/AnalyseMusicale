@@ -30,7 +30,6 @@ function yt_http(string $methode, string $url, ?array $corps = null, array $ente
   curl_setopt_array($ch, $options);
   $reponse = curl_exec($ch);
   $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-  curl_close($ch);
   $donnees = json_decode((string) $reponse, true) ?: [];
   if ($code < 200 || $code >= 300) {
     error_log("YouTube $methode $url → $code : $reponse");
