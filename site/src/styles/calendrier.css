@@ -67,7 +67,8 @@ form.edition .une-ligne label.en-ligne { white-space: nowrap; }
 form.edition input.analyste { width: 9em; }
 form.edition .lien input { width: 24em; max-width: 100%; }
 form.edition .aide { font-size: 0.75em; color: #888; }
-form.edition .boutons { display: flex; gap: 1.2em; align-items: center; justify-content: flex-end; margin-top: 0.3em; }
+form.edition .boutons { display: flex; gap: 1.2em; align-items: center; justify-content: space-between; margin-top: 0.3em; }
+form.edition button.annuler { font-size: 0.75em; }
 /* Suppression : à l'écart, avec confirmation */
 .zone-suppression { margin-top: 1.6em; padding-top: 0.6em; border-top: 1px dashed #ccc; font-size: 0.8em; }
 .zone-suppression .confirmer { color: #a33; }

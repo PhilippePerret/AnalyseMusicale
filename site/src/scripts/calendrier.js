@@ -162,7 +162,7 @@ function editer(k, erreur = '') {
        <div class="aide">^texte^ = exposant (ex. 1^er^)</div>
        ${erreur ? `<p class="erreur">${erreur}</p>` : ''}
        <div class="boutons">
-         <a href="#" data-action="annuler">Annuler</a>
+         <button type="button" class="bouton annuler" data-action="annuler">Annuler</button>
          <button class="bouton">Enregistrer</button>
        </div>
      </form>
