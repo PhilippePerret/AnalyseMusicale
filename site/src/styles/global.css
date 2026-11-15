@@ -119,8 +119,10 @@ h1.titre-page {
   color: var(--vert-titre);
   font-size: 1.33em;
 }
-/* Césure automatique : seulement dans les paragraphes de texte */
-.adoc .paragraph p { text-align: justify; hyphens: auto; }
+/* Textes (paragraphes et éléments de listes) : justifiés, césure automatique */
+.adoc .paragraph p,
+.adoc .ulist:not(.blocs) li p,
+.adoc .olist li p { text-align: justify; hyphens: auto; }
 /* …sauf les courts textes de mise en page (contact, centrés, encadrés) */
 .adoc .paragraph.contact-bloc p { text-align: right; hyphens: manual; }
 .adoc .text-center .paragraph p, .adoc .paragraph.text-center p { text-align: center; hyphens: manual; }
