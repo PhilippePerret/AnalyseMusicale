@@ -31,7 +31,7 @@ test('toutes les pages attendues sont construites', () => {
   assert.ok(existsSync(join(DIST, 'contact.php')));
   assert.ok(existsSync(join(DIST, 'telechargement.php')));
   assert.ok(existsSync(join(DIST, '.htaccess')));
-  for (const api of ['_cami', 'etat', 'compte', 'confirmer', 'presence', 'seance']) {
+  for (const api of ['_cami', 'moi', 'etat', 'compte', 'confirmer', 'presence', 'seance']) {
     assert.ok(existsSync(join(DIST, 'api', `${api}.php`)), `api manquante : ${api}`);
   }
 });

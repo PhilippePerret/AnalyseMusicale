@@ -9,20 +9,20 @@ import { EMAIL, OBJETS_CONTACT } from '../../lib/site';
       <p>Ou par ce formulaire :</p>
 
       <form class="contact-form" method="post" action="/contact.php">
-        <label>Votre nom
+        <label class="en-regard">Votre nom
           <input type="text" name="nom" required maxlength="120" autocomplete="name">
         </label>
-        <label>Votre adresse e-mail
+        <label class="en-regard">Votre adresse e-mail
           <input type="email" name="email" required maxlength="200" autocomplete="email">
         </label>
-        <label>Objet
+        <label class="en-regard">Objet
           <select name="objet" id="objet">
             {Object.entries(OBJETS_CONTACT).map(([cle, libelle]) => (
               <option value={cle}>{libelle}</option>
             ))}
           </select>
         </label>
-        <label>Message
+        <label class="message-libelle">Message
           <textarea name="message" required rows="8" maxlength="5000"></textarea>
         </label>
         <div class="piege" aria-hidden="true">

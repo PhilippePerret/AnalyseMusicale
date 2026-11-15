@@ -29,11 +29,14 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
 <body>
   <header class="site">
     <a class="logo" href="/">
-      <img src="/logo-carres-lettres-portee-200.jpg" width="80" height="56" alt="Logo CAMI">
-      <span>CAMI</span>
+      <span class="marque">
+        <img src="/logo-carres-lettres-portee-200.jpg" width="80" height="56" alt="Logo CAMI">
+        <span>CAMI</span>
+      </span>
+      <span class="accueil">ACCUEIL</span>
     </a>
     {Astro.url.pathname !== '/' && (
-      <div class="nom">Cours<br>d’Analyse<br>Musicale</div>
+      <div class="nom">Cours d’Analyse Mus<span style="color:ardoise;font-size:1.2em;">i</span>cale</div>
     )}
   </header>
 

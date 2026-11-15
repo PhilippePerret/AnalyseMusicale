@@ -5,7 +5,7 @@
   --survol: #3d6a96;      /* bleu : survol */
   --courant: #2f7a3e;     /* vert : séance du jour uniquement */
   --vert-titre: var(--principal);
-  --vert-lien: var(--principal);
+  --vert-lien: #d18700;
   --vert-survol: var(--survol);
   --rouge-exergue: #ae1919;
   --gris-logo: #999999;
@@ -59,8 +59,16 @@ header.site .logo {
   align-items: center;
   gap: 0.4em;
 }
+header.site .logo {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+header.site .logo .marque { display: inline-flex; align-items: center; gap: 0.4em; }
+header.site .logo .accueil { font-size: 0.55em; letter-spacing: 0.15em; color: var(--gris-logo); padding-left: 0.3em; }
+header.site .logo:hover .accueil { color: var(--survol); }
 header.site .logo img { width: 80px; }
-header.site .logo span {
+header.site .logo .marque span {
   font-weight: bold;
   color: var(--gris-logo);
   font-size: 24px;
@@ -111,7 +119,9 @@ h1.titre-page {
   color: var(--vert-titre);
   font-size: 1.33em;
 }
-.adoc p { text-align: justify; hyphens: auto; }
+/* Césure automatique : seulement dans les paragraphes de texte */
+.adoc .paragraph p { text-align: justify; hyphens: auto; }
+.adoc p { text-align: justify; }
 .adoc ul { margin-left: 1em; padding-left: 1em; }
 .adoc ul li { margin-top: 1em; }
 .adoc ul.square { list-style: square; }
@@ -164,17 +174,11 @@ h1.titre-page {
 }
 .blocs li { display: contents; }
 .blocs li p { display: contents; }
-.blocs {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2em;
-}
 .blocs a {
   flex: 0 1 30%;
   min-width: min(100%, 14em);
   border: 1px solid;
-  padding: 2em;
+  padding: 2em 1em;
   font-size: 1.5em;
   text-align: center;
   display: block;
@@ -186,21 +190,40 @@ form.contact-form {
   display: grid;
   gap: 1em;
 }
-form.contact-form label { display: grid; gap: 0.3em; }
+/* Libellé en bloc (pas en grille : le texte et ses liens restent sur la même ligne) */
+form.contact-form label { display: block; }
+form.contact-form label > input,
+form.contact-form label > select,
+form.contact-form label > textarea { display: block; margin-top: 0.3em; }
 form.contact-form input,
 form.contact-form select,
 form.contact-form textarea {
   font: inherit;
   font-size: 0.9em;
-  padding: 0.4em 0.6em;
+  line-height: 1.25;
+  padding: 0.12em 0.4em;
   border: 1px solid #aaaaaa;
   border-radius: 3px;
   width: 100%;
 }
+form.contact-form input[type=text],
+form.contact-form input[type=email] { max-width: 22em; }
+form.contact-form select { width: auto; }
+/* Libellé à gauche, champ en regard */
+form.contact-form label.en-regard { display: grid; grid-template-columns: 10.5em 1fr; align-items: center; gap: 0.8em; font-size: 0.9em; white-space: nowrap; }
+form.contact-form label.en-regard > input,
+form.contact-form label.en-regard > select { margin-top: 0; justify-self: start; }
+form.contact-form label.message-libelle { font-size: 0.9em; }
+@media (max-width: 600px) {
+  form.contact-form label.en-regard { grid-template-columns: 1fr; gap: 0.2em; }
+}
 form.contact-form button {
   font: inherit;
+  font-size: 0.9em;
+  line-height: 1.25;
   justify-self: start;
-  padding: 0.4em 1.5em;
+  padding: 0.15em 1em;
+  border-radius: 3px;
   border: 1px solid var(--vert-lien);
   background: var(--fond);
   color: var(--vert-lien);
@@ -219,6 +242,7 @@ form.contact-form .piege {
 /* Pied de page */
 footer.site {
   text-align: center;
+  font-size: 0.7em;
   margin-bottom: 10em;
   line-height: 2;
 }
@@ -232,6 +256,27 @@ footer.site nav a { white-space: nowrap; }
 .center { text-align: center; }
 
 /* Page Table d'analyse */
+.bloc-telechargement {
+  border: 1px solid #cccccc;
+  border-left: 4px solid var(--principal);
+  background: #f6f7f6;
+  padding: 1em 1.4em 1.2em;
+  margin-top: 2em;
+}
+.bloc-telechargement > .title {
+  color: var(--principal);
+  font-weight: 700;
+  font-size: 1.2em;
+  margin-bottom: 0.6em;
+}
+.bloc-telechargement form.contact-form { gap: 0.8em; font-size: 0.9em; }
+/* Plateforme + bouton sur une ligne, bouton à droite */
+form.contact-form .ligne-envoi { display: flex; align-items: center; gap: 0.6em; flex-wrap: wrap; }
+form.contact-form .ligne-envoi label { display: flex; align-items: center; gap: 0.5em; font-size: 0.85em; }
+form.contact-form .ligne-envoi label > select { margin-top: 0; }
+form.contact-form .ligne-envoi > input[type=email] { flex: 0 1 16em; }
+form.contact-form p.consigne { margin: 0; text-align: left; hyphens: manual; }
+form.contact-form .ligne-envoi button { margin-left: auto; }
 video.demo { width: 100%; height: auto; border: 1px solid #aaaaaa; }
 ul.telechargements { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 1em; }
 ul.telechargements a { display: inline-block; padding: 0.4em 1.5em; border: 1px solid var(--vert-lien); }

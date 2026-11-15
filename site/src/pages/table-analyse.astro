@@ -1,68 +1,98 @@
 ---
+// Textes : src/content/pages/table-analyse.adoc. Les lignes « @demonstration »
+// et « @telechargement » y placent la vidéo et le formulaire ci-dessous.
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { TABLE_ANALYSE } from '../lib/site';
+
+const page = await getEntry('pages', 'table-analyse');
+if (!page) throw new Error('src/content/pages/table-analyse.adoc introuvable');
+const { title, description, bande } = page.data;
+// Morceaux de HTML séparés par les marqueurs : [html, 'demonstration', html, 'telechargement', html]
+const morceaux = (page.rendered?.html ?? '').split(/<div class="paragraph">\s*<p>@(demonstration|telechargement)<\/p>\s*<\/div>/);
 
 // Fichier local (public/) absent : non proposé
 const disponible = (chemin: string) => !chemin.startsWith('/') || existsSync(join(process.cwd(), 'public', chemin));
 const telechargements = TABLE_ANALYSE.telechargements.filter((t) => disponible(t.fichier));
 const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
 ---
-<Base
-  title="Table d’analyse"
-  heading="La Table d’analyse"
-  bande="L’application pour analyser une partition directement sur ses systèmes : accords, harmonie, cadences, forme…"
-  description="Télécharger la Table d’analyse de Philippe Perret, application d’analyse musicale pour macOS, Windows et Linux."
->
-  <div class="row colonne">
-    <h2>Démonstration</h2>
-    {demo
+<Base title={title} heading={title} bande={bande} description={description}>
+  <div class="row colonne adoc">
+  {morceaux.map((m, i) => i % 2 === 0 ? <Fragment set:html={m} /> : m === 'demonstration' ? (
+    demo
       ? <video class="demo" src={demo} controls preload="metadata"></video>
-      : <p class="demo-absente">La vidéo de démonstration sera bientôt disponible.</p>}
-
-    <h2>Télécharger l’application</h2>
+      : <p class="demo-absente">La vidéo de démonstration sera bientôt disponible.</p>
+  ) : (
+    <>
     <form class="contact-form" id="telechargement" method="post" action="/telechargement.php">
-      <label>Indiquez votre adresse mail pour télécharger l’application
-        <input type="email" name="email" required maxlength="200" autocomplete="email">
-      </label>
+      <p class="consigne" id="consigneMail">Pour obtenir le lien de téléchargement de l’application, merci d’indiquer votre adresse mail (ou de <a href="/jeudis-analyse/?compte=connexion&retour=/table-analyse/">vous connecter</a>/<a href="/jeudis-analyse/?compte=inscription&retour=/table-analyse/">vous inscrire</a>)</p>
+      <div class="ligne-envoi">
+        <input type="email" name="email" required maxlength="200" autocomplete="email" placeholder="adresse mail" aria-labelledby="consigneMail">
+        <label>Plateforme
+          <select name="fichier" required>
+            <option value="">—</option>
+            {TABLE_ANALYSE.telechargements.map((t) => <option value={t.fichier}>{t.systeme}</option>)}
+          </select>
+        </label>
+        <button type="submit">Obtenir le lien de téléchargement</button>
+      </div>
       <div class="piege" aria-hidden="true">
         <label>Ne pas remplir ce champ
           <input type="text" name="site_web" tabindex="-1" autocomplete="off">
         </label>
       </div>
-      <button type="submit">Obtenir les liens</button>
       <p class="message" hidden></p>
     </form>
 
     <div id="liens" hidden>
-      <p>Merci ! Choisissez la version pour votre système (version {TABLE_ANALYSE.version}) :</p>
+      <p><span id="merci">Merci ! </span>Choisissez la version pour votre système (version {TABLE_ANALYSE.version}) :</p>
       <ul class="telechargements">
         {telechargements.map((t) => (
           <li><a data-href={t.fichier} download>{t.systeme}</a></li>
         ))}
       </ul>
     </div>
+    </>
+  ))}
   </div>
 
   <script is:inline>
-    // Adresse envoyée à /telechargement.php, puis liens affichés
+    // Visiteur identifié : liens affichés directement.
+    // Sinon : adresse + plateforme envoyées à /telechargement.php, qui envoie le lien par mail.
     (function () {
       var form = document.getElementById('telechargement');
       var message = form.querySelector('.message');
+      function afficherLiens() {
+        document.querySelectorAll('#liens a[data-href]').forEach(function (a) { a.href = a.dataset.href; });
+        form.hidden = true;
+        document.getElementById('liens').hidden = false;
+      }
+      fetch('/api/moi.php', { credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (res) { if (res.user) { document.getElementById('merci').hidden = true; afficherLiens(); } })
+        .catch(function () {});
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         message.hidden = true;
-        fetch(form.action, { method: 'POST', body: new FormData(form) })
+        var donnees = new FormData(form);
+        var choix = form.elements.fichier;
+        donnees.append('systeme', choix.options[choix.selectedIndex].text);
+        var ERREURS = {
+          email: 'Adresse mail invalide. Vérifiez-la et réessayez.',
+          plateforme: 'Choisissez votre plateforme.',
+          indisponible: 'Cette version n’est pas encore disponible au téléchargement.',
+        };
+        fetch(form.action, { method: 'POST', body: donnees })
           .then(function (r) { return r.json(); })
           .then(function (res) {
             if (!res.ok) throw new Error(res.error || 'erreur');
-            document.querySelectorAll('#liens a[data-href]').forEach(function (a) { a.href = a.dataset.href; });
-            form.hidden = true;
-            document.getElementById('liens').hidden = false;
+            form.innerHTML = '<p class="envoye">Le lien de téléchargement vient d’être envoyé à <strong></strong>.</p>';
+            form.querySelector('strong').textContent = donnees.get('email');
           })
-          .catch(function () {
-            message.textContent = 'Cette adresse n’a pas pu être enregistrée. Vérifiez-la et réessayez.';
+          .catch(function (err) {
+            message.textContent = ERREURS[err.message] || 'Le lien n’a pas pu être envoyé. Réessayez dans un moment.';
             message.hidden = false;
           });
       });

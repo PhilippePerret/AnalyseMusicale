@@ -1,44 +1,41 @@
 <?php
 // Téléchargement de la Table d'analyse (page /table-analyse/).
-// Reçoit l'adresse mail (POST), l'enregistre (donnees/inscrits.csv) et la
-// signale par mail ; réponse JSON {ok, error}.
+// Reçoit l'adresse mail et le fichier de la plateforme choisie (POST),
+// envoie le lien de téléchargement à cette adresse, enregistre la demande
+// dans la base (table telechargements) et la signale par mail ;
+// réponse JSON {ok, error}.
+require __DIR__ . '/api/_cami.php';
 
 const DESTINATAIRE = 'philippe.perret@analyse-musicale.fr';
-const EXPEDITEUR   = 'contact@analyse-musicale.fr';
-const FICHIER      = __DIR__ . '/donnees/inscrits.csv';
 
-header('Content-Type: application/json; charset=utf-8');
-
-function repondre(bool $ok, string $error = ''): void {
-  echo json_encode(['ok' => $ok, 'error' => $error]);
-  exit;
+function reponse(bool $ok, string $error = ''): void {
+  repondre(['ok' => $ok, 'error' => $error]);
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') repondre(false, 'methode');
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') reponse(false, 'methode');
 
-// Champ piège rempli : robot. On fait mine d'avoir enregistré.
-if (trim($_POST['site_web'] ?? '') !== '') repondre(true);
+// Champ piège rempli : robot. On fait mine d'avoir envoyé.
+if (trim($_POST['site_web'] ?? '') !== '') reponse(true);
 
 $email = trim($_POST['email'] ?? '');
-if (mb_strlen($email) > 200 || !filter_var($email, FILTER_VALIDATE_EMAIL)) repondre(false, 'email');
+if (mb_strlen($email) > 200 || !filter_var($email, FILTER_VALIDATE_EMAIL)) reponse(false, 'email');
+
+// Fichier de la plateforme : /telechargements/<nom>, présent sur le serveur
+$fichier = (string) ($_POST['fichier'] ?? '');
+$systeme = texte($_POST['systeme'] ?? '', 40);
+if (!preg_match('#^/telechargements/[\w.-]+$#', $fichier)) reponse(false, 'plateforme');
+if (!is_file(__DIR__ . $fichier)) reponse(false, 'indisponible');
+
+// Lien de téléchargement envoyé au demandeur
+$corps = "Bonjour,\n\n"
+  . "Voici le lien pour télécharger la Table d’analyse ($systeme) :\n\n"
+  . SITE . $fichier . "\n\n"
+  . "Bonnes analyses !\n\nPhilippe Perret\nCours d’Analyse Musicale — " . SITE . "\n";
+if (!envoyer_mail($email, 'Votre lien de téléchargement de la Table d’analyse', $corps)) reponse(false, 'envoi');
 
 $date = date('Y-m-d H:i:s');
-if (!is_dir(dirname(FICHIER))) mkdir(dirname(FICHIER), 0750, true);
-$f = fopen(FICHIER, 'a');
-if ($f) {
-  flock($f, LOCK_EX);
-  fputcsv($f, [$date, $email], ',', '"', '');
-  flock($f, LOCK_UN);
-  fclose($f);
-}
+db()->prepare('INSERT INTO telechargements (email, systeme, fichier, le) VALUES (?, ?, ?, ?)')
+  ->execute([$email, $systeme, $fichier, $date]);
+envoyer_mail(DESTINATAIRE, 'CAMI • Téléchargement de la Table d’analyse', "Adresse : $email\nPlateforme : $systeme\nDate : $date\n");
 
-$sujet = mb_encode_mimeheader('CAMI • Téléchargement de la Table d’analyse', 'UTF-8');
-$entetes = implode("\r\n", [
-  'From: ' . mb_encode_mimeheader('CAMI — site', 'UTF-8') . ' <' . EXPEDITEUR . '>',
-  'MIME-Version: 1.0',
-  'Content-Type: text/plain; charset=UTF-8',
-  'Content-Transfer-Encoding: 8bit',
-]);
-mail(DESTINATAIRE, $sujet, "Adresse : $email\nDate : $date\n", $entetes);
-
-repondre(true);
+reponse(true);

@@ -38,6 +38,13 @@ CREATE TABLE IF NOT EXISTS seances (
   fin TEXT NOT NULL DEFAULT '22:00',
   youtube TEXT NOT NULL DEFAULT ''
 );
+CREATE TABLE IF NOT EXISTS telechargements (   -- demandes de lien de la Table d'analyse
+  id INTEGER PRIMARY KEY,
+  email TEXT NOT NULL,
+  systeme TEXT NOT NULL,
+  fichier TEXT NOT NULL,
+  le TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS presences (
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   jour TEXT NOT NULL REFERENCES seances(jour) ON DELETE CASCADE,
@@ -79,6 +86,7 @@ function demarrer_session(): void {
 }
 
 function user_courant(): ?array {
+  if (!isset($_COOKIE['cami'])) return null;   // pas de session ouverte pour un simple visiteur
   demarrer_session();
   if (empty($_SESSION['uid'])) return null;
   $st = db()->prepare('SELECT * FROM users WHERE id = ? AND confirme = 1');

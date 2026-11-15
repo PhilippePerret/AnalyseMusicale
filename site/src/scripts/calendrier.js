@@ -1,5 +1,7 @@
 // Calendrier des jeudis de l'analyse (page /jeudis-analyse/).
 // Données : /api/etat.php — séances, visiteur identifié, présences.
+// Liens directs : ?compte=connexion, ?compte=inscription (ouvrent la fenêtre),
+// avec &retour=/chemin/ : page où revenir une fois identifié (ou inscription confirmée).
 // Actions : /api/compte.php, /api/presence.php, /api/seance.php (administrateur).
 
 const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
@@ -226,6 +228,7 @@ async function seConnecter(form) {
   const f = Object.fromEntries(new FormData(form));
   const r = await api('compte.php', { action: 'connexion', email: f.email, mdp: f.mdp, jour: enAttente });
   if (!r.ok) return messageFenetre(form, ERREURS_COMPTE[r.erreur] || 'Identification impossible.');
+  if (retour) { location.href = retour; return; }
   if (enAttente) choisi = enAttente;
   fermer();
   await charger();
@@ -241,6 +244,8 @@ async function sInscrire(form) {
   const presence = enAttente ? ` et votre présence au ${dateLongue(enAttente).toLowerCase()}` : '';
   messageFenetre(form, `Un mail vient de vous être envoyé à <strong>${esc(f.email)}</strong>. Cliquez sur le lien qu’il contient pour confirmer votre inscription${presence}.`, true);
   form.querySelector('button.bouton').disabled = true;
+  // Page où revenir après le clic sur le lien de confirmation (ouvert depuis le mail)
+  try { if (retour) localStorage.setItem('cami-retour', retour); } catch {}
 }
 
 // --- Événements ---
@@ -281,10 +286,24 @@ $('formInscription').addEventListener('change', (e) => { if (e.target.name === '
 document.querySelectorAll('.fenetre .bascule').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); ouvrir(a.dataset.vers); }));
 $('fermer').addEventListener('click', fermer);
 
+// Lien direct vers la fenêtre : /jeudis-analyse/?compte=connexion ou ?compte=inscription
+const params = new URLSearchParams(location.search);
+const compte = params.get('compte');
+const retourDemande = params.get('retour');
+// Seulement une page de ce site
+let retour = retourDemande && /^\/(?!\/)/.test(retourDemande) ? retourDemande : null;
+if (compte === 'connexion' || compte === 'inscription') {
+  history.replaceState(null, '', location.pathname);
+  ouvrir(compte);
+}
+
 // Retour du lien de confirmation
 const confirmation = new URLSearchParams(location.search).get('confirmation');
 if (confirmation) {
   history.replaceState(null, '', location.pathname);
+  let apres = null;
+  try { apres = localStorage.getItem('cami-retour'); localStorage.removeItem('cami-retour'); } catch {}
+  if (confirmation === 'ok' && apres) location.replace(apres);
   $('detail').innerHTML = confirmation === 'ok'
     ? '<p class="message">Inscription confirmée, bienvenue !</p>'
     : '<p class="erreur">Ce lien de confirmation n’est pas (ou plus) valide.</p>';
