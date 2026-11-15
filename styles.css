@@ -1,0 +1,76 @@
+body {
+  font-family: Quicksand;
+  font-size: 18pt;
+  max-width: 1800px;
+}
+.row {
+  margin-top: 80px;
+  padding: 0 2em;
+}
+footer {margin-bottom: 10em}
+/* Généralités */
+a, a:link, a:visited, a:hover {
+  text-decoration: none;
+}
+a, a:link, a:visited, a:hover {color: rgb(10, 111, 10)}
+a:hover {color: rgb(10, 211, 110)}
+
+.bold {font-weight: 600}
+.italic {font-style:italic;}
+
+/* Font Size */
+
+.biggerSize { font-size: 24pt }
+.regSize { font-size: 18pt }
+.miniSize { font-size: 12pt }
+
+/* Alignement */
+
+.center {text-align: center;}
+.right {text-align:right;}
+.valign-middle{vertical-align: middle;}
+
+/* Couleurs */
+
+.regTitleColor {color: #306a30;}
+
+/* Listes */
+ul { 
+  margin-left: 1em;
+}
+ul li {
+  margin-top: 1em;
+}
+
+p {
+  text-align:justify;
+}
+
+.bandeGrise {
+ background-color: #EEEEEE;
+ padding: 1.5em;
+}
+
+h2.titre-exergue {
+  font-weight:bold;color:#ae1919;
+}
+
+
+@media only screen and (min-width: 767px) {
+  /* ÉCRAN */
+  section.content-colonne {
+    margin-left:5em;
+    margin-right:5em;
+    max-width: 840px;
+  }
+  .tiny {
+    font-size:0.65em !important;
+  }
+}
+@media only screen and (max-width: 767px) {
+  /* SMARTPHONE */
+  .tiny {
+    font-size:0.55em !important;
+  }
+}
+

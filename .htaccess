@@ -1,0 +1,5 @@
+# AddHandler cgi-script .rb
+# Options +ExecCGI
+Options -Indexes
+
+DirectoryIndex index.htm
