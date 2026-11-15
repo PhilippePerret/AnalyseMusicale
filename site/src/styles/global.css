@@ -27,7 +27,7 @@ body {
   font-family: 'Quicksand', sans-serif;
   color: var(--texte);
   background: var(--fond);
-  max-width: 1800px;
+  max-width: 1200px;
   margin: 0 auto;
   line-height: 1.5;
 }
