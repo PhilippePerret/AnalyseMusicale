@@ -27,13 +27,14 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
   ) : (
     <>
     <form class="contact-form" id="telechargement" method="post" action="/telechargement.php">
+      <p class="version-courante">Version courante : <strong class="version-table">{TABLE_ANALYSE.version}</strong></p>
       <p class="consigne" id="consigneMail">Pour obtenir le lien de téléchargement de l’application, merci d’indiquer votre adresse mail (ou de <a href="/jeudis-analyse/?compte=connexion&retour=/table-analyse/">vous connecter</a>/<a href="/jeudis-analyse/?compte=inscription&retour=/table-analyse/">vous inscrire</a>)</p>
       <div class="ligne-envoi">
         <input type="email" name="email" required maxlength="200" autocomplete="email" placeholder="adresse mail" aria-labelledby="consigneMail">
         <label>Plateforme
           <select name="fichier" required>
             <option value="">—</option>
-            {TABLE_ANALYSE.telechargements.map((t) => <option value={t.fichier}>{t.systeme}</option>)}
+            {TABLE_ANALYSE.telechargements.map((t) => <option value={t.fichier} data-systeme={t.systeme}>{t.systeme}</option>)}
           </select>
         </label>
         <button type="submit">Obtenir le lien de téléchargement</button>
@@ -47,10 +48,10 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
     </form>
 
     <div id="liens" hidden>
-      <p><span id="merci">Merci ! </span>Choisissez la version pour votre système (version {TABLE_ANALYSE.version}) :</p>
+      <p><span id="merci">Merci ! </span>Choisissez la version pour votre système (version <span class="version-table">{TABLE_ANALYSE.version}</span>) :</p>
       <ul class="telechargements">
         {telechargements.map((t) => (
-          <li><a data-href={t.fichier}>{t.systeme}</a></li>
+          <li><a data-href={t.fichier} data-systeme={t.systeme}>{t.systeme}</a></li>
         ))}
       </ul>
     </div>
@@ -59,6 +60,27 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
   </div>
 
   <script is:inline>
+    // Dernière version publiée (Release GitHub de l'application) : numéro affiché
+    // et liens de téléchargement mis à jour. Sans réponse : valeurs du site gardées.
+    (function () {
+      var EXTENSIONS = { macOS: /\.dmg$/, Windows: /\.exe$/, Linux: /\.AppImage$/ };
+      fetch('https://api.github.com/repos/PhilippePerret/TableAnalyse-nodejs/releases/latest')
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+        .then(function (rel) {
+          var version = String(rel.tag_name || '').replace(/^v/, '');
+          if (!version) return;
+          document.querySelectorAll('.version-table').forEach(function (e) { e.textContent = version; });
+          document.querySelectorAll('[data-systeme]').forEach(function (e) {
+            var motif = EXTENSIONS[e.dataset.systeme];
+            var fichier = (rel.assets || []).find(function (a) { return motif && motif.test(a.name); });
+            if (!fichier) return;
+            if (e.tagName === 'OPTION') e.value = fichier.browser_download_url;
+            else e.dataset.href = fichier.browser_download_url;
+          });
+        })
+        .catch(function () {});
+    })();
+
     // Visiteur identifié : liens affichés directement.
     // Sinon : adresse + plateforme envoyées à /telechargement.php, qui envoie le lien par mail.
     (function () {

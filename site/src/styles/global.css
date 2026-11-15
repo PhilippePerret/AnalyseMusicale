@@ -280,6 +280,7 @@ form.contact-form .ligne-envoi { display: flex; align-items: center; gap: 0.6em;
 form.contact-form .ligne-envoi label { display: flex; align-items: center; gap: 0.5em; font-size: 0.85em; }
 form.contact-form .ligne-envoi label > select { margin-top: 0; }
 form.contact-form .ligne-envoi > input[type=email] { flex: 0 1 16em; }
+form.contact-form p.version-courante { margin: 0; font-size: 0.9em; }
 form.contact-form p.consigne { margin: 0; text-align: left; hyphens: manual; }
 form.contact-form .ligne-envoi button { margin-left: auto; }
 video.demo { width: 100%; height: auto; border: 1px solid #aaaaaa; }

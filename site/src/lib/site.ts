@@ -11,7 +11,8 @@ export type ObjetContact = keyof typeof OBJETS_CONTACT;
 
 // Table d'analyse (page /table-analyse/) : version (mise à jour par
 // _scripts/publier.command de l'application) et fichiers à télécharger,
-// publiés dans la Release GitHub de cette version ; vidéo de
+// publiés dans la Release GitHub de cette version. Valeurs de secours :
+// la page affiche la dernière Release lue sur GitHub à l'ouverture ; vidéo de
 // démonstration (fichier local de public/, non proposée s'il est absent).
 export const TABLE_ANALYSE_VERSION = '3.0.0';
 const RELEASE = `https://github.com/PhilippePerret/TableAnalyse-nodejs/releases/download/v${TABLE_ANALYSE_VERSION}`;
