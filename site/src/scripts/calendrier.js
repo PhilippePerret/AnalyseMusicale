@@ -286,7 +286,13 @@ $('barreCompte').addEventListener('click', async (e) => {
 $('formConnexion').addEventListener('submit', (e) => { e.preventDefault(); seConnecter(e.target); });
 $('formInscription').addEventListener('submit', (e) => { e.preventDefault(); sInscrire(e.target); });
 $('formInscription').addEventListener('change', (e) => { if (e.target.name === 'genre') { genre = e.target.value; appliquerGenre(); } });
-document.querySelectorAll('.fenetre .bascule').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); ouvrir(a.dataset.vers); }));
+// Passage connexion ↔ inscription : l'adresse et le mot de passe déjà saisis sont repris
+document.querySelectorAll('.fenetre .bascule').forEach((a) => a.addEventListener('click', (e) => {
+  e.preventDefault();
+  const [de, vers] = a.dataset.vers === 'inscription' ? [$('formConnexion'), $('formInscription')] : [$('formInscription'), $('formConnexion')];
+  for (const champ of ['email', 'mdp']) if (de.elements[champ].value) vers.elements[champ].value = de.elements[champ].value;
+  ouvrir(a.dataset.vers);
+}));
 $('fermer').addEventListener('click', fermer);
 
 // Lien direct vers la fenêtre : /jeudis-analyse/?compte=connexion ou ?compte=inscription
