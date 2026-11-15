@@ -5,10 +5,7 @@
 
 [.contact-bloc]
 Contact, renseignements et inscription +
-mailto:philippe.perret@analyse-musicale.fr[philippe.perret@analyse-musicale.fr,Les cours particuliers] +
 link:/contact/?objet=cours[ou par le formulaire de contact]
-
-image::/logo-carres-vides-portee-800.jpg[Logo CAMI,role=illustration]
 
 Le COURS D’ANALYSE MUSICALE, c’est…
 
