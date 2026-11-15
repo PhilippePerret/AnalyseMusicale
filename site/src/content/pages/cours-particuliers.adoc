@@ -13,19 +13,21 @@ image::/logo-carres-vides-portee-800.jpg[Logo CAMI,role=illustration]
 Le COURS D’ANALYSE MUSICALE, c’est…
 
 [square]
-* Un apprentissage fondé sur la pratique concrète et dynamique de l’analyse
-* Des œuvres choisies par celui qui apprend ou qui lui sont proposées
-* Des cours individualisés ou en groupe, n’importe où, n’importe quand (par https://zoom.us[Zoom,window=_blank])
+* Un apprentissage fondé sur la pratique concrète et dynamique de l’analyse.
+* Des œuvres choisies par celui qui apprend ou qui lui sont proposées.
+* Des cours individualisés ou en groupe, n’importe où, n’importe quand (par https://zoom.us[Zoom,window=_blank] ou autre logiciel de visioconférence).
 
 [.clear.text-center]
 --
 *DURÉE, FRÉQUENCE & TARIF*
 
-Cours particuliers : 2 heures ^({asterisk})^, 80 € (40 € / heure) +
-Cours en binôme : 2 heures ^({asterisk})^, 50 € (25 € / heure)
+[cols="2,1,2", options="header"]
+|====
+| Désignation         | durée   | Tarif horaire
+| Cours particuliers  | 1 heure | 40 €
+| Cours en binôme     | 1 heure | 25 €
+|====
 
-[.small]
-^({asterisk})^ Possibilité de faire 2 x 1 heure
 
 Fréquence à la convenance de chacun +
 (1 à 2 cours par mois, 1 cours toutes les 6 semaines, etc.)
