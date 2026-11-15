@@ -1,0 +1,7 @@
+= Cours d’Analyse Musicale
+:description: Cours d’analyse musicale de Philippe Perret : les Jeudis de l’analyse (sessions d’analyses en direct) et les cours particuliers.
+:bande: Bienvenue dans l’espace virtuel du Cours d’Analyse Musicale (CAMI) de Philippe PERRET.
+
+[.blocs]
+* link:/jeudis-analyse/[Les _Jeudis de l’analyse_]
+* link:/cours-particuliers/[Les cours particuliers]

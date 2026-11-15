@@ -52,7 +52,7 @@ test('chaque page a un titre, une langue et un pied de page', () => {
     const html = readFileSync(file, 'utf-8');
     assert.match(html, /<html lang="fr">/, file);
     assert.match(html, /<title>[^<]+<\/title>/, file);
-    assert.match(html, /<footer class="row site">/, file);
+    if (!file.endsWith(`${DIST}/index.html`)) assert.match(html, /<footer class="row site">/, file);
   }
 });
 
@@ -85,6 +85,15 @@ test('le contenu AsciiDoc est converti (sous-dossier compris)', () => {
   assert.match(html, /<h1 class="row titre-page">Les Jeudis de l’Analyse \(musicale\)<\/h1>/);
   assert.match(html, /<h2 id="[^"]*">C’est quand \?<\/h2>/);
   assert.doesNotMatch(html, /^== /m);
+});
+
+test('accueil : contenu AsciiDoc, blocs, sans pied de page', () => {
+  const html = readFileSync(resolveLocal('/'), 'utf-8');
+  assert.match(html, /<h1 class="row titre-page">Cours d’Analyse Musicale<\/h1>/);
+  assert.match(html, /class="ulist blocs"/);
+  assert.match(html, /href="\/jeudis-analyse\/"/);
+  assert.doesNotMatch(html, /<footer/);
+  assert.ok(!existsSync(resolveLocal('/accueil/')));
 });
 
 test('page calendrier : structure et lien vers le détail', () => {

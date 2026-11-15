@@ -10,9 +10,10 @@ interface Props {
   bande?: string;         // Texte de la bande grise (HTML autorisé)
   description?: string;
   objetContact?: ObjetContact;
+  piedDePage?: boolean;   // false : pas de liens en bas de page (accueil)
 }
 
-const { title, heading, bande, description, objetContact = 'renseignements' } = Astro.props;
+const { title, heading, bande, description, objetContact = 'renseignements', piedDePage = true } = Astro.props;
 const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} — CAMI`;
 ---
 <!doctype html>
@@ -42,6 +43,7 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
     <slot />
   </main>
 
+  {piedDePage && (
   <footer class="row site">
     <nav>
       <a href="/">Accueil</a><span> — </span>
@@ -51,5 +53,6 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
       <a href={`/contact/?objet=${objetContact}`}>Contact</a>
     </nav>
   </footer>
+  )}
 </body>
 </html>

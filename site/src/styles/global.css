@@ -152,7 +152,18 @@ h1.titre-page {
 .adoc .halign-right { text-align: right; }
 .adoc table caption { font-weight: 600; margin-bottom: 0.5em; }
 
-/* Accueil : blocs côte à côte, empilés sur mobile */
+/* Accueil : blocs côte à côte, empilés sur mobile ([.blocs] dans accueil.adoc) */
+.blocs ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2em;
+}
+.blocs li { display: contents; }
+.blocs li p { display: contents; }
 .blocs {
   display: flex;
   flex-wrap: wrap;
@@ -166,9 +177,8 @@ h1.titre-page {
   padding: 2em;
   font-size: 1.5em;
   text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
+  align-content: center;   /* centrage vertical */
 }
 
 /* Formulaire */
