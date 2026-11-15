@@ -120,7 +120,11 @@ h1.titre-page {
   font-size: 1.33em;
 }
 /* Césure automatique : seulement dans les paragraphes de texte */
-.adoc .paragraph p { hyphens: auto; }
+.adoc .paragraph p { text-align: justify; hyphens: auto; }
+/* …sauf les courts textes de mise en page (contact, centrés, encadrés) */
+.adoc .paragraph.contact-bloc p { text-align: right; hyphens: manual; }
+.adoc .text-center .paragraph p, .adoc .paragraph.text-center p { text-align: center; hyphens: manual; }
+.adoc .bloc-telechargement .paragraph p, .adoc .paragraph.small p { text-align: left; hyphens: manual; }
 .adoc ul { margin-left: 1em; padding-left: 1em; }
 .adoc ul li { margin-top: 1em; }
 .adoc ul.square { list-style: square; }
