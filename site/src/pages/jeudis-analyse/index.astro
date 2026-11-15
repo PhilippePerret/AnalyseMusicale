@@ -30,6 +30,7 @@ import '../../styles/calendrier.css';
 
   <div class="voile" id="voile">
     <div class="fenetre">
+      <button type="button" class="fermer" id="fermer" aria-label="Fermer" title="Fermer">×</button>
       <div id="fConnexion">
         <h3>S’identifier</h3>
         <form id="formConnexion">
@@ -38,7 +39,7 @@ import '../../styles/calendrier.css';
           <p class="message" hidden></p>
           <div class="boutons">
             <a href="#" class="bascule" data-vers="inscription" data-g="Pas encore inscrit[|e] ? S’inscrire"></a>
-            <button class="bouton">Valider</button>
+            <button class="bouton">Se connecter</button>
           </div>
         </form>
       </div>
@@ -61,11 +62,10 @@ import '../../styles/calendrier.css';
           <p class="message" hidden></p>
           <div class="boutons">
             <a href="#" class="bascule" data-vers="connexion" data-g="Déjà inscrit[|e] ? S’identifier"></a>
-            <button class="bouton">Valider</button>
+            <button class="bouton">S’inscrire</button>
           </div>
         </form>
       </div>
-      <div class="boutons"><span></span><button type="button" class="fermer" id="fermer">Fermer</button></div>
     </div>
   </div>
 

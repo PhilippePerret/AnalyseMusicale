@@ -83,7 +83,7 @@ form.edition .boutons { display: flex; gap: 1.2em; align-items: center; justify-
 /* Fenêtre d'identification / inscription */
 .voile { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: none; align-items: center; justify-content: center; padding: 1rem; z-index: 10; }
 .voile.ouvert { display: flex; }
-.fenetre { background: var(--fond); max-width: 26em; width: 100%; padding: 1.4em 1.6em; border-top: 5px solid var(--principal); max-height: 100%; overflow-y: auto; }
+.fenetre { position: relative; background: var(--fond); max-width: 26em; width: 100%; padding: 1.4em 1.6em; border-top: 5px solid var(--principal); max-height: 100%; overflow-y: auto; }
 .fenetre h3 { color: var(--principal); margin: 0 0 0.6em; }
 .fenetre form { display: grid; gap: 0.7em; }
 .fenetre label { display: grid; gap: 0.2em; font-size: 0.9em; }
@@ -95,7 +95,8 @@ form.edition .boutons { display: flex; gap: 1.2em; align-items: center; justify-
 .fenetre .bascule { font-size: 0.85em; }
 .fenetre .message { margin: 0; font-size: 0.9em; color: #a33; }
 .fenetre .message.ok { color: var(--courant); }
-.fenetre .fermer { font: inherit; border: none; background: none; color: var(--gris-logo); cursor: pointer; }
+.fenetre .fermer { position: absolute; top: 0.3em; right: 0.5em; font-size: 1.5em; line-height: 1; border: none; background: none; color: var(--gris-logo); cursor: pointer; padding: 0.1em 0.2em; }
+.fenetre .fermer:hover { color: var(--survol); }
 .fenetre .piege { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 
 @media (max-width: 700px) {
