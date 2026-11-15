@@ -49,11 +49,13 @@ import '../../styles/calendrier.css';
           <label>Adresse e-mail <input type="email" name="email" required maxlength="200" autocomplete="email"></label>
           <label>Pseudo (facultatif) <input type="text" name="pseudo" maxlength="60" autocomplete="nickname"></label>
           <label>Mot de passe <input type="password" name="mdp" required minlength="8" autocomplete="new-password"></label>
-          <div class="genre">Vous êtes…
-            <label><input type="radio" name="genre" value="F"> une femme</label>
-            <label><input type="radio" name="genre" value="H"> un homme</label>
-            <label><input type="radio" name="genre" value="N" checked> discret</label>
-          </div>
+          <label class="genre">Vous êtes…
+            <select name="genre">
+              <option value="N" selected>discret</option>
+              <option value="F">une femme</option>
+              <option value="H">un homme</option>
+            </select>
+          </label>
           <div class="cases">
             <label><input type="checkbox" name="avertir" checked> <span data-g="M’avertir des prochains jeudis"></span></label>
             <label><input type="checkbox" name="auditeur"> <span data-g="Je compte venir en audit[eur|rice] libre"></span></label>
