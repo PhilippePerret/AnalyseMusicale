@@ -44,6 +44,7 @@ table.grille td { vertical-align: top; }
 .detail .date { font-weight: 700; padding-right: 4em; text-transform: uppercase; letter-spacing: 0.03em; }
 .detail .date sup { text-transform: none; }
 .detail .actions { margin-top: 0.7em; display: flex; flex-wrap: wrap; gap: 0.8em 1.4em; align-items: center; }
+.detail .studio { font-size: 0.85em; margin-top: 0.3em; }
 .detail .editer { position: absolute; top: 0.7em; right: 1em; font-size: 0.85em; }
 .detail .message { color: var(--courant); font-weight: 700; }
 .detail .erreur { color: #a33; }

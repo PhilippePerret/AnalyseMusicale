@@ -8,7 +8,14 @@ const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août'
 const OEIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const DEFAUT = { compositeur: '', oeuvre: '', analyste: 'Ph. Perret', debut: '19:00', fin: '22:00', youtube: '', partition: '' };
 const HEURES = Array.from({ length: 15 }, (_, i) => `${String(9 + i).padStart(2, '0')}:00`);
-const MOIS_AVANT = 1, MOIS_APRES = 4;   // période affichée autour du mois courant
+const MOIS_AVANT = 1, MOIS_APRES = 4;
+const STUDIO = 'https://studio.youtube.com/channel/UCX3XhJw9x1RsVx1s3GNYceA/livestreaming';   // directs de la chaîne
+
+// Lien YouTube Studio d'une séance (administrateur) : page du direct, ou liste des directs
+function lienStudio(youtube) {
+  const id = (youtube || '').match(/[?&]v=([\w-]{6,})/)?.[1];
+  return id ? `https://studio.youtube.com/video/${id}/livestreaming` : STUDIO;
+}   // période affichée autour du mois courant
 
 let etat = { maintenant: '', seances: {}, user: null, presences: [] };
 let choisi = null, enAttente = null, message = '';
@@ -131,6 +138,7 @@ function afficherDetail(k) {
      <div>${piece}</div>
      <div>Analyste principal : ${txt(s.analyste)}</div>
      ${s.partition ? `<div><a href="${esc(s.partition)}" target="_blank" rel="noopener">Télécharger la partition</a></div>` : ''}
+     ${admin() ? `<div class="studio"><a href="${esc(lienStudio(s.youtube))}" target="_blank" rel="noopener">${s.youtube ? 'Ce direct dans YouTube Studio' : 'Les directs dans YouTube Studio'}</a></div>` : ''}
      <div class="actions">${actions.join('')}</div>${msg}`;
 }
 
