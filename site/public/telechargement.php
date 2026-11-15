@@ -9,7 +9,7 @@ const FICHIER      = __DIR__ . '/donnees/inscrits.csv';
 
 header('Content-Type: application/json; charset=utf-8');
 
-function repondre(bool $ok, string $error = ''): never {
+function repondre(bool $ok, string $error = ''): void {
   echo json_encode(['ok' => $ok, 'error' => $error]);
   exit;
 }
