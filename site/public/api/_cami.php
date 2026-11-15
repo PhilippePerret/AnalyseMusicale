@@ -36,7 +36,8 @@ CREATE TABLE IF NOT EXISTS seances (
   analyste TEXT NOT NULL DEFAULT 'Ph. Perret',
   debut TEXT NOT NULL DEFAULT '19:00',
   fin TEXT NOT NULL DEFAULT '22:00',
-  youtube TEXT NOT NULL DEFAULT ''
+  youtube TEXT NOT NULL DEFAULT '',
+  partition TEXT NOT NULL DEFAULT ''   -- URL de la partition
 );
 CREATE TABLE IF NOT EXISTS telechargements (   -- demandes de lien de la Table d'analyse
   id INTEGER PRIMARY KEY,
@@ -67,7 +68,14 @@ function db(): PDO {
   ]);
   $pdo->exec('PRAGMA foreign_keys = ON');
   $pdo->exec(SCHEMA);
+  migrer($pdo);
   return $pdo;
+}
+
+// Colonnes ajoutées après la création de la base
+function migrer(PDO $pdo): void {
+  $colonnes = $pdo->query('PRAGMA table_info(seances)')->fetchAll(PDO::FETCH_COLUMN, 1);
+  if (!in_array('partition', $colonnes, true)) $pdo->exec("ALTER TABLE seances ADD COLUMN partition TEXT NOT NULL DEFAULT ''");
 }
 
 // --- Session (fichiers dans le dossier des données, 90 jours) ---

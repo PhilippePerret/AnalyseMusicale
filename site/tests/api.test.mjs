@@ -110,6 +110,10 @@ test('administrateur : création, modification, contrôles, suppression', { skip
   assert.equal(s.analyste, 'M. Dupont');
   assert.equal(s.fin, '23:00');
 
+  r = await admin.post('seance.php', { action: 'enregistrer', jour: JOUR, debut: '19:00', fin: '22:00', partition: 'https://imslp.org/partition.pdf' });
+  assert.equal((await admin.etat()).seances[JOUR].partition, 'https://imslp.org/partition.pdf');
+  assert.equal((await admin.post('seance.php', { action: 'enregistrer', jour: JOUR, debut: '19:00', fin: '22:00', partition: 'javascript:x' })).erreur, 'partition');
+
   assert.equal((await admin.post('seance.php', { action: 'enregistrer', jour: JOUR, debut: '22:00', fin: '20:00' })).erreur, 'heures');
   assert.equal((await admin.post('seance.php', { action: 'enregistrer', jour: JOUR, debut: '19:00', fin: '22:00', youtube: 'javascript:alert(1)' })).erreur, 'youtube');
   assert.equal((await admin.post('seance.php', { action: 'enregistrer', jour: '2026-11-18', debut: '19:00', fin: '22:00' })).erreur, 'jour');   // un mercredi

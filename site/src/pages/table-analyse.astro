@@ -50,7 +50,7 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
       <p><span id="merci">Merci ! </span>Choisissez la version pour votre système (version {TABLE_ANALYSE.version}) :</p>
       <ul class="telechargements">
         {telechargements.map((t) => (
-          <li><a data-href={t.fichier} download>{t.systeme}</a></li>
+          <li><a data-href={t.fichier}>{t.systeme}</a></li>
         ))}
       </ul>
     </div>

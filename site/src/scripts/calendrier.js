@@ -6,7 +6,7 @@
 
 const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const OEIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
-const DEFAUT = { compositeur: '', oeuvre: '', analyste: 'Ph. Perret', debut: '19:00', fin: '22:00', youtube: '' };
+const DEFAUT = { compositeur: '', oeuvre: '', analyste: 'Ph. Perret', debut: '19:00', fin: '22:00', youtube: '', partition: '' };
 const HEURES = Array.from({ length: 15 }, (_, i) => `${String(9 + i).padStart(2, '0')}:00`);
 const MOIS_AVANT = 1, MOIS_APRES = 4;   // période affichée autour du mois courant
 
@@ -130,6 +130,7 @@ function afficherDetail(k) {
     `${lienEditer}<div class="date">${dateLongue(k)}, ${heure(s.debut)} – ${heure(s.fin)}</div>
      <div>${piece}</div>
      <div>Analyste principal : ${txt(s.analyste)}</div>
+     ${s.partition ? `<div><a href="${esc(s.partition)}" target="_blank" rel="noopener">Télécharger la partition</a></div>` : ''}
      <div class="actions">${actions.join('')}</div>${msg}`;
 }
 
@@ -157,6 +158,7 @@ function editer(k, erreur = '') {
          ${menuHeures('fin', 'Fin', s.fin, '23:00')}
        </div>
        <label class="en-ligne lien">Lien du direct YouTube <input type="url" name="youtube" value="${esc(s.youtube)}" maxlength="300" placeholder="https://www.youtube.com/live/…"></label>
+       <label class="en-ligne lien">URL de la partition <input type="url" name="partition" value="${esc(s.partition)}" maxlength="300" placeholder="https://…"></label>
        <div class="aide">^texte^ = exposant (ex. 1^er^)</div>
        ${erreur ? `<p class="erreur">${erreur}</p>` : ''}
        <div class="boutons">
@@ -170,6 +172,7 @@ function editer(k, erreur = '') {
 const ERREURS_SEANCE = {
   heures: 'L’heure de fin doit être après l’heure de début.',
   youtube: 'Le lien YouTube doit commencer par https://',
+  partition: 'L’URL de la partition doit commencer par https:// (ou http://)',
   admin: 'Action réservée à l’administration.',
 };
 

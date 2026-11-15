@@ -13,3 +13,5 @@ temp/
 site/node_modules/
 site/dist/
 site/.astro/
+site/public/telechargements/*
+!site/public/telechargements/demo-table-analyse.mp4

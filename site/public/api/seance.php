@@ -20,10 +20,12 @@ $fin = $heure($e['fin'] ?? null, '09:00', '23:00');
 $youtube = trim((string) ($e['youtube'] ?? ''));
 if (!$debut || !$fin || $fin <= $debut) repondre(['ok' => false, 'erreur' => 'heures'], 422);
 if ($youtube !== '' && !preg_match('#^https://[^\s"<>]+$#', $youtube)) repondre(['ok' => false, 'erreur' => 'youtube'], 422);
+$partition = trim((string) ($e['partition'] ?? ''));
+if ($partition !== '' && !preg_match('#^https?://[^\s"<>]+$#', $partition)) repondre(['ok' => false, 'erreur' => 'partition'], 422);
 $analyste = texte($e['analyste'] ?? '', 80) ?: 'Ph. Perret';
 
-db()->prepare('INSERT INTO seances (jour, compositeur, oeuvre, analyste, debut, fin, youtube) VALUES (?, ?, ?, ?, ?, ?, ?)
+db()->prepare('INSERT INTO seances (jour, compositeur, oeuvre, analyste, debut, fin, youtube, partition) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   ON CONFLICT(jour) DO UPDATE SET compositeur = excluded.compositeur, oeuvre = excluded.oeuvre,
-  analyste = excluded.analyste, debut = excluded.debut, fin = excluded.fin, youtube = excluded.youtube')
-  ->execute([$jour, texte($e['compositeur'] ?? '', 80), texte($e['oeuvre'] ?? '', 200), $analyste, $debut, $fin, mb_substr($youtube, 0, 300)]);
+  analyste = excluded.analyste, debut = excluded.debut, fin = excluded.fin, youtube = excluded.youtube, partition = excluded.partition')
+  ->execute([$jour, texte($e['compositeur'] ?? '', 80), texte($e['oeuvre'] ?? '', 200), $analyste, $debut, $fin, mb_substr($youtube, 0, 300), mb_substr($partition, 0, 300)]);
 repondre(['ok' => true]);

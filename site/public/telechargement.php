@@ -20,16 +20,15 @@ if (trim($_POST['site_web'] ?? '') !== '') reponse(true);
 $email = trim($_POST['email'] ?? '');
 if (mb_strlen($email) > 200 || !filter_var($email, FILTER_VALIDATE_EMAIL)) reponse(false, 'email');
 
-// Fichier de la plateforme : /telechargements/<nom>, présent sur le serveur
+// Fichier de la plateforme : dans une Release GitHub de l'application
 $fichier = (string) ($_POST['fichier'] ?? '');
 $systeme = texte($_POST['systeme'] ?? '', 40);
-if (!preg_match('#^/telechargements/[\w.-]+$#', $fichier)) reponse(false, 'plateforme');
-if (!is_file(__DIR__ . $fichier)) reponse(false, 'indisponible');
+if (!preg_match('#^https://github\.com/PhilippePerret/TableAnalyse-nodejs/releases/download/v[\d.]+/[\w.-]+$#', $fichier)) reponse(false, 'plateforme');
 
 // Lien de téléchargement envoyé au demandeur
 $corps = "Bonjour,\n\n"
   . "Voici le lien pour télécharger la Table d’analyse ($systeme) :\n\n"
-  . SITE . $fichier . "\n\n"
+  . $fichier . "\n\n"
   . "Bonnes analyses !\n\nPhilippe Perret\nCours d’Analyse Musicale — " . SITE . "\n";
 if (!envoyer_mail($email, 'Votre lien de téléchargement de la Table d’analyse', $corps)) reponse(false, 'envoi');
 
