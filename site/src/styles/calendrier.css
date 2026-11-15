@@ -50,8 +50,6 @@ table.grille td { vertical-align: top; }
 .direct::before { content: '● '; }
 .direct.inactif { color: #bbb; cursor: not-allowed; }
 .direct.actif { color: var(--courant); font-weight: 700; }
-button.bouton { font: inherit; padding: 0.35em 1.2em; border: 1px solid var(--principal); background: var(--fond); color: var(--principal); cursor: pointer; border-radius: 3px; }
-button.bouton:hover { background: var(--survol); border-color: var(--survol); color: #fff; }
 .inscrit-ok { color: var(--principal); font-weight: 700; }
 
 /* Formulaire d'édition (administrateur) */

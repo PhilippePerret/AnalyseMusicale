@@ -222,19 +222,24 @@ form.contact-form label.message-libelle { font-size: 0.9em; }
 @media (max-width: 600px) {
   form.contact-form label.en-regard { grid-template-columns: 1fr; gap: 0.2em; }
 }
-form.contact-form button {
+/* Boutons (et liens en forme de bouton) : style sobre, commun à tout le site */
+form.contact-form button,
+ul.telechargements a,
+button.bouton {
   font: inherit;
   font-size: 0.9em;
   line-height: 1.25;
   justify-self: start;
   padding: 0.15em 1em;
+  border: 1px solid #aaaaaa;
   border-radius: 3px;
-  border: 1px solid var(--vert-lien);
-  background: var(--fond);
-  color: var(--vert-lien);
+  background: #f4f4f4;
+  color: var(--texte);
   cursor: pointer;
 }
-form.contact-form button:hover { color: var(--vert-survol); border-color: var(--vert-survol); }
+form.contact-form button:hover,
+ul.telechargements a:hover,
+button.bouton:hover { border-color: var(--survol); color: var(--survol); background: var(--fond); }
 /* Champ piège anti-robots : invisible pour les humains */
 form.contact-form .piege {
   position: absolute;
@@ -285,5 +290,5 @@ form.contact-form p.consigne { margin: 0; text-align: left; hyphens: manual; }
 form.contact-form .ligne-envoi button { margin-left: auto; }
 video.demo { width: 100%; height: auto; border: 1px solid #aaaaaa; }
 ul.telechargements { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 1em; }
-ul.telechargements a { display: inline-block; padding: 0.4em 1.5em; border: 1px solid var(--vert-lien); }
+ul.telechargements a { display: inline-block; }
 form.contact-form .message { color: #b00020; margin: 0; }
