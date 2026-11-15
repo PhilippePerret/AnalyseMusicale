@@ -1,7 +1,9 @@
 # Build du site Astro (dossier site/) et envoi sur Alwaysdata.
 #
-# Cible UNIQUE et écrite en dur : /home/icare/www/analyse_musicale/
-# Rien d'autre sur le serveur n'est touché.
+# Cible UNIQUE : /home/icare/www/analyse_musicale/
+# La clé de déploiement est bridée côté serveur (rrsync dans authorized_keys) :
+# elle ne peut écrire que dans ce dossier, les chemins sont relatifs à lui.
+# Le dossier donnees/ (fichiers créés par le site) est protégé de --delete.
 #
 # Pour l'instant : lancement manuel uniquement (onglet Actions > Déploiement > Run workflow),
 # en mode test (dry-run) par défaut : rsync liste ce qu'il ferait sans rien écrire.
@@ -34,7 +36,7 @@ jobs:
         working-directory: site
     env:
       SSH_HOST: ssh-icare.alwaysdata.net
-      CIBLE: /home/icare/www/analyse_musicale/
+      CIBLE: ./
       DRY_RUN: ${{ github.event_name != 'workflow_dispatch' && 'false' || inputs.dry_run }}
     steps:
       - uses: actions/checkout@v4
@@ -66,6 +68,6 @@ jobs:
 
       - name: Envoi (rsync)
         run: |
-          OPTS="-rlvz --checksum --delete"
-          [ "$DRY_RUN" = "true" ] && OPTS="$OPTS --dry-run" && echo "=== MODE TEST : rien n'est écrit ==="
-          rsync $OPTS -e "ssh -i ~/.ssh/id_deploy" dist/ "${{ secrets.ALWAYSDATA_SSH_USER }}@$SSH_HOST:$CIBLE"
+          OPTS=(-rlvz --checksum --delete --filter='P donnees/***')
+          if [ "$DRY_RUN" = "true" ]; then OPTS+=(--dry-run); echo "=== MODE TEST : rien n'est écrit ==="; fi
+          rsync "${OPTS[@]}" -e "ssh -i ~/.ssh/id_deploy" dist/ "${{ secrets.ALWAYSDATA_SSH_USER }}@$SSH_HOST:$CIBLE"
