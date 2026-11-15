@@ -120,8 +120,7 @@ h1.titre-page {
   font-size: 1.33em;
 }
 /* Césure automatique : seulement dans les paragraphes de texte */
-.adoc .paragraph p { text-align: justify; hyphens: auto; }
-.adoc p { text-align: justify; }
+.adoc .paragraph p { hyphens: auto; }
 .adoc ul { margin-left: 1em; padding-left: 1em; }
 .adoc ul li { margin-top: 1em; }
 .adoc ul.square { list-style: square; }
