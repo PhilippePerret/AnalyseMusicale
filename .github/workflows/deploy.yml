@@ -1,0 +1,71 @@
+# Build du site Astro (dossier site/) et envoi sur Alwaysdata.
+#
+# Cible UNIQUE et écrite en dur : /home/icare/www/analyse_musicale/
+# Rien d'autre sur le serveur n'est touché.
+#
+# Pour l'instant : lancement manuel uniquement (onglet Actions > Déploiement > Run workflow),
+# en mode test (dry-run) par défaut : rsync liste ce qu'il ferait sans rien écrire.
+# Une fois validé, décommenter le bloc « push » pour déployer à chaque git push sur main.
+#
+# Secrets à créer dans GitHub (Settings > Secrets and variables > Actions) :
+#   ALWAYSDATA_SSH_KEY  : clé privée SSH autorisée sur le compte Alwaysdata
+#   ALWAYSDATA_SSH_USER : utilisateur SSH (ex. icare)
+
+name: Déploiement
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Mode test (rien n’est écrit sur le serveur)'
+        type: boolean
+        default: true
+  # push:
+  #   branches: [main]
+  #   paths: ['site/**']
+
+concurrency: deploiement
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    env:
+      SSH_HOST: ssh-icare.alwaysdata.net
+      CIBLE: /home/icare/www/analyse_musicale/
+      DRY_RUN: ${{ github.event_name != 'workflow_dispatch' && 'false' || inputs.dry_run }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Installation
+        run: npm ci
+
+      - name: Build et tests (PHP compris)
+        run: npm test
+
+      - name: Garde-fou (dist/ complet)
+        run: |
+          test -f dist/index.html
+          test -f dist/contact.php
+          test -f dist/.htaccess
+
+      - name: Clé SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ALWAYSDATA_SSH_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts
+
+      - name: Envoi (rsync)
+        run: |
+          OPTS="-rlvz --checksum --delete"
+          [ "$DRY_RUN" = "true" ] && OPTS="$OPTS --dry-run" && echo "=== MODE TEST : rien n'est écrit ==="
+          rsync $OPTS -e "ssh -i ~/.ssh/id_deploy" dist/ "${{ secrets.ALWAYSDATA_SSH_USER }}@$SSH_HOST:$CIBLE"

@@ -1,0 +1,73 @@
+= Les Jeudis de l’Analyse (musicale)
+:description: Les Jeudis de l’analyse : rendez-vous bimensuels gratuits en visioconférence pour découvrir et pratiquer l’analyse musicale.
+:objet-contact: jeudis
+:bande: _Espace virtuel du Cours d’Analyse Musicale (CAMI) de Philippe PERRET._
+
+[.contact-bloc]
+Contact et renseignements +
+mailto:philippe.perret@analyse-musicale.fr[philippe.perret@analyse-musicale.fr,Les Jeudis de l’analyse] +
+link:/contact/?objet=jeudis[ou par le formulaire de contact]
+
+== Les _**jeudis de l’analyse**_, qu’est-ce que c’est ?
+
+Ce sont des rendez-vous bimensuels, en visioconférence, permettant de découvrir l’**analyse musicale**, de s’y entrainer et d’aborder autrement les pièces du répertoire ou la musique en général.
+
+== C’est quand ?
+
+*Le premier et le troisième jeudi de chaque mois de 20 heures à 21 heures 30.*
+
+== C’est où ?
+
+Ces _Jeudis de l’analyse_ se déroulent dans une salle de réunion https://zoom.us[Zoom,window=_blank] dédiée, dont le lien peut vous être fourni par link:/contact/?objet=jeudis[simple demande].
+
+== Pour qui ?
+
+Pour toute personne sachant lire une partition de piano (sans être pour autant un ou une experte de la lecture à vue) et connaissant un rudiment de théorie (les intervalles, le principe des gammes et des accords — même si tous ces points seront rappelés, souvent).
+
+Autant dire qu’**aucune compétence particulière en analyse musicale n’est requise** pour participer à ces réunions.
+
+== Pour quoi ?
+
+Le but principal de ces _jeudis de l’analyse_ vise en premier lieu à **__démocratiser__ l’analyse musicale**, discipline qui effraie encore beaucoup trop de musiciens et de musiciennes, élèves ou non, alors que sa pratique, intégrée naturellement à tout bon enseignement, est fondamentale aussi bien à la compréhension de ce qu’on joue et donc à l’interprétation, que pour la mémorisation rapide et durable, ou encore pour l’accompagnement, l’histoire de la musique ou la lecture à vue (cette liste est non exhaustive).
+
+Un autre but de ces réunions vise bien sûr à partager ses approches et ses compréhensions de la musique, dans toutes leurs diversités et leurs variétés, loin de tout dogmatisme.
+
+== Quelles pièces ?
+
+En priorité, les pièces étudiées seront celles proposées par les participants (pourvu qu’elles soient adaptées au niveau des plus réguliers).
+
+Il s’agira principalement de pièces classiques, pas seulement pour le piano. Mais il sera tout à fait possible, pourvu qu’une partition puisse servir de support, de proposer des œuvres provenant d’autres sources, musique populaire, traditionnelle, jazz, etc.
+
+== Comment ça se passe ?
+
+L’emploi du temps de ces réunions n’est pas gravé dans le marbre. Il peut varier au gré des circonstances et des envies.
+
+À titre de repère, on trouve un premier temps, court, consacré à la théorie, qui permet de découvrir ou d’approfondir ses connaissances. Ce temps peut être remplacé par un quiz permettant de confirmer ou corriger ses connaissances.
+
+Un second temps plus long est ensuite consacré à l’analyse proprement dite, de façon collégiale — chacun pouvant participer à sa guise. Cette analyse, souvent, se déroule sur plusieurs séances.
+
+Ainsi, *toute personne présente peut rester simple spectateur ou spectatrice, ou participer activement aux analyses et aux débats*.
+
+== Quel niveau ?
+
+Pour le moment, les rendez-vous concernent tous les niveaux de musiciens, hormis les experts de l’analyse ou de la musicologie. Nous le redisons, ces réunions visent à initier à l’analyse musicale de « simples » musiciens.
+
+Aux musiciens qui se sentiraient en dessous du niveau requis pourront être proposés des travaux à faire pour se mettre à niveau (concernant par exemple la lecture ou la connaissance des accords).
+
+S’il s’avérait à la longue qu’une trop grande disparité composait l’assistance, on pourrait imaginer deux groupes distincts dans deux créneaux différents.
+
+== À quelles conditions ?
+
+Il n’y a aucune condition à la participation à ces rendez-vous, ni financière, ni de diplôme ou de formation. L’entrée est libre et gratuite pour tout un chacun, à tout moment de l’année.
+
+La seule exigence imposée est d’arriver à l’heure, afin de ne pas perturber le déroulement de la réunion.
+
+== Par qui ?
+
+Je suis Philippe Perret, l’instigateur de ces jeudis, Premier Prix d’Analyse Musicale à l’unanimité, Prix Sacem 1992 pour mon mémoire, directeur de la https://icare-editions.fr[collection d’analyses « Comprendre & apprendre » pour les éditions Icare,window=_blank], je suis passionné de musique, d’analyse musicale et de pédagogie (vous pouvez en apprendre plus link:/pedagogue/[sur cette page]).
+
+Mais en vérité, si je suis l’animateur principal de ces _jeudis_, quiconque participant à ces réunions peut prendre les rênes et venir présenter une œuvre et son analyse personnelle, au bénéfice de tous. C’est aussi la vocation de ces rendez-vous !
+
+== Intéressé(e) ?
+
+*Vous êtes intéressé(e) par ces « Jeudis de l’analyse » ?* Ou vous voulez en savoir plus ? Vous pouvez, par link:/contact/?objet=jeudis[simple requête en cliquant ici], *demander le lien vers la salle de réunion Zoom* dédiée ou poser vos questions.

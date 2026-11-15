@@ -1,0 +1,55 @@
+---
+import '@fontsource/quicksand/latin-400.css';
+import '@fontsource/quicksand/latin-700.css';
+import '../styles/global.css';
+import type { ObjetContact } from '../lib/site';
+
+interface Props {
+  title: string;          // Titre de l'onglet
+  heading?: string;       // Grand titre vert en tête de page
+  bande?: string;         // Texte de la bande grise (HTML autorisé)
+  description?: string;
+  objetContact?: ObjetContact;
+}
+
+const { title, heading, bande, description, objetContact = 'renseignements' } = Astro.props;
+const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} — CAMI`;
+---
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{fullTitle}</title>
+  {description && <meta name="description" content={description}>}
+  <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)}>
+  <link rel="icon" href="/logo-carres-lettres-portee-200.jpg">
+</head>
+<body>
+  <header class="site">
+    <a class="logo" href="/">
+      <img src="/logo-carres-lettres-portee-200.jpg" width="80" height="56" alt="Logo CAMI">
+      <span>CAMI</span>
+    </a>
+    {Astro.url.pathname !== '/' && (
+      <div class="nom">Cours<br>d’Analyse<br>Musicale</div>
+    )}
+  </header>
+
+  <main>
+    {heading && <h1 class="row titre-page">{heading}</h1>}
+    {bande && <div class="row bande-grise" set:html={bande} />}
+    <slot />
+  </main>
+
+  <footer class="row site">
+    <nav>
+      <a href="/">Accueil</a><span> — </span>
+      <a href="/cours-particuliers/">Les cours particuliers</a><span> — </span>
+      <a href="/jeudis-analyse/">Les jeudis de l’analyse</a><span> — </span>
+      <a href="/pedagogue/">Philippe Perret, pédagogue</a><span> — </span>
+      <a href={`/contact/?objet=${objetContact}`}>Contact</a>
+    </nav>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,10 @@
+---
+import Base from '../../layouts/Base.astro';
+import { EMAIL } from '../../lib/site';
+---
+<Base title="Message non envoyé" heading="Message non envoyé">
+  <div class="row center colonne">
+    <p>Désolé, votre message n’a pas pu être envoyé (champ manquant ou adresse e-mail invalide).</p>
+    <p><a href="/contact/">Revenir au formulaire</a> ou écrire directement à <a href={`mailto:${EMAIL}`}>{EMAIL}</a>.</p>
+  </div>
+</Base>

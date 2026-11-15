@@ -8,3 +8,8 @@ tmp/
 
 temp/
 
+
+# Site Astro
+site/node_modules/
+site/dist/
+site/.astro/
