@@ -5,7 +5,7 @@
 
 [.contact-bloc]
 Contact, renseignements et inscription +
-link:/contact/?objet=cours[ou par le formulaire de contact]
+link:/contact/?objet=cours[→ formulaire de contact]
 
 Le COURS D’ANALYSE MUSICALE, c’est…
 
