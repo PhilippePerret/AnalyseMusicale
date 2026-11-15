@@ -118,6 +118,13 @@ test('administrateur : création, modification, contrôles, suppression', { skip
   assert.equal((await admin.post('seance.php', { action: 'enregistrer', jour: JOUR, debut: '19:00', fin: '22:00', youtube: 'javascript:alert(1)' })).erreur, 'youtube');
   assert.equal((await admin.post('seance.php', { action: 'enregistrer', jour: '2026-11-18', debut: '19:00', fin: '22:00' })).erreur, 'jour');   // un mercredi
 
+  // Direct YouTube demandé sans autorisation : séance enregistrée, avertissement
+  const avecDirect = jeudiFutur(6);
+  r = await admin.post('seance.php', { action: 'enregistrer', jour: avecDirect, compositeur: 'Bach', debut: '19:00', fin: '22:00', creer_direct: true });
+  assert.equal(r.ok, true);
+  assert.equal(r.avertissement, 'youtube_non_autorise');
+  assert.equal((await admin.etat()).seances[avecDirect].compositeur, 'Bach');
+
   const autre = jeudiFutur(5);
   await admin.post('seance.php', { action: 'enregistrer', jour: autre, debut: '19:00', fin: '22:00' });
   r = await admin.post('seance.php', { action: 'supprimer', jour: autre });

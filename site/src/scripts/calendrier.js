@@ -159,6 +159,7 @@ function editer(k, erreur = '') {
        </div>
        <label class="en-ligne lien">Lien du direct YouTube <input type="url" name="youtube" value="${esc(s.youtube)}" maxlength="300" placeholder="https://www.youtube.com/live/…"></label>
        <label class="en-ligne lien">URL de la partition <input type="url" name="partition" value="${esc(s.partition)}" maxlength="300" placeholder="https://…"></label>
+       ${s.youtube ? '' : '<label class="case-direct"><input type="checkbox" name="creer_direct"> Créer le direct YouTube (programmé à l’heure de début)</label>'}
        <div class="aide">^texte^ = exposant (ex. 1^er^)</div>
        ${erreur ? `<p class="erreur">${erreur}</p>` : ''}
        <div class="boutons">
@@ -176,10 +177,22 @@ const ERREURS_SEANCE = {
   admin: 'Action réservée à l’administration.',
 };
 
+const ERREURS_DIRECT = {
+  youtube_non_autorise: 'le site n’est pas encore autorisé à créer des directs (scripts/youtube-autoriser.command)',
+  youtube_api: 'YouTube a refusé la création',
+  debut: 'l’heure de début de la séance n’est pas réglée',
+};
+
 async function enregistrer(k, form) {
-  const r = await api('seance.php', { action: 'enregistrer', jour: k, ...Object.fromEntries(new FormData(form)) });
+  const champs = Object.fromEntries(new FormData(form));
+  const r = await api('seance.php', { action: 'enregistrer', jour: k, ...champs, creer_direct: !!champs.creer_direct });
   if (!r.ok) return editer(k, ERREURS_SEANCE[r.erreur] || 'Enregistrement impossible.');
   message = 'Séance enregistrée.';
+  if (r.direct) {
+    message += ` Direct YouTube créé : <a href="${esc(r.direct)}" target="_blank" rel="noopener">${esc(r.direct)}</a>`;
+    if (r.flux?.cle) message += `<br><small>Logiciel de diffusion — serveur : ${esc(r.flux.serveur)} · clé du flux : <code>${esc(r.flux.cle)}</code></small>`;
+  }
+  if (r.avertissement) message += ` <span class="erreur">Direct YouTube non créé : ${ERREURS_DIRECT[r.avertissement] || r.avertissement}.</span>`;
   await charger();
 }
 

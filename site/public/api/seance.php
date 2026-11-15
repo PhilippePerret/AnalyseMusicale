@@ -1,6 +1,8 @@
 <?php
 // POST {action: enregistrer | supprimer, jour, …} : édition d'une séance (administrateur).
+// creer_direct: true → crée aussi le direct YouTube programmé (si pas encore de lien).
 require __DIR__ . '/_cami.php';
+require __DIR__ . '/_youtube.php';
 
 $e = entree_post();
 if (!est_admin(user_courant())) repondre(['ok' => false, 'erreur' => 'admin'], 403);
@@ -28,4 +30,14 @@ db()->prepare('INSERT INTO seances (jour, compositeur, oeuvre, analyste, debut, 
   ON CONFLICT(jour) DO UPDATE SET compositeur = excluded.compositeur, oeuvre = excluded.oeuvre,
   analyste = excluded.analyste, debut = excluded.debut, fin = excluded.fin, youtube = excluded.youtube, partition = excluded.partition')
   ->execute([$jour, texte($e['compositeur'] ?? '', 80), texte($e['oeuvre'] ?? '', 200), $analyste, $debut, $fin, mb_substr($youtube, 0, 300), mb_substr($partition, 0, 300)]);
-repondre(['ok' => true]);
+
+if (empty($e['creer_direct']) || $youtube !== '') repondre(['ok' => true]);
+
+// Séance enregistrée ; création du direct (un échec n'annule pas l'enregistrement)
+try {
+  $lien = creer_direct(seance($jour));
+  db()->prepare('UPDATE seances SET youtube = ? WHERE jour = ?')->execute([$lien, $jour]);
+  repondre(['ok' => true, 'direct' => $lien, 'flux' => infos_flux()]);
+} catch (ErreurYoutube $err) {
+  repondre(['ok' => true, 'avertissement' => $err->getMessage()]);
+}

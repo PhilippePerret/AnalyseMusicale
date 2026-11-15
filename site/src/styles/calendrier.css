@@ -66,6 +66,7 @@ form.edition .une-ligne { flex-wrap: nowrap; align-items: center; gap: 1.6em; }
 form.edition .une-ligne label.en-ligne { white-space: nowrap; }
 form.edition input.analyste { width: 9em; }
 form.edition .lien input { width: 24em; max-width: 100%; }
+form.edition label.case-direct { display: flex; gap: 0.5em; align-items: center; }
 form.edition .aide { font-size: 0.75em; color: #888; }
 form.edition .boutons { display: flex; gap: 1.2em; align-items: center; justify-content: space-between; margin-top: 0.3em; }
 form.edition button.annuler { font-size: 0.75em; }
