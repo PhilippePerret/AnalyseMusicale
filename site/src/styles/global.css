@@ -133,6 +133,7 @@ h1.titre-page {
 .adoc .text-center, .adoc .text-center p { text-align: center; }
 .adoc .text-right, .adoc .text-right p { text-align: right; }
 .adoc .small { font-size: 0.67em; }
+.adoc .medium { font-size: 0.85em; }
 .adoc .title {
   font-weight: 600;
 }
