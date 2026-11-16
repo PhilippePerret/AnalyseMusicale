@@ -143,7 +143,9 @@ function afficherDetail(k) {
 }
 
 function montrerDetail() {
-  $('detail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  const r = $('detail').getBoundingClientRect();
+  const manque = r.bottom - window.innerHeight + 40;
+  if (manque > 0) window.scrollBy({ top: Math.min(manque, r.top - 16), behavior: 'smooth' });
 }
 
 // --- Édition (administrateur) ---
