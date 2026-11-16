@@ -14,7 +14,7 @@ export type ObjetContact = keyof typeof OBJETS_CONTACT;
 // publiés dans la Release GitHub de cette version. Valeurs de secours :
 // la page affiche la dernière Release lue sur GitHub à l'ouverture ; vidéo de
 // démonstration (fichier local de public/, non proposée s'il est absent).
-export const TABLE_ANALYSE_VERSION = '3.0.1';
+export const TABLE_ANALYSE_VERSION = '3.0.2';
 const RELEASE = `https://github.com/PhilippePerret/TableAnalyse-nodejs/releases/download/v${TABLE_ANALYSE_VERSION}`;
 
 export const TABLE_ANALYSE = {
@@ -25,4 +25,6 @@ export const TABLE_ANALYSE = {
     { systeme: 'Linux',   fichier: `${RELEASE}/Table-Analyse-${TABLE_ANALYSE_VERSION}.AppImage` },
   ],
   demo: '/telechargements/demo-table-analyse.mp4',
+  // Commande Terminal sortant l'application de la quarantaine (macOS, application non signée)
+  deblocageMac: 'xattr -dr com.apple.quarantine /Applications/Table-d-analyse.app',
 };

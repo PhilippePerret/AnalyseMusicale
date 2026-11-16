@@ -55,6 +55,11 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
         ))}
       </ul>
     </div>
+
+    <div id="deblocageMac" class="deblocage-mac" hidden>
+      <p>Pour débloquer l’application, jouer ce code dans votre application Terminal</p>
+      <pre class="terminal"><code>{TABLE_ANALYSE.deblocageMac}</code></pre>
+    </div>
     </>
   ))}
   </div>
@@ -91,6 +96,15 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
         form.hidden = true;
         document.getElementById('liens').hidden = false;
       }
+      // Plateforme macOS choisie : commande de déblocage affichée
+      var deblocage = document.getElementById('deblocageMac');
+      form.elements.fichier.addEventListener('change', function () {
+        var choix = this.options[this.selectedIndex];
+        deblocage.hidden = choix.dataset.systeme !== 'macOS';
+      });
+      document.querySelectorAll('#liens a[data-systeme="macOS"]').forEach(function (a) {
+        a.addEventListener('click', function () { deblocage.hidden = false; });
+      });
       fetch('/api/moi.php', { credentials: 'same-origin' })
         .then(function (r) { return r.json(); })
         .then(function (res) { if (res.user) { document.getElementById('merci').hidden = true; afficherLiens(); } })

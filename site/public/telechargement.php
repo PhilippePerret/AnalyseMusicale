@@ -7,6 +7,8 @@
 require __DIR__ . '/api/_cami.php';
 
 const DESTINATAIRE = 'philippe.perret@analyse-musicale.fr';
+// Commande Terminal sortant l'application de la quarantaine (macOS, application non signée)
+const DEBLOCAGE_MAC = 'xattr -dr com.apple.quarantine /Applications/Table-d-analyse.app';
 
 function reponse(bool $ok, string $error = ''): void {
   repondre(['ok' => $ok, 'error' => $error]);
@@ -25,10 +27,26 @@ $fichier = (string) ($_POST['fichier'] ?? '');
 $systeme = texte($_POST['systeme'] ?? '', 40);
 if (!preg_match('#^https://github\.com/PhilippePerret/TableAnalyse-nodejs/releases/download/v[\d.]+/[\w.-]+$#', $fichier)) reponse(false, 'plateforme');
 
+// Marche à suivre pour ouvrir l'application non signée (mail macOS seulement)
+function texte_deblocage_mac(): string {
+  return "Apple contraignant de payer un abonnement annuel de développeur pour « autoriser » les applications, "
+    . "même lorsqu'on les fournit gratuitement, il est nécessaire de débloquer Table d’analyse (une seule fois) "
+    . "pour pouvoir l'utiliser. À cette fin :\n"
+    . "- ouvrez votre application Terminal (Cmd+Espace puis tapez \"Termi\"),\n"
+    . "- copiez-collez le code : " . DEBLOCAGE_MAC . "\n"
+    . "- pressez la touche Entrée\n"
+    . "- rejoignez le dossier /Applications\n"
+    . "- control-cliquez sur l'application (ou clic-droit)\n"
+    . "- choisissez le menu \"Ouvrir\"\n\n"
+    . "L'application devrait s'ouvrir sans problème. Si cependant vous en rencontrez, "
+    . "merci de nous en informer en répondant à ce message.\n\n";
+}
+
 // Lien de téléchargement envoyé au demandeur
 $corps = "Bonjour,\n\n"
   . "Voici le lien pour télécharger la Table d’analyse ($systeme) :\n\n"
   . $fichier . "\n\n"
+  . (preg_match('/\.dmg$/', $fichier) ? texte_deblocage_mac() : '')
   . "Bonnes analyses !\n\nPhilippe Perret\nCours d’Analyse Musicale — " . SITE . "\n";
 if (!envoyer_mail($email, 'Votre lien de téléchargement de la Table d’analyse', $corps)) reponse(false, 'envoi');
 

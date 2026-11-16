@@ -292,3 +292,18 @@ video.demo { width: 100%; height: auto; border: 1px solid #aaaaaa; }
 ul.telechargements { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 1em; }
 ul.telechargements a { display: inline-block; }
 form.contact-form .message { color: #b00020; margin: 0; }
+/* Commande de déblocage macOS, à l'aspect du Terminal */
+.deblocage-mac { margin-top: 1em; font-size: 0.9em; }
+.deblocage-mac p { margin: 0 0 0.4em; text-align: left; }
+pre.terminal {
+  margin: 0;
+  padding: 0.7em 0.8em;
+  background: #1e1e1e;
+  color: #e8e8e8;
+  border-radius: 6px;
+  font: 0.75em/1.4 Menlo, Monaco, 'Courier New', monospace;
+  white-space: pre;
+  overflow-x: auto;
+  user-select: all;
+}
+pre.terminal::before { content: '% '; color: #7fd27f; user-select: none; }
