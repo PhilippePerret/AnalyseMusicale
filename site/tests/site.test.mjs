@@ -101,7 +101,7 @@ test('page calendrier : structure et lien vers le détail', () => {
   assert.match(html, /<h1 class="titre-page">Les jeudis de l’analyse<\/h1>/);
   assert.match(html, /Session d’analyses musicales en direct/);
   for (const id of ['cal', 'detail', 'barreCompte', 'formConnexion', 'formInscription']) assert.match(html, new RegExp(`id="${id}"`));
-  assert.match(html, /<a href="\/jeudis-analyse\/detail\/">Détail des jeudis de l’analyse<\/a>/);
+  assert.match(html, /<a href="\/jeudis-analyse\/detail\/">Voir le détail<\/a>/);
   assert.match(html, /<select name="genre">/);
   for (const g of ['F', 'H', 'N']) assert.match(html, new RegExp(`<option value="${g}"`));
 });
