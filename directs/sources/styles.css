@@ -1,0 +1,5 @@
+@font-face { font-family: Quicksand; font-weight: 400; src: url(quicksand-latin-400-normal.woff2); }
+@font-face { font-family: Quicksand; font-weight: 700; src: url(quicksand-latin-700-normal.woff2); }
+:root { --principal: #3e4a54; --texte: #222; --gris: #999; }
+* { box-sizing: border-box; margin: 0; }
+body { font-family: Quicksand, sans-serif; color: var(--texte); }

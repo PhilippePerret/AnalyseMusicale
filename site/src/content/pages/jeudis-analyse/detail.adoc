@@ -25,7 +25,7 @@ Ces sessions en direct sont destinées et accessibles à **toute personne sachan
 
 Un rudiment de théorie est un atout certain, comme la connaissance des accords, des gammes, des cadences et autres éléments de solfège.
 
-Cependant, les analyses étant menées, le plus souvent et dans un premier temps par link:/pedagogue/[Philippe Perret] lui-même, l’hôte de ces lieux, il est possible qu’il faille vous accrocher pour suivre. Rassurez-vous : ces sessions sont enregistrées et vous pouvez y revenir quand bon vous semble pour les suivres à votre tempo.
+Cependant, les analyses étant menées, le plus souvent et dans un premier temps par link:/pedagogue/[Philippe Perret] lui-même, l’hôte de ces lieux, il est possible qu’il faille vous accrocher pour suivre. Rassurez-vous : ces sessions sont enregistrées et vous pouvez y revenir quand bon vous semble pour les suivre à votre tempo.
 
 == Pour quoi ?
 
@@ -33,16 +33,16 @@ Le but caché de ces __jeudis de l’analyse__ vise en premier lieu à faire dé
 
 Car dans son approche, Philippe Perret n’a jamais appréhendé l’analyse musicale __comme une fin en soi__ mais bien plutôt comme un moyen incontournable de devenir un meilleur musicien, une meilleure musicienne qui non seulement comprend les pièces plus en profondeur, sait mieux les lire, mais parvient aussi à les apprendre plus vite et plus durablement et, surtout, sait mieux les jouer, les interpréter. 
 
-**__Démocratiser__ l’analyse musicale**, discipline qui effraie encore beaucoup trop de musiciens et de musiciennes est aussi un but affirmé.
+**__Démocratiser__ l’analyse musicale**, discipline qui effraie encore beaucoup trop de musiciens et de musiciennes, est aussi un but affirmé.
 
 Un troisième but de ces réunions vise bien sûr à partager des approches et des compréhensions de la musique, dans toutes leurs diversités et leurs variétés, loin de tout dogmatisme ou tout formalisme.
 
-Pour résumer, voici la liste des buts vers lesquels tend ces __Jeudis de l’analyse__ :
+Pour résumer, voici la liste des buts vers lesquels tendent ces __Jeudis de l’analyse__ :
 
 * comprendre que l’analyse musicale n’est pas une fin en soi,
 * mieux comprendre comment sont composées les pièces,
 * mieux comprendre, donc, celui qui les a composées, le __compositeur__,
-* mieux comprendre les mécanimes de la musique en général (et pas seulement la musique classique),
+* mieux comprendre les mécanismes de la musique en général (et pas seulement la musique classique),
 * par cette compréhension, mieux apprendre, plus vite et plus durablement,
 * mieux interpréter, par une proximité plus grande et plus profonde avec l’œuvre,
 * raffermir ses connaissances théoriques,
@@ -67,17 +67,19 @@ __Précisons avant de commencer que le challenge, pour Philippe, l’hôte et pr
 * Vous rejoignez, si possible un quart d’heure avant le début, la salle de Direct YouTube depuis le link:/jeudis-analyse/[calendrier des Jeudis].
 * Dès l’heure de début fixée, Philippe (ou l’analyste volontaire) présente rapidement la pièce, sans trop d’histoire. On aborde tout de suite la partition.
 * Philippe (ou l’analyste volontaire) regarde la pièce qu’il découvre, de façon générale, pour en tirer, justement, les généralités (date, compositeur, genre, tonalités, parties visibles, points remarquables, etc.), le maximum d’informations.
-* Puis vient le gros de l’analyse : le chiffrage de la partition. Le plus rapidement possible, Philippe (ou l’analyse) donne le nom et le chiffrage de tous les accords, identifie les notes, les modulations, les cadences.
+* Puis vient le gros de l’analyse : le chiffrage de la partition. Le plus rapidement possible, Philippe (ou l’analyste) donne le nom et le chiffrage de tous les accords, identifie les notes, les modulations, les cadences.
 * Ensuite, sur la base de ce chiffrage, on peut commencer la recherche de la forme, en identifiant les parties.
-* Au cours de ce travail, on fait aussi une analyse mélodique succinte mais qui aidera à comprendre comment la pièce est construite.
-* Une fois les éléments principaux dégagés, une fois la forme établies, une conclusion achèvra le travail d’analyse et la session.
+* Au cours de ce travail, on fait aussi une analyse mélodique succincte mais qui aidera à comprendre comment la pièce est construite.
+* Une fois les éléments principaux dégagés, une fois la forme établie, une conclusion achèvera le travail d’analyse et la session.
 * En espérant, chaque fois, pouvoir aller au bout de la partition avant la fin de la session afin qu’un temps puisse être consacré aux questions.
+
+_Les analyses sont menées sur la link:/table-analyse/[Table d’analyse], application conçue par Philippe Perret, que vous pouvez découvrir et télécharger sur sa page._
 
 == À quelles conditions ?
 
-Il n’y a aucune condition à la participation à ces rendez-vous hebdomadaires, ni financière, ni de diplôme ou de formation. L’entrée est libre et gratuite pour tout un chacun, et ce quel que soit le nombre de séance auquel vous participeriez.
+Il n’y a aucune condition à la participation à ces rendez-vous hebdomadaires, ni financière, ni de diplôme ou de formation. L’entrée est libre et gratuite pour tout un chacun, et ce quel que soit le nombre de séances auxquelles vous participeriez.
 
-La seule exigence est ne pas perturber le déroulement de la réunion quand vous arrivez, surtout si vous arrivez en cours de session.
+La seule exigence est de ne pas perturber le déroulement de la réunion quand vous arrivez, surtout si vous arrivez en cours de session.
 
 == Par qui ? ==
 
@@ -85,4 +87,4 @@ Pour savoir qui est Philippe Perret, hôte de ces lieux, analyste passionné et 
 
 == Intéressé, intéressée ? ==
 
-Ces séances des « Jeudis de l’analyse » vous tente ? Vous pouvez voir link:/jeudis-analyse/[les prochaines séances] (qui décrivent leur contenu). Vous voulez les voir un peu plus concrètement ? Rien de plus simple que de voir à quoi elles ressemblent en consultant les link:/jeudis-analyse/[directs précédents]. Vous voulez en savoir plus ? Posez vos question en utilisant le link:/contact/?objet=jeudis[formulaire de contact].
+Ces séances des « Jeudis de l’analyse » vous tentent ? Vous pouvez voir link:/jeudis-analyse/[les prochaines séances] (qui décrivent leur contenu). Vous voulez les voir un peu plus concrètement ? Rien de plus simple que de voir à quoi elles ressemblent en consultant les link:/jeudis-analyse/[directs précédents]. Vous voulez en savoir plus ? Posez vos questions en utilisant le link:/contact/?objet=jeudis[formulaire de contact].
