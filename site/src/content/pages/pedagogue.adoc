@@ -1,13 +1,15 @@
 = Philippe Perret, pédagogue
 :description: Philippe Perret, Premier Prix d’analyse musicale, Prix SACEM 1992, pédagogue du Cours d’Analyse Musicale.
-:bande: *PHILIPPE PERRET* est le pédagogue responsable de l’animation et de la formation des cours d’analyse musicale.
+:bande: *PHILIPPE PERRET* est l’analyste œuvrant au cours des link:/jeudis-analyse/[Jeudis de l'analyse] et formateur link:/cours-particuliers/[analyse musicale appliquée].
 
 == Bio résumée
 
-* Premier Prix d’Analyse musicale à l’unanimité.
-* Prix SACEM 1992 pour son mémoire d’analyse (sanctionnant au niveau national un des meilleurs mémoires).
+* **Premier Prix d’Analyse musicale** à l’unanimité 
+[.medium]#(dans la classe de l'excellent Denis Morrier, spécialiste de musique baroque et professeur au Conservatoire National Supérieur de Musique et de Danse de Paris)#.
+* **Prix SACEM 1992** pour son mémoire d’analyse 
+[.medium]#(sanctionnant au niveau national un des meilleurs mémoires)#.
 * Plus de 10 années de pratique de la musique en professionnel, en qualité de musicien, arrangeur (diplôme d’arrangeur de la SACEM), compositeur, directeur artistique, chef d’orchestre de variété. Premier disque (45 tours) à 21 ans chez Barclay.
-* Concepteur de tutoriels vidéos Youtube et notamment https://www.youtube.com/watch?v=dT6RSHmyoN0&t=2s[Initiation à l’analyse musicale] (qui atteint bientôt les 150 000 vues — sa chaine, quant à elle, atteint le million de vues).
+* Concepteur de tutoriels vidéos Youtube et notamment https://www.youtube.com/watch?v=dT6RSHmyoN0&t=2s[Initiation à l’analyse musicale] [.medium]#(qui atteint bientôt les 150 000 vues — sa chaine, quant à elle, atteint le million de vues)#.
 * Responsable, pour les https://www.icare-editions.fr[éditions ICARE], d’une collection d’ouvrages d’analyse complètes d’œuvres.
 * Philippe est également romancier et scénariste professionnel. En tant que pédagogue, il est l’auteur des ouvrages de référence https://www.amazon.fr/dp/2487613009[Savoir rédiger et présenter son scénario], de https://www.amazon.fr/dp/248761305X[Gammes et Accords dans tous les Tons] et il est le traducteur de Linda Seger (« Créer des personnages inoubliables »). 
-* https://www.philippeperret.fr[En apprendre davantage sur Philippe Perret].
+* https://www.philippeperret.fr[En apprendre davantage sur Philippe Perret^].

@@ -5,7 +5,7 @@
 
 [.contact-bloc]
 Contact et renseignements +
-link:/contact/?objet=jeudis[→ formulaire de contact]
+link:/contact/?objet=jeudis[→ formulaire de contact^]
 
 == Les _**jeudis de l’analyse**_, qu’est-ce que c’est ? ==
 
@@ -17,7 +17,7 @@ C’est simple : **tous les jeudis du mois de 19 heures à 22 heures.**
 
 == C’est où ?
 
-Ces __Jeudis de l’analyse__ se déroulent en direct sur YouTube. Chaque séance possède son propre espace et son propre programme que vous pouvez trouver dans link:/jeudis-analyse/[le calendrier des Jeudis].
+Ces __Jeudis de l’analyse__ se déroulent en direct sur YouTube. Chaque séance possède son propre espace et son propre programme que vous pouvez trouver dans link:/jeudis-analyse/[le calendrier des Jeudis^].
 
 == Pour qui ?
 
@@ -51,11 +51,11 @@ Pour résumer, voici la liste des buts vers lesquels tendent ces __Jeudis de l�
 
 == Quelles pièces ? ==
 
-Les pièces seront principalement choisies **dans le répertoire classique**. Le piano sera mis à l’honneur pour sa grande diversité du répertoire, sa lecture plus facile (plus facile qu’un quatuor à cordes par exemple), sa simplicité (seulement deux portées simultanées) qui offre pourtant une densité d’écriture, une variété de dispositifs et un ambitus élevé (plus de huit octaves).
+Les pièces seront principalement choisies **dans le répertoire classique**. Le piano sera mis à l’honneur pour la grande diversité de son répertoire, sa lecture plus facile (plus facile qu’un quatuor à cordes par exemple), sa simplicité (seulement deux portées simultanées) qui offre pourtant une densité d’écriture, une variété de dispositifs et un ambitus élevé (plus de huit octaves, une écriture qui peut être parfois __orchestrale__).
 
 Néanmoins seront abordées régulièrement des pièces d’autres instruments, proposées par exemple par les participants.
 
-Chaque année, un compositeur sera mis à l’honneur, en fonction de la relation qu’il entretient avec l’année en question. Par exemple, 2027 fêtant les 200 ans de la mort de BEETHOVEN, c’est lui qui sera mis à l’honneur. 2028 fêtant les 200 ans de la mort de SCHUBERT, c’est lui qui sera mis à l’honneur, etc.
+Chaque année, **un compositeur sera mis à l’honneur**, en fonction de la relation qu’il entretient avec l’année en question. Par exemple, 2027 fêtant les 200 ans de la mort de BEETHOVEN, c’est lui qui sera mis à l’honneur. 2028 fêtant les 200 ans du décès de SCHUBERT, c’est lui qui sera mis à l’honneur, etc.
 
 == Comment ça se passe concrètement ? ==
 
@@ -64,16 +64,16 @@ D’abord, sachez que vous pouvez rejoindre ces analyses quand vous le voulez en
 __Précisons avant de commencer que le challenge, pour Philippe, l’hôte et principal acteur de ces sessions (ou l’analyste qui se sera proposé peut-être), est d’aborder une pièce qu’il connait d’oreille (ou de lecture) mais qu’il n’a jamais analysée auparavant.__
 
 
-* Vous rejoignez, si possible un quart d’heure avant le début, la salle de Direct YouTube depuis le link:/jeudis-analyse/[calendrier des Jeudis].
-* Dès l’heure de début fixée, Philippe (ou l’analyste volontaire) présente rapidement la pièce, sans trop d’histoire. On aborde tout de suite la partition.
-* Philippe (ou l’analyste volontaire) regarde la pièce qu’il découvre, de façon générale, pour en tirer, justement, les généralités (date, compositeur, genre, tonalités, parties visibles, points remarquables, etc.), le maximum d’informations.
-* Puis vient le gros de l’analyse : le chiffrage de la partition. Le plus rapidement possible, Philippe (ou l’analyste) donne le nom et le chiffrage de tous les accords, identifie les notes, les modulations, les cadences.
-* Ensuite, sur la base de ce chiffrage, on peut commencer la recherche de la forme, en identifiant les parties.
-* Au cours de ce travail, on fait aussi une analyse mélodique succincte mais qui aidera à comprendre comment la pièce est construite.
-* Une fois les éléments principaux dégagés, une fois la forme établie, une conclusion achèvera le travail d’analyse et la session.
-* En espérant, chaque fois, pouvoir aller au bout de la partition avant la fin de la session afin qu’un temps puisse être consacré aux questions.
+* Vous rejoignez, si possible un quart d’heure avant le début, la salle de Direct YouTube depuis le link:/jeudis-analyse/[calendrier des Jeudis^].
+* Dès l’heure de début fixée, Philippe (ou l’analyste volontaire) procède à la **présentation rapide la pièce**. On aborde tout de suite la partition.
+* Philippe (ou l’analyste volontaire) regarde la pièce qu’il découvre, de façon générale, pour en dégager, justement,les **généralités** (compositeur, genre, date, tonalités, parties visibles, points remarquables, etc.), le maximum d’informations.
+* Puis vient le gros de l’analyse : **le chiffrage de la partition**. Le plus rapidement possible, Philippe (ou l’analyste) donne le nom et le chiffrage de tous les accords, identifie les notes, les modulations, les cadences^*^.
+* Ensuite, sur la base de ce chiffrage, on peut commencer la **recherche de la forme**, en identifiant les parties.
+* Au cours de ce travail, on fait aussi une **analyse mélodique succincte** mais qui aidera à comprendre comment la pièce est construite.
+* Une fois les éléments principaux dégagés, une fois la forme établie, une **conclusion** achèvera le travail d’analyse et la session. Cette conclusion peut essayer de proposer une __thèse__ qu'il serait intéressant de développer dans un mémoire par exemple.
+* En espérant, chaque fois, pouvoir aller au bout de la partition avant la fin de la session afin qu'il y reste **un temps consacré aux questions**.
 
-_Les analyses sont menées sur la link:/table-analyse/[Table d’analyse], application conçue par Philippe Perret, que vous pouvez découvrir et télécharger sur sa page._
+^*^ _Les analyses sont menées sur la link:/table-analyse/[Table d’analyse^], application conçue par Philippe Perret, que vous pouvez découvrir et télécharger sur sa page._
 
 == À quelles conditions ?
 
