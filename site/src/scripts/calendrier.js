@@ -142,6 +142,10 @@ function afficherDetail(k) {
      <div class="actions">${actions.join('')}</div>${msg}`;
 }
 
+function montrerDetail() {
+  $('detail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
 // --- Édition (administrateur) ---
 
 function menuHeures(nom, libelle, valeur, derniere) {
@@ -285,11 +289,11 @@ async function sInscrire(form) {
 $('cal').addEventListener('click', (e) => {
   if (e.target.closest('.oeil')) return;
   const j = e.target.closest('.jeudi[data-k]');
-  if (j) afficherDetail(j.dataset.k);
+  if (j) { afficherDetail(j.dataset.k); montrerDetail(); }
 });
 $('cal').addEventListener('keydown', (e) => {
   const j = e.target.closest('.jeudi[data-k]');
-  if (j && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); afficherDetail(j.dataset.k); }
+  if (j && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); afficherDetail(j.dataset.k); montrerDetail(); }
 });
 
 $('detail').addEventListener('click', (e) => {
@@ -297,7 +301,7 @@ $('detail').addEventListener('click', (e) => {
   if (!a) return;
   e.preventDefault();
   const actions = {
-    editer: () => editer(choisi),
+    editer: () => { editer(choisi); montrerDetail(); },
     annuler: () => afficherDetail(choisi),
     present: () => jeSeraiPresent(choisi),
     'demander-suppression': () => demanderSuppression(choisi),

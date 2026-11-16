@@ -58,7 +58,13 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
 
     <div id="deblocageMac" class="deblocage-mac" hidden>
       <p>Pour débloquer l’application, jouer ce code dans votre application Terminal</p>
-      <pre class="terminal"><code>{TABLE_ANALYSE.deblocageMac}</code></pre>
+      <div class="terminal-copie">
+        <pre class="terminal"><code>{TABLE_ANALYSE.deblocageMac}</code></pre>
+        <button type="button" class="copier" id="copierDeblocage" title="Copier le code" aria-label="Copier le code">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+        <span class="copie-ok" id="copieOk" hidden>Copié</span>
+      </div>
     </div>
     </>
   ))}
@@ -101,6 +107,14 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
       form.elements.fichier.addEventListener('change', function () {
         var choix = this.options[this.selectedIndex];
         deblocage.hidden = choix.dataset.systeme !== 'macOS';
+      });
+      // Picto : code de déblocage copié dans le presse-papier
+      document.getElementById('copierDeblocage').addEventListener('click', function () {
+        var ok = document.getElementById('copieOk');
+        navigator.clipboard.writeText(deblocage.querySelector('code').textContent).then(function () {
+          ok.hidden = false;
+          setTimeout(function () { ok.hidden = true; }, 1800);
+        });
       });
       document.querySelectorAll('#liens a[data-systeme="macOS"]').forEach(function (a) {
         a.addEventListener('click', function () { deblocage.hidden = false; });

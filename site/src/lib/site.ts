@@ -14,7 +14,7 @@ export type ObjetContact = keyof typeof OBJETS_CONTACT;
 // publiés dans la Release GitHub de cette version. Valeurs de secours :
 // la page affiche la dernière Release lue sur GitHub à l'ouverture ; vidéo de
 // démonstration (fichier local de public/, non proposée s'il est absent).
-export const TABLE_ANALYSE_VERSION = '3.0.2';
+export const TABLE_ANALYSE_VERSION = '3.0.3';
 const RELEASE = `https://github.com/PhilippePerret/TableAnalyse-nodejs/releases/download/v${TABLE_ANALYSE_VERSION}`;
 
 export const TABLE_ANALYSE = {
