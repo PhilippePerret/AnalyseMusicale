@@ -322,3 +322,21 @@ pre.terminal::before { content: '% '; color: #7fd27f; user-select: none; }
   position: absolute; right: 0; top: 100%; margin-top: 0.2em;
   font-size: 0.8em; color: #2e7d32;
 }
+
+/* Blocs NOTE:, TIP:, etc. (AsciiDoc) : libellé à gauche, trait, texte */
+.admonitionblock { margin: 1.2em 0; }
+.admonitionblock > table { border-collapse: collapse; width: 100%; }
+.admonitionblock td.icon {
+  vertical-align: middle;
+  padding-right: 1em;
+  border-right: 1px solid var(--principal);
+  white-space: nowrap;
+}
+.admonitionblock td.icon .title {
+  font-weight: bold;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--principal);
+}
+.admonitionblock td.content { padding-left: 1em; }
