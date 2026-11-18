@@ -121,7 +121,7 @@ function afficherDetail(k) {
   if (s.etat === 'avant') {
     actions.push(etat.presences.includes(k)
       ? `<span class="inscrit-ok">${g('✓ Vous serez présent[|e]')}</span>`
-      : `<button class="bouton" data-action="present">${g('Je serai présent[|e]')}</button>`);
+      : `<button class="bouton" data-action="present">J’assisterai à cette session</button>`);
     actions.push('<span class="direct inactif" title="Disponible le jour et à l’heure de la séance">Rejoindre l’analyse en direct</span>');
   } else if (s.etat === 'direct') {
     actions.push(s.youtube
