@@ -23,7 +23,7 @@ function resolveLocal(href) {
   return join(DIST, path);
 }
 
-const PAGES = ['/', '/jeudis-analyse/', '/jeudis-analyse/detail/', '/cours-particuliers/', '/pedagogue/', '/contact/', '/contact/merci/', '/contact/erreur/', '/table-analyse/'];
+const PAGES = ['/', '/jeudis-analyse/', '/jeudis-analyse/detail/', '/cours/', '/pedagogue/', '/contact/', '/contact/merci/', '/contact/erreur/', '/table-analyse/'];
 
 test('toutes les pages attendues sont construites', () => {
   for (const page of PAGES) assert.ok(existsSync(resolveLocal(page)), `page manquante : ${page}`);
@@ -77,7 +77,7 @@ test('formulaire de contact : champs, cible et champ piège', () => {
 test('les pages Jeudis et Cours préremplissent l’objet du contact', () => {
   assert.match(readFileSync(resolveLocal('/jeudis-analyse/'), 'utf-8'), /href="\/contact\/\?objet=jeudis"/);
   assert.match(readFileSync(resolveLocal('/jeudis-analyse/detail/'), 'utf-8'), /href="\/contact\/\?objet=jeudis"/);
-  assert.match(readFileSync(resolveLocal('/cours-particuliers/'), 'utf-8'), /href="\/contact\/\?objet=cours"/);
+  assert.match(readFileSync(resolveLocal('/cours/'), 'utf-8'), /href="\/contact\/\?objet=cours"/);
 });
 
 test('le contenu AsciiDoc est converti (sous-dossier compris)', () => {

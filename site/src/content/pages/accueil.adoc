@@ -4,5 +4,5 @@
 
 [.blocs]
 * link:/jeudis-analyse/[Les _Jeudis de l’analyse_]
-* link:/cours-particuliers/[Les cours particuliers]
+* link:/cours/[Les cours particuliers]
 * link:/table-analyse/[La Table d’analyse]

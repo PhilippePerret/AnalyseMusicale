@@ -1,6 +1,6 @@
 = Philippe Perret, pédagogue
 :description: Philippe Perret, Premier Prix d’analyse musicale, Prix SACEM 1992, pédagogue du Cours d’Analyse Musicale.
-:bande: *PHILIPPE PERRET* est l’analyste œuvrant au cours des link:/jeudis-analyse/[Jeudis de l'analyse] et formateur link:/cours-particuliers/[analyse musicale appliquée].
+:bande: *PHILIPPE PERRET* est l’analyste œuvrant au cours des link:/jeudis-analyse/[Jeudis de l'analyse] et formateur link:/cours/[analyse musicale appliquée].
 
 == Bio résumée
 
