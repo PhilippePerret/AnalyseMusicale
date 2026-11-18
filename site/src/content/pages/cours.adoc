@@ -1,4 +1,4 @@
-= Les Cours particuliers
+= Les cours d’analyse
 :description: Cours particuliers et en binôme d’analyse musicale par Zoom, avec Philippe Perret : durée, fréquence et tarifs.
 :objet-contact: cours
 :bande: Espace virtuel du Cours d’Analyse Musicale (CAMI) de Philippe PERRET.

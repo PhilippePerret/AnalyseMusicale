@@ -7,7 +7,7 @@ const EXPEDITEUR   = 'contact@analyse-musicale.fr';
 const OBJETS = [
   'renseignements' => 'Renseignements',
   'jeudis'         => 'Les Jeudis de l’analyse',
-  'cours'          => 'Les cours particuliers',
+  'cours'          => 'Les cours d’analyse',
 ];
 
 function rediriger(string $page): void {

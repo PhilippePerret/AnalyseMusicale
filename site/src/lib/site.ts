@@ -4,7 +4,7 @@ export const EMAIL = 'philippe.perret@analyse-musicale.fr';
 export const OBJETS_CONTACT = {
   renseignements: 'Renseignements',
   jeudis: 'Les Jeudis de l’analyse',
-  cours: 'Les cours particuliers',
+  cours: 'Les cours d’analyse',
 } as const;
 
 export type ObjetContact = keyof typeof OBJETS_CONTACT;
