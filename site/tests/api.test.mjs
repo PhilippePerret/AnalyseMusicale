@@ -169,7 +169,8 @@ test('connexion, présence, déconnexion', { skip }, async () => {
 
 test('adresse déjà confirmée : nouvelle inscription refusée ; piège à robots', { skip }, async () => {
   const c = client();
-  assert.equal((await c.post('compte.php', { action: 'inscription', email: 'membre@example.com', mdp: 'motdepasse' })).erreur, 'existe');
+  assert.equal((await c.post('compte.php', { action: 'inscription', email: 'membre@example.com', mdp: 'motdepasse', genre: 'N' })).erreur, 'existe');
+  assert.equal((await c.post('compte.php', { action: 'inscription', email: 'sansgenre@example.com', mdp: 'motdepasse' })).erreur, 'genre');
   const avant = readFileSync(mailFile, 'utf-8').length;
   assert.equal((await c.post('compte.php', { action: 'inscription', email: 'robot@example.com', mdp: 'motdepasse', site_web: 'x' })).ok, true);
   assert.equal(readFileSync(mailFile, 'utf-8').length, avant);
@@ -237,7 +238,8 @@ test('administrateur : ajout à la main, message avec pièce jointe, suppression
   assert.equal((await admin.post('personnes.php', { action: 'ajouter', comme: 'telechargement', email: 'x@example.com', systeme: 'Linux', version: '2', date: '2999-01-01' })).erreur, 'date');
   r = await admin.post('personnes.php', { action: 'ajouter', comme: 'inscrit', email: 'ami@example.com', pseudo: 'Ami', genre: 'F', avertir: true });
   assert.equal(r.ok, true);
-  assert.equal((await admin.post('personnes.php', { action: 'ajouter', comme: 'inscrit', email: 'ami@example.com' })).erreur, 'existe');
+  assert.equal((await admin.post('personnes.php', { action: 'ajouter', comme: 'inscrit', email: 'ami@example.com', genre: 'N' })).erreur, 'existe');
+  assert.equal((await admin.post('personnes.php', { action: 'ajouter', comme: 'inscrit', email: 'autre@example.com' })).erreur, 'genre');
 
   let l = await liste(admin);
   const t = personne(l, 'main@example.com').telechargements[0];
@@ -246,7 +248,7 @@ test('administrateur : ajout à la main, message avec pièce jointe, suppression
   assert.equal(personne(l, 'ami@example.com').inscription.avertir, true);
 
   // Personne saisie à la main : peut ensuite s'inscrire elle-même
-  assert.equal((await client().post('compte.php', { action: 'inscription', email: 'ami@example.com', mdp: 'motdepasse' })).ok, true);
+  assert.equal((await client().post('compte.php', { action: 'inscription', email: 'ami@example.com', mdp: 'motdepasse', genre: 'F' })).ok, true);
 
   const form = new FormData();
   form.append('action', 'envoyer');

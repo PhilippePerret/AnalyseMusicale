@@ -260,6 +260,7 @@ const ERREURS_COMPTE = {
   identifiants: 'Adresse ou mot de passe incorrect.',
   non_confirme: 'Adresse pas encore confirmée : cliquez sur le lien du mail reçu à l’inscription (ou inscrivez-vous de nouveau pour le recevoir encore).',
   existe: 'Cette adresse est déjà inscrite : identifiez-vous.',
+  genre: 'Merci d’indiquer qui vous êtes (ou « pas précisé »).',
 };
 
 async function seConnecter(form) {
@@ -320,7 +321,7 @@ $('barreCompte').addEventListener('click', async (e) => {
 
 $('formConnexion').addEventListener('submit', (e) => { e.preventDefault(); seConnecter(e.target); });
 $('formInscription').addEventListener('submit', (e) => { e.preventDefault(); sInscrire(e.target); });
-$('formInscription').addEventListener('change', (e) => { if (e.target.name === 'genre') { genre = e.target.value; appliquerGenre(); } });
+$('formInscription').addEventListener('change', (e) => { if (e.target.name === 'genre') { genre = e.target.value || 'N'; appliquerGenre(); } });
 // Passage connexion ↔ inscription : l'adresse et le mot de passe déjà saisis sont repris
 document.querySelectorAll('.fenetre .bascule').forEach((a) => a.addEventListener('click', (e) => {
   e.preventDefault();

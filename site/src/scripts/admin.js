@@ -5,6 +5,7 @@ const $ = (id) => document.getElementById(id);
 const ERREURS = {
   email: 'Adresse e-mail invalide.',
   existe: 'Cette adresse est déjà inscrite.',
+  genre: 'Genre à préciser.',
   version: 'Version invalide (ex. 2.1.6).',
   date: 'Date invalide.',
   systeme: 'Plateforme invalide.',
@@ -189,6 +190,7 @@ $('panneauSuppression').querySelector('.confirmer').addEventListener('click', as
 const formAjout = $('formAjout');
 function majComme() {
   formAjout.querySelectorAll('fieldset').forEach((f) => { f.hidden = f.dataset.comme !== formAjout.elements.comme.value; });
+  formAjout.elements.genre.required = formAjout.elements.comme.value === 'inscrit';
 }
 formAjout.elements.comme.addEventListener('change', majComme);
 formAjout.elements.date.value = new Date().toLocaleDateString('sv');

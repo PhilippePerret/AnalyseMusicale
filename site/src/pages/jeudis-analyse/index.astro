@@ -48,10 +48,11 @@ import '../../styles/calendrier.css';
           <label>Pseudo (facultatif) <input type="text" name="pseudo" maxlength="60" autocomplete="nickname"></label>
           <label>Mot de passe <input type="password" name="mdp" required minlength="8" autocomplete="new-password"></label>
           <label class="genre">Vous êtes…
-            <select name="genre">
-              <option value="N" selected>discret</option>
+            <select name="genre" required>
+              <option value="">—</option>
               <option value="F">une femme</option>
               <option value="H">un homme</option>
+              <option value="N">(pas précisé)</option>
             </select>
           </label>
           <div class="cases">

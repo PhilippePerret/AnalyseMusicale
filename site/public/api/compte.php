@@ -35,7 +35,8 @@ if ($action === 'inscription') {
   if (mb_strlen($mdp) < 8) repondre(['ok' => false, 'erreur' => 'mdp'], 422);
   if ($existant && $existant['confirme']) repondre(['ok' => false, 'erreur' => 'existe'], 409);
 
-  $genre = in_array($e['genre'] ?? '', ['F', 'H', 'N'], true) ? $e['genre'] : 'N';
+  if (!in_array($e['genre'] ?? '', ['F', 'H', 'N'], true)) repondre(['ok' => false, 'erreur' => 'genre'], 422);
+  $genre = $e['genre'];
   $prefs = (!empty($e['avertir']) ? PREF_AVERTIR : 0) | (!empty($e['auditeur']) ? PREF_AUDITEUR : 0);
   $pseudo = texte($e['pseudo'] ?? '', 60);
   $jeton = bin2hex(random_bytes(16));
