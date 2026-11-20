@@ -1,5 +1,6 @@
 # MEMORY — analyse_musicale
 
+
 - URL du site (actuel et futur site Astro) : https://www.analyse-musicale.fr
 - Projet : migrer l'embryon de site statique (4 pages .htm/.html + styles.css + .htaccess Apache) vers Astro. Site léger, statique, facile à déployer/actualiser.
 
@@ -49,3 +50,6 @@
 42. Directs YouTube (2026-11-15) : case « Créer le direct YouTube » dans l'édition d'une séance → api/_youtube.php (liveBroadcasts.insert + bind sur un flux unique réutilisable « CAMI — Jeudis de l'analyse », id dans data/analyse_musicale/youtube-flux.json). Public, selfDeclaredMadeForKids=false, programmé au début de séance, titre « Analyses Musicales en Direct — <compositeur>, <œuvre> », description selon modèle de Phil. Jeton : data/analyse_musicale/youtube.json déposé par scripts/youtube-autoriser.command (client_secret : ~/Music/4 pour 2/4pour2/lib/module/api_youtube/modules/client_secret.json). PAS ENCORE TESTÉ contre YouTube.
 43. COMMIT EXIGÉ (2026-11-16) : dès qu'une issue/demande est traitée, Claude commite (seulement ses fichiers). PAS de push (Phil s'en charge). **Why:** correctif non commité = jugé non fait.
 44. Commit d'une issue traitée : message avec « Fixed #N » (une ligne par issue) → fermeture au push.
+45. INTERDICTION FORMELLE des phrases négatives dans les réponses à Phil : toujours formuler positivement.
+46. Jamais expliquer à Phil les gestes de base (Mac, fenêtres, logiciels courants) ni rien de non demandé : répondre STRICTEMENT à la question (2026-11-19, OBS : « arrête de me prendre pour un crétin »). Désigner chaque élément sans ambiguïté (nom complet de l'événement, « YouTube Studio » / « OBS Studio », jamais « l'autre », « Studio »). Indiquer explicitement si un fait est NORMAL ou un DANGER. RÉCIDIVE 2026-11-19 (YouTube Studio) : ne JAMAIS paraphraser un message que Phil vient de citer, ne jamais répéter une solution déjà donnée, ne jamais décrire des boutons qu'il voit (« Aperçu », « Enregistrer »). Ne donner que l'information nouvelle.
+47. CHARTE : cases à cocher agrandies PARTOUT (règle globale dans global.css, taille relative au texte). Jamais de cases à la taille par défaut du navigateur.
