@@ -1,9 +1,11 @@
 = La Table d’analyse
 :description: Télécharger la Table d’analyse de Philippe Perret, application d’analyse musicale pour macOS, Windows et Linux.
 
-Application de bureau MacOs/Windows/Unix pour analyser une partition avec un confort maximale et l’exporter ensuite en PDF ou SVG.
+**Application de bureau MacOs/Windows/Unix pour analyser une partition avec un confort maximale et l’exporter ensuite en PDF ou SVG.**
 
-La **Table d’analyse** est notamment utilisée pour les link:/jeudis-analyse/[__Analyses musicales en direct__] des « Jeudis de l'analyse ».
+<<telechargement-application,Télécharger l’application>>
+
+**Table d’analyse** est notamment utilisée pour les link:/jeudis-analyse/[__Analyses musicales en direct__] des « Jeudis de l'analyse ».
 // Les lignes « @demonstration » et « @telechargement » placent la vidéo
 // et le formulaire de téléchargement (gérés par src/pages/table-analyse.astro).
 // Le bloc encadré [.bloc-telechargement] reçoit son titre de la ligne « .Titre ».
@@ -11,6 +13,9 @@ La **Table d’analyse** est notamment utilisée pour les link:/jeudis-analyse/[
 == Démonstration
 
 @demonstration
+
+[[telechargement-application]]
+== Téléchargement de l’application
 
 [.bloc-telechargement]
 .Télécharger Table d’Analyse
