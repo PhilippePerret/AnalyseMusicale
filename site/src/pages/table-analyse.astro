@@ -29,6 +29,7 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
     <form class="contact-form" id="telechargement" method="post" action="/telechargement.php">
       <p class="version-courante">Version courante : <strong class="version-table">{TABLE_ANALYSE.version}</strong></p>
       <p class="consigne" id="consigneMail">Pour obtenir le lien de téléchargement de l’application, merci d’indiquer votre adresse mail (ou de <a href="/jeudis-analyse/?compte=connexion&retour=/table-analyse/">vous connecter</a>/<a href="/jeudis-analyse/?compte=inscription&retour=/table-analyse/">vous inscrire</a>)</p>
+      <label class="cgu"><input type="checkbox" name="cgu" required> <span>J’accepte les <a href="/cgu/" target="_blank">conditions générales d’utilisation</a></span></label>
       <div class="ligne-envoi">
         <input type="email" name="email" required maxlength="200" autocomplete="email" placeholder="adresse mail" aria-labelledby="consigneMail">
         <label>Plateforme
@@ -137,6 +138,7 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
         var ERREURS = {
           email: 'Adresse mail invalide. Vérifiez-la et réessayez.',
           plateforme: 'Choisissez votre plateforme.',
+          cgu: 'L’acceptation des conditions générales d’utilisation est nécessaire.',
           indisponible: 'Cette version n’est pas encore disponible au téléchargement.',
         };
         fetch(form.action, { method: 'POST', body: donnees })

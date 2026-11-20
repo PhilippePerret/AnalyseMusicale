@@ -1,0 +1,27 @@
+= Mentions légales
+:description: Mentions légales du site du Cours d’Analyse Musicale (CAMI) : éditeur, hébergeur, propriété intellectuelle.
+
+== Éditeur
+
+Le site *analyse-musicale.fr* (Cours d’Analyse Musicale, « CAMI ») est édité à titre non professionnel par *Philippe Perret*.
+
+Directeur de la publication : Philippe Perret.
+
+Contact : mailto:philippe.perret@analyse-musicale.fr[philippe.perret@analyse-musicale.fr] ou link:/contact/[formulaire de contact].
+
+Conformément à l’article 6, III, 2 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l’économie numérique, les éléments d’identification personnels de l’éditeur ont été communiqués à l’hébergeur.
+
+== Hébergeur
+
+*Alwaysdata* (SAS) — 91 rue du Faubourg Saint-Honoré, 75008 Paris, France — https://www.alwaysdata.com[www.alwaysdata.com^].
+
+== Propriété intellectuelle
+
+Les textes, analyses, images, vidéos et logiciels (dont la Table d’analyse) présentés sur ce site sont la propriété de Philippe Perret, sauf mention contraire. Toute reproduction ou diffusion, totale ou partielle, sans autorisation écrite est interdite, hors usage strictement personnel.
+
+Les partitions citées appartiennent à leurs ayants droit ; les liens vers des bibliothèques de partitions (IMSLP notamment) sont fournis à titre indicatif.
+
+== Voir aussi
+
+* link:/cgu/[Conditions générales d’utilisation]
+* link:/confidentialite/[Confidentialité et cookies]

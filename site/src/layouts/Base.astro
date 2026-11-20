@@ -59,5 +59,48 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
     </nav>
   </footer>
   )}
+
+  <nav class="legal row">
+    <a href="/mentions-legales/">Mentions légales</a><span> — </span>
+    <a href="/cgu/">CGU</a><span> — </span>
+    <a href="/confidentialite/">Confidentialité</a><span> — </span>
+    <a href="#" id="gererCookies">Gérer les cookies</a>
+  </nav>
+
+  <div class="bandeau-cookies" id="bandeauCookies" role="dialog" aria-label="Cookies" hidden>
+    <p>Ce site utilise des cookies pour vous garder connecté·e et mémoriser vos choix. Aucun cookie publicitaire. <a href="/confidentialite/#_cookies">En savoir plus</a></p>
+    <div class="boutons">
+      <button type="button" class="bouton" data-choix="refuse">Refuser</button>
+      <button type="button" class="bouton" data-choix="accepte">Accepter</button>
+    </div>
+  </div>
+
+  <script is:inline>
+    // Consentement aux cookies : choix gardé 6 mois dans le cookie « cami-cookies » (accepte | refuse).
+    // Tout service soumis à consentement doit tester window.camiCookies.accepte()
+    // et écouter l'évènement « cami-cookies » (choix modifié).
+    (function () {
+      var NOM = 'cami-cookies';
+      var bandeau = document.getElementById('bandeauCookies');
+      function choix() {
+        var m = document.cookie.match(/(?:^|; )cami-cookies=(accepte|refuse)/);
+        return m ? m[1] : null;
+      }
+      function enregistrer(valeur) {
+        document.cookie = NOM + '=' + valeur + '; max-age=' + 60 * 60 * 24 * 182 + '; path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+        bandeau.hidden = true;
+        document.dispatchEvent(new CustomEvent('cami-cookies', { detail: valeur }));
+      }
+      window.camiCookies = {
+        accepte: function () { return choix() === 'accepte'; },
+        ouvrir: function () { bandeau.hidden = false; },
+      };
+      bandeau.querySelectorAll('[data-choix]').forEach(function (b) {
+        b.addEventListener('click', function () { enregistrer(b.dataset.choix); });
+      });
+      document.getElementById('gererCookies').addEventListener('click', function (e) { e.preventDefault(); window.camiCookies.ouvrir(); });
+      if (!choix()) bandeau.hidden = false;
+    })();
+  </script>
 </body>
 </html>

@@ -1,0 +1,50 @@
+= Confidentialité et cookies
+:description: Données personnelles collectées par le site du Cours d’Analyse Musicale (CAMI), finalités, durées de conservation, droits et cookies.
+
+[.small]#Version du 20 novembre 2026.#
+
+== Responsable du traitement
+
+Philippe Perret, éditeur du site (voir les link:/mentions-legales/[mentions légales]) — mailto:philippe.perret@analyse-musicale.fr[philippe.perret@analyse-musicale.fr].
+
+== Données collectées et finalités
+
+[cols="2,3,2",options="header"]
+|===
+| Données | Finalité | Base légale
+
+| Inscription : adresse e-mail, pseudo (facultatif), forme d’adresse souhaitée, mot de passe (chiffré), préférences, date d’acceptation des CGU
+| Gestion du compte, information sur les prochains Jeudis de l’analyse (si demandé), présences annoncées aux séances
+| Exécution des CGU, consentement
+
+| Table d’analyse : adresse e-mail, plateforme, version, dates de la demande et du téléchargement, date d’acceptation des CGU
+| Envoi du lien de téléchargement, suivi des versions utilisées, information sur les nouvelles versions
+| Exécution des CGU, intérêt légitime
+
+| Formulaire de contact : nom, adresse e-mail, message
+| Réponse à la demande
+| Intérêt légitime
+|===
+
+Aucune donnée n’est vendue, louée ni cédée. Aucune publicité n’est diffusée. Les données sont stockées chez l’hébergeur du site (Alwaysdata, en France) et ne sont accessibles qu’à l’éditeur.
+
+== Durée de conservation
+
+Les données d’un compte ou d’un téléchargement sont conservées tant que la personne ne demande pas leur suppression, et au plus trois ans après le dernier contact. Les messages du formulaire de contact sont conservés le temps de traiter la demande.
+
+== Vos droits
+
+Conformément au Règlement général sur la protection des données (RGPD) et à la loi Informatique et Libertés, vous disposez d’un droit d’accès, de rectification, d’effacement, de limitation et d’opposition sur vos données, ainsi que du droit de retirer votre consentement à tout moment. Pour les exercer : link:/contact/[formulaire de contact] ou mailto:philippe.perret@analyse-musicale.fr[philippe.perret@analyse-musicale.fr].
+
+Vous pouvez également adresser une réclamation à la CNIL (https://www.cnil.fr[www.cnil.fr^]).
+
+== Cookies
+
+Le site utilise :
+
+* un *cookie de connexion* (« cami »), déposé uniquement lorsque vous vous identifiez, pour vous garder connecté·e (90 jours au plus) ;
+* un *cookie de choix* (« cami-cookies ») qui mémorise votre réponse au bandeau des cookies (6 mois).
+
+Le site n’utilise à ce jour aucun cookie de mesure d’audience ni de publicité. Si de tels services étaient ajoutés, ils ne seraient activés qu’avec votre accord, donné par le bouton « Accepter » du bandeau.
+
+Vous pouvez revenir à tout moment sur votre choix par le lien « Gérer les cookies » en bas de chaque page.

@@ -261,6 +261,7 @@ const ERREURS_COMPTE = {
   non_confirme: 'Adresse pas encore confirmée : cliquez sur le lien du mail reçu à l’inscription (ou inscrivez-vous de nouveau pour le recevoir encore).',
   existe: 'Cette adresse est déjà inscrite : identifiez-vous.',
   genre: 'Merci d’indiquer en tant que qui le site doit s’adresser à vous.',
+  cgu: 'L’acceptation des conditions générales d’utilisation est nécessaire.',
 };
 
 async function seConnecter(form) {
@@ -277,7 +278,7 @@ async function sInscrire(form) {
   const f = Object.fromEntries(new FormData(form));
   const r = await api('compte.php', {
     action: 'inscription', email: f.email, mdp: f.mdp, pseudo: f.pseudo, genre: f.genre,
-    avertir: !!f.avertir, auditeur: !!f.auditeur, site_web: f.site_web, jour: enAttente,
+    avertir: !!f.avertir, auditeur: !!f.auditeur, cgu: !!f.cgu, site_web: f.site_web, jour: enAttente,
   });
   if (!r.ok) return messageFenetre(form, ERREURS_COMPTE[r.erreur] || 'Inscription impossible.');
   const presence = enAttente ? ` et votre présence au ${dateLongue(enAttente).toLowerCase()}` : '';

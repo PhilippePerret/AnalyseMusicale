@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS users (
   jeton TEXT,                       -- jeton de confirmation de l'adresse
   presence_attente TEXT,            -- jeudi à enregistrer à la confirmation
   cree_le TEXT NOT NULL,
-  source TEXT NOT NULL DEFAULT 'site'   -- site | main (saisi par l'administrateur)
+  source TEXT NOT NULL DEFAULT 'site',  -- site | main (saisi par l'administrateur)
+  cgu_le TEXT                       -- acceptation des CGU
 );
 CREATE TABLE IF NOT EXISTS seances (
   jour TEXT PRIMARY KEY,            -- AAAA-MM-JJ (un jeudi)
@@ -53,7 +54,8 @@ CREATE TABLE IF NOT EXISTS telechargements (   -- Table d'analyse : demandes de 
   version TEXT NOT NULL DEFAULT '',
   jeton TEXT,                       -- jeton du lien envoyé par mail
   telecharge_le TEXT,               -- premier clic sur le lien : adresse confirmée
-  source TEXT NOT NULL DEFAULT 'site'   -- site | main (saisi par l'administrateur)
+  source TEXT NOT NULL DEFAULT 'site',  -- site | main (saisi par l'administrateur)
+  cgu_le TEXT                       -- acceptation des CGU
 );
 CREATE TABLE IF NOT EXISTS contacts (   -- adresses seules, saisies par l'administrateur
   id INTEGER PRIMARY KEY,
@@ -92,12 +94,13 @@ function db(): PDO {
 function migrer(PDO $pdo): void {
   $ajouts = [
     'seances' => ['partition' => "TEXT NOT NULL DEFAULT ''"],
-    'users' => ['source' => "TEXT NOT NULL DEFAULT 'site'"],
+    'users' => ['source' => "TEXT NOT NULL DEFAULT 'site'", 'cgu_le' => 'TEXT'],
     'telechargements' => [
       'version' => "TEXT NOT NULL DEFAULT ''",
       'jeton' => 'TEXT',
       'telecharge_le' => 'TEXT',
       'source' => "TEXT NOT NULL DEFAULT 'site'",
+      'cgu_le' => 'TEXT',
     ],
   ];
   foreach ($ajouts as $table => $definitions) {

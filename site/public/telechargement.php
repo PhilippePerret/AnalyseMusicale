@@ -25,6 +25,7 @@ if (mb_strlen($email) > 200 || !filter_var($email, FILTER_VALIDATE_EMAIL)) repon
 $fichier = (string) ($_POST['fichier'] ?? '');
 $systeme = texte($_POST['systeme'] ?? '', 40);
 if (!fichier_valide($fichier)) reponse(false, 'plateforme');
+if (empty($_POST['cgu'])) reponse(false, 'cgu');
 $jeton = bin2hex(random_bytes(16));
 
 // Marche à suivre pour ouvrir l'application non signée (mail macOS seulement)
@@ -52,8 +53,8 @@ if (!envoyer_mail($email, 'Votre lien de téléchargement de la Table d’analys
 
 $date = date('Y-m-d H:i:s');
 $version = version_fichier($fichier);
-db()->prepare('INSERT INTO telechargements (email, systeme, fichier, version, jeton, le) VALUES (?, ?, ?, ?, ?, ?)')
-  ->execute([$email, $systeme, $fichier, $version, $jeton, $date]);
+db()->prepare('INSERT INTO telechargements (email, systeme, fichier, version, jeton, le, cgu_le) VALUES (?, ?, ?, ?, ?, ?, ?)')
+  ->execute([$email, $systeme, $fichier, $version, $jeton, $date, $date]);
 envoyer_mail(NOTIFICATIONS, 'CAMI • Demande de lien de la Table d’analyse', "Adresse : $email\nPlateforme : $systeme\nVersion : $version\nDate : $date\n");
 
 reponse(true);

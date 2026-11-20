@@ -1,0 +1,62 @@
+= Conditions générales d’utilisation
+:description: Conditions générales d’utilisation du site du Cours d’Analyse Musicale (CAMI), des Jeudis de l’analyse et de la Table d’analyse.
+
+[.small]#Version du 20 novembre 2026.#
+
+== 1. Objet
+
+Les présentes conditions générales d’utilisation (CGU) régissent l’utilisation du site *analyse-musicale.fr* (ci-après « le site ») édité par Philippe Perret (voir les link:/mentions-legales/[mentions légales]), et notamment :
+
+* l’inscription au site et l’utilisation d’un compte ;
+* la participation aux link:/jeudis-analyse/[Jeudis de l’analyse] (sessions d’analyse musicale en direct) ;
+* le téléchargement et l’utilisation de l’application link:/table-analyse/[Table d’analyse].
+
+L’inscription au site et la demande de lien de téléchargement de la Table d’analyse impliquent l’acceptation pleine et entière des présentes CGU.
+
+== 2. Accès au site
+
+Le site est accessible gratuitement à toute personne disposant d’un accès à Internet. Les frais d’accès (matériel, connexion) restent à la charge de l’utilisateur ou de l’utilisatrice.
+
+L’éditeur s’efforce d’assurer la disponibilité du site, sans obligation de résultat. L’accès peut être interrompu à tout moment, notamment pour maintenance, sans que cela ouvre droit à une quelconque indemnité.
+
+== 3. Inscription et compte
+
+L’inscription se fait avec une adresse e-mail valide et un mot de passe ; elle est confirmée par un lien envoyé à cette adresse. L’inscrit ou l’inscrite s’engage à fournir des informations exactes et à garder son mot de passe confidentiel. Toute action effectuée depuis un compte est réputée faite par son ou sa titulaire.
+
+Le compte peut être supprimé à tout moment sur simple demande (link:/contact/[formulaire de contact]). L’éditeur peut supprimer un compte en cas de manquement aux présentes CGU.
+
+== 4. Jeudis de l’analyse
+
+Les sessions d’analyse en direct sont diffusées sur YouTube ; leur suivi est donc également soumis aux conditions d’utilisation de YouTube. Le programme (œuvres, horaires) est indicatif et peut être modifié ou annulé sans préavis.
+
+Les échanges (messages dans la discussion en direct notamment) doivent rester courtois et en rapport avec l’analyse. Tout propos injurieux, discriminatoire, publicitaire ou illicite pourra être supprimé et son auteur ou autrice exclu·e.
+
+Les sessions peuvent être enregistrées et rester consultables en différé.
+
+== 5. Table d’analyse
+
+La Table d’analyse est une application mise gratuitement à disposition. Elle est fournie « en l’état », sans garantie d’aucune sorte, notamment d’adéquation à un usage particulier ou d’absence d’erreurs. L’éditeur ne saurait être tenu responsable des dommages, directs ou indirects, résultant de son installation ou de son utilisation (perte de données notamment).
+
+L’application reste la propriété de son auteur. Sa revente, sa modification ou sa redistribution sans autorisation sont interdites.
+
+Le lien de téléchargement est envoyé par e-mail ; l’utilisation de ce lien est enregistrée (adresse, plateforme, version, date) comme indiqué dans la page link:/confidentialite/[Confidentialité].
+
+== 6. Propriété intellectuelle
+
+Les contenus du site (textes, analyses, vidéos, logiciels) sont protégés par le droit d’auteur. Ils peuvent être consultés et utilisés pour un usage strictement personnel et pédagogique ; toute autre utilisation nécessite l’accord écrit de l’éditeur.
+
+== 7. Données personnelles et cookies
+
+Le traitement des données personnelles et l’usage des cookies sont décrits dans la page link:/confidentialite/[Confidentialité et cookies].
+
+== 8. Responsabilité
+
+Les analyses et informations publiées le sont à titre pédagogique. L’éditeur ne peut être tenu responsable de l’usage qui en est fait, ni du contenu des sites externes vers lesquels pointent des liens.
+
+== 9. Modification des CGU
+
+L’éditeur peut modifier les présentes CGU à tout moment. La version applicable est celle en ligne au moment de l’utilisation du site. En cas de modification importante, les inscrits et inscrites en sont informé·e·s par e-mail.
+
+== 10. Droit applicable
+
+Les présentes CGU sont soumises au droit français. En cas de litige, une solution amiable sera recherchée avant toute action ; à défaut, les tribunaux français seront compétents.

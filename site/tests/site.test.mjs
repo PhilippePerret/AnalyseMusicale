@@ -23,7 +23,7 @@ function resolveLocal(href) {
   return join(DIST, path);
 }
 
-const PAGES = ['/', '/jeudis-analyse/', '/jeudis-analyse/detail/', '/cours/', '/pedagogue/', '/contact/', '/contact/merci/', '/contact/erreur/', '/table-analyse/'];
+const PAGES = ['/', '/jeudis-analyse/', '/jeudis-analyse/detail/', '/cours/', '/pedagogue/', '/contact/', '/contact/merci/', '/contact/erreur/', '/table-analyse/', '/mentions-legales/', '/cgu/', '/confidentialite/'];
 
 test('toutes les pages attendues sont construites', () => {
   for (const page of PAGES) assert.ok(existsSync(resolveLocal(page)), `page manquante : ${page}`);
@@ -152,4 +152,19 @@ test('contact.php : e-mail invalide → erreur', { skip: !phpOk && 'PHP indispon
   const r = await posterContact({ ...valide, email: 'pas-un-mail\r\nBcc: x@y.z' });
   assert.equal(r.location, '/contact/erreur/');
   assert.equal(r.mail, '');
+});
+
+test('chaque page : liens légaux et bandeau des cookies', () => {
+  for (const fichier of htmlFiles()) {
+    const html = readFileSync(fichier, 'utf-8');
+    for (const lien of ['/mentions-legales/', '/cgu/', '/confidentialite/']) assert.match(html, new RegExp(`href="${lien}"`), `${fichier} : ${lien}`);
+    assert.match(html, /id="bandeauCookies"/, fichier);
+    assert.match(html, /data-choix="refuse"/, fichier);
+  }
+});
+
+test('acceptation des CGU demandée à l’inscription et au téléchargement', () => {
+  for (const page of ['/jeudis-analyse/', '/table-analyse/']) {
+    assert.match(readFileSync(resolveLocal(page), 'utf-8'), /<input type="checkbox" name="cgu" required>/, page);
+  }
 });

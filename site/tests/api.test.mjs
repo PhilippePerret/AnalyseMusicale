@@ -64,7 +64,7 @@ function jeudiFutur(semaines = 3) {
 const JOUR = jeudiFutur();
 
 async function inscrireEtConfirmer(c, email, extra = {}) {
-  const r = await c.post('compte.php', { action: 'inscription', email, mdp: 'motdepasse', genre: 'F', avertir: true, ...extra });
+  const r = await c.post('compte.php', { action: 'inscription', email, mdp: 'motdepasse', genre: 'F', avertir: true, cgu: true, ...extra });
   assert.equal(r.ok, true);
   const rep = await c.get(`/api/confirmer.php?jeton=${dernierLien()}`);
   assert.equal(rep.status, 303);
@@ -138,7 +138,7 @@ test('administrateur : création, modification, contrôles, suppression', { skip
 
 test('inscription avec présence en attente → présence enregistrée à la confirmation', { skip }, async () => {
   const c = client();
-  const r = await c.post('compte.php', { action: 'inscription', email: 'auditrice@example.com', mdp: 'motdepasse', genre: 'F', jour: JOUR });
+  const r = await c.post('compte.php', { action: 'inscription', email: 'auditrice@example.com', mdp: 'motdepasse', genre: 'F', cgu: true, jour: JOUR });
   assert.equal(r.attente, true);
   const mails = readFileSync(mailFile, 'utf-8');
   assert.match(mails, /To: auditrice@example\.com/);
@@ -169,8 +169,9 @@ test('connexion, présence, déconnexion', { skip }, async () => {
 
 test('adresse déjà confirmée : nouvelle inscription refusée ; piège à robots', { skip }, async () => {
   const c = client();
-  assert.equal((await c.post('compte.php', { action: 'inscription', email: 'membre@example.com', mdp: 'motdepasse', genre: 'N' })).erreur, 'existe');
-  assert.equal((await c.post('compte.php', { action: 'inscription', email: 'sansgenre@example.com', mdp: 'motdepasse' })).erreur, 'genre');
+  assert.equal((await c.post('compte.php', { action: 'inscription', email: 'membre@example.com', mdp: 'motdepasse', genre: 'N', cgu: true })).erreur, 'existe');
+  assert.equal((await c.post('compte.php', { action: 'inscription', email: 'sansgenre@example.com', mdp: 'motdepasse', cgu: true })).erreur, 'genre');
+  assert.equal((await c.post('compte.php', { action: 'inscription', email: 'sanscgu@example.com', mdp: 'motdepasse', genre: 'H' })).erreur, 'cgu');
   const avant = readFileSync(mailFile, 'utf-8').length;
   assert.equal((await c.post('compte.php', { action: 'inscription', email: 'robot@example.com', mdp: 'motdepasse', site_web: 'x' })).ok, true);
   assert.equal(readFileSync(mailFile, 'utf-8').length, avant);
@@ -191,7 +192,9 @@ const liste = async (c) => (await c.get('/api/personnes.php')).json();
 const personne = (l, email) => l.personnes.find((p) => p.email === email);
 
 test('téléchargement : adresse confirmée au premier clic sur le lien du mail', { skip }, async () => {
-  const demande = new URLSearchParams({ email: 'Lecteur@Example.com', fichier: FICHIER_TA, systeme: 'macOS' });
+  const sansCgu = new URLSearchParams({ email: 'lecteur@example.com', fichier: FICHIER_TA, systeme: 'macOS' });
+  assert.equal((await (await fetch(`${base}/telechargement.php`, { method: 'POST', body: sansCgu })).json()).error, 'cgu');
+  const demande = new URLSearchParams({ email: 'Lecteur@Example.com', fichier: FICHIER_TA, systeme: 'macOS', cgu: 'on' });
   const r = await (await fetch(`${base}/telechargement.php`, { method: 'POST', body: demande })).json();
   assert.equal(r.ok, true);
   const admin = await adminConnecte();
@@ -254,7 +257,7 @@ test('administrateur : ajout à la main, message avec pièce jointe, suppression
   assert.equal(personne(l, 'ami@example.com').inscription.avertir, true);
 
   // Personne saisie à la main : peut ensuite s'inscrire elle-même
-  assert.equal((await client().post('compte.php', { action: 'inscription', email: 'ami@example.com', mdp: 'motdepasse', genre: 'F' })).ok, true);
+  assert.equal((await client().post('compte.php', { action: 'inscription', email: 'ami@example.com', mdp: 'motdepasse', genre: 'F', cgu: true })).ok, true);
 
   const form = new FormData();
   form.append('action', 'envoyer');
