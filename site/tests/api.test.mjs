@@ -283,3 +283,17 @@ test('administrateur : ajout à la main, message avec pièce jointe, suppression
   assert.equal(personne(l, 'seul@example.com'), undefined);
   assert.ok(personne(l, 'philippe.perret@analyse-musicale.fr'));
 });
+
+test('conservation : données sans contact depuis 3 ans supprimées à la connexion', { skip }, async () => {
+  const { DatabaseSync } = await import('node:sqlite');
+  const admin = await adminConnecte();
+  await admin.post('personnes.php', { action: 'ajouter', comme: 'contact', email: 'vieux@example.com', genre: 'N' });
+  await admin.post('personnes.php', { action: 'ajouter', comme: 'contact', email: 'recent@example.com', genre: 'N' });
+  const db = new DatabaseSync(join(tmp, 'cami.sqlite'));
+  db.prepare("UPDATE contacts SET cree_le = '2020-01-01 00:00:00' WHERE email = 'vieux@example.com'").run();
+  db.close();
+  await adminConnecte();
+  const l = await liste(admin);
+  assert.equal(personne(l, 'vieux@example.com'), undefined);
+  assert.ok(personne(l, 'recent@example.com'));
+});

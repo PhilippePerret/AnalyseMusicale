@@ -47,4 +47,4 @@ Le site utilise :
 
 Le site n’utilise à ce jour aucun cookie de mesure d’audience ni de publicité. Si de tels services étaient ajoutés, ils ne seraient activés qu’avec votre accord, donné par le bouton « Accepter » du bandeau.
 
-Vous pouvez revenir à tout moment sur votre choix par le lien « Gérer les cookies » en bas de chaque page.
+Vous pouvez à tout moment pass:[<a href="#" data-gerer-cookies>modifier votre choix</a>].

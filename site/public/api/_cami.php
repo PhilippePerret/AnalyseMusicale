@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS users (
   presence_attente TEXT,            -- jeudi à enregistrer à la confirmation
   cree_le TEXT NOT NULL,
   source TEXT NOT NULL DEFAULT 'site',  -- site | main (saisi par l'administrateur)
-  cgu_le TEXT                       -- acceptation des CGU
+  cgu_le TEXT,                      -- acceptation des CGU
+  vu_le TEXT                        -- dernière connexion (dernier contact)
 );
 CREATE TABLE IF NOT EXISTS seances (
   jour TEXT PRIMARY KEY,            -- AAAA-MM-JJ (un jeudi)
@@ -94,7 +95,7 @@ function db(): PDO {
 function migrer(PDO $pdo): void {
   $ajouts = [
     'seances' => ['partition' => "TEXT NOT NULL DEFAULT ''"],
-    'users' => ['source' => "TEXT NOT NULL DEFAULT 'site'", 'cgu_le' => 'TEXT'],
+    'users' => ['source' => "TEXT NOT NULL DEFAULT 'site'", 'cgu_le' => 'TEXT', 'vu_le' => 'TEXT'],
     'telechargements' => [
       'version' => "TEXT NOT NULL DEFAULT ''",
       'jeton' => 'TEXT',
@@ -171,6 +172,27 @@ function entree_post(): array {
 
 function texte($valeur, int $max): string {
   return mb_substr(trim(str_replace(["\r", "\n"], ' ', (string) $valeur)), 0, $max);
+}
+
+// --- Conservation des données (page Confidentialité) ---
+
+const CONSERVATION = '-3 years';   // après le dernier contact
+
+// Adresses sans contact (inscription, connexion, téléchargement, saisie) depuis CONSERVATION :
+// toutes leurs données supprimées (adresses administrateur exceptées).
+function purger_anciens(): void {
+  $limite = date('Y-m-d H:i:s', strtotime(CONSERVATION));
+  $st = db()->prepare("SELECT email FROM (
+      SELECT lower(email) AS email, COALESCE(vu_le, cree_le) AS d FROM users
+      UNION ALL SELECT lower(email), COALESCE(telecharge_le, le) FROM telechargements
+      UNION ALL SELECT lower(email), cree_le FROM contacts
+    ) GROUP BY email HAVING MAX(d) < ?");
+  $st->execute([$limite]);
+  foreach (array_diff($st->fetchAll(PDO::FETCH_COLUMN), ADMINS) as $email) {
+    foreach (['users', 'telechargements', 'contacts'] as $table) {
+      db()->prepare("DELETE FROM $table WHERE lower(email) = ?")->execute([$email]);
+    }
+  }
 }
 
 // --- Séances ---

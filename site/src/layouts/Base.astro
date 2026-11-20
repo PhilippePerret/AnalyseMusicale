@@ -60,13 +60,6 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
   </footer>
   )}
 
-  <nav class="legal row">
-    <a href="/mentions-legales/">Mentions légales</a><span> — </span>
-    <a href="/cgu/">CGU</a><span> — </span>
-    <a href="/confidentialite/">Confidentialité</a><span> — </span>
-    <a href="#" id="gererCookies">Gérer les cookies</a>
-  </nav>
-
   <div class="bandeau-cookies" id="bandeauCookies" role="dialog" aria-label="Cookies" hidden>
     <p>Ce site utilise des cookies pour vous garder connecté·e et mémoriser vos choix. Aucun cookie publicitaire. <a href="/confidentialite/#_cookies">En savoir plus</a></p>
     <div class="boutons">
@@ -98,7 +91,10 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
       bandeau.querySelectorAll('[data-choix]').forEach(function (b) {
         b.addEventListener('click', function () { enregistrer(b.dataset.choix); });
       });
-      document.getElementById('gererCookies').addEventListener('click', function (e) { e.preventDefault(); window.camiCookies.ouvrir(); });
+      // Liens « modifier votre choix » (page Confidentialité)
+      document.querySelectorAll('[data-gerer-cookies]').forEach(function (a) {
+        a.addEventListener('click', function (e) { e.preventDefault(); window.camiCookies.ouvrir(); });
+      });
       if (!choix()) bandeau.hidden = false;
     })();
   </script>

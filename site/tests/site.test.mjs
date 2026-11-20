@@ -154,10 +154,10 @@ test('contact.php : e-mail invalide → erreur', { skip: !phpOk && 'PHP indispon
   assert.equal(r.mail, '');
 });
 
-test('chaque page : liens légaux et bandeau des cookies', () => {
+test('chaque page : bandeau des cookies', () => {
   for (const fichier of htmlFiles()) {
     const html = readFileSync(fichier, 'utf-8');
-    for (const lien of ['/mentions-legales/', '/cgu/', '/confidentialite/']) assert.match(html, new RegExp(`href="${lien}"`), `${fichier} : ${lien}`);
+    assert.match(html, /href="\/confidentialite\/#_cookies"/, fichier);
     assert.match(html, /id="bandeauCookies"/, fichier);
     assert.match(html, /data-choix="refuse"/, fichier);
   }

@@ -12,7 +12,7 @@ if (!$user) {
   exit;
 }
 
-db()->prepare('UPDATE users SET confirme = 1, jeton = NULL, presence_attente = NULL WHERE id = ?')->execute([$user['id']]);
+db()->prepare('UPDATE users SET confirme = 1, jeton = NULL, presence_attente = NULL, vu_le = ? WHERE id = ?')->execute([date('Y-m-d H:i:s'), $user['id']]);
 if ($user['presence_attente']) ajouter_presence((int) $user['id'], $user['presence_attente']);
 connecter($user);
 header('Location: /jeudis-analyse/?confirmation=ok', true, 303);

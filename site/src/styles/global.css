@@ -257,15 +257,10 @@ form.contact-form .piege {
 footer.site {
   text-align: center;
   font-size: 0.7em;
-  margin-bottom: 1em;
+  margin-bottom: 10em;
   line-height: 2;
 }
 footer.site nav a { white-space: nowrap; }
-
-/* Liens légaux (toutes les pages) */
-nav.legal { text-align: center; font-size: 0.55em; margin: 3em auto 8em; color: var(--gris-logo); }
-nav.legal a, nav.legal a:link, nav.legal a:visited { color: var(--gris-logo); white-space: nowrap; }
-nav.legal a:hover { color: var(--survol); }
 
 /* Bandeau des cookies */
 .bandeau-cookies {

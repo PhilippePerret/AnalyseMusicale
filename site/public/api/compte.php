@@ -26,6 +26,8 @@ if ($action === 'connexion') {
   if (!$existant || !password_verify($mdp, $existant['mdp'])) repondre(['ok' => false, 'erreur' => 'identifiants'], 401);
   if (!$existant['confirme']) repondre(['ok' => false, 'erreur' => 'non_confirme'], 403);
   connecter($existant);
+  db()->prepare('UPDATE users SET vu_le = ? WHERE id = ?')->execute([date('Y-m-d H:i:s'), $existant['id']]);
+  purger_anciens();
   if ($jour) ajouter_presence((int) $existant['id'], $jour);
   repondre(['ok' => true]);
 }
