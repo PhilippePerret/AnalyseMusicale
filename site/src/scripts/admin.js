@@ -2,7 +2,6 @@
 
 const API = '/api/personnes.php';
 const $ = (id) => document.getElementById(id);
-const GENRES = { F: 'femme', H: 'homme', N: 'discret' };
 const ERREURS = {
   email: 'Adresse e-mail invalide.',
   existe: 'Cette adresse est déjà inscrite.',
@@ -17,8 +16,8 @@ const ERREURS = {
 let personnes = [];
 let aSupprimer = [];
 
-// « 2026-11-20 14:05:00 » → « 20/11/2026 »
-const date = (d) => (d ? d.slice(0, 10).split('-').reverse().join('/') : '');
+// « 2026-11-20 14:05:00 » → « 20/11/26 »
+const date = (d) => (d ? d.slice(2, 10).split('-').reverse().join('/') : '');
 
 function el(tag, classe, texte) {
   const e = document.createElement(tag);
@@ -57,12 +56,14 @@ function ligne(p) {
 
   const tdDetail = el('td', 'detail');
   p.telechargements.forEach((t) => {
-    const texte = `${t.systeme} ${t.version}`.trim() + ' — ' + (t.telecharge_le ? date(t.telecharge_le) : `demandé le ${date(t.le)}`) + (t.source === 'main' ? ' (saisie)' : '');
+    const texte = [t.version && `version ${t.version}`, t.systeme, t.telecharge_le ? date(t.telecharge_le) : `demandé le ${date(t.le)}`].filter(Boolean).join(' — ');
     tdDetail.append(el('div', t.telecharge_le ? '' : 'attente', texte));
   });
   if (p.inscription) {
     const i = p.inscription;
-    const parties = [i.pseudo, GENRES[i.genre], i.avertir && 'à avertir', i.auditeur && 'auditeur libre', `depuis le ${date(i.le)}`].filter(Boolean);
+    const genre = i.genre === 'N' ? '' : `(${i.genre})`;
+    const qui = [i.pseudo && `Pseudo : ${i.pseudo}`, genre].filter(Boolean).join(' ');
+    const parties = [qui, i.avertir && 'à avertir', i.auditeur && 'auditeur libre', date(i.le)].filter(Boolean);
     tdDetail.append(el('div', '', parties.join(' · ')));
   }
   tr.append(tdDetail);
