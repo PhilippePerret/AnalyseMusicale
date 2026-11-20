@@ -90,6 +90,7 @@ form.edition button.annuler { font-size: 0.75em; }
 .fenetre form { display: grid; gap: 0.7em; }
 .fenetre label { display: grid; grid-template-columns: 9em 1fr; align-items: center; gap: 0.6em; font-size: 0.9em; }
 .fenetre input[type=email], .fenetre input[type=password], .fenetre input[type=text] { font: inherit; line-height: 1.25; padding: 0.12em 0.4em; border: 1px solid #aaa; border-radius: 3px; }
+.fenetre label.genre { grid-template-columns: 1fr auto; }
 .fenetre label.genre select { justify-self: start; }
 .fenetre label.genre select { font: inherit; padding: 0.1em 0.3em; border: 1px solid #aaa; border-radius: 3px; }
 .fenetre .cases label { grid-template-columns: none; display: inline-flex; gap: 0.4em; align-items: baseline; }

@@ -260,7 +260,7 @@ const ERREURS_COMPTE = {
   identifiants: 'Adresse ou mot de passe incorrect.',
   non_confirme: 'Adresse pas encore confirmée : cliquez sur le lien du mail reçu à l’inscription (ou inscrivez-vous de nouveau pour le recevoir encore).',
   existe: 'Cette adresse est déjà inscrite : identifiez-vous.',
-  genre: 'Merci d’indiquer qui vous êtes (ou « pas précisé »).',
+  genre: 'Merci d’indiquer en tant que qui le site doit s’adresser à vous.',
 };
 
 async function seConnecter(form) {
