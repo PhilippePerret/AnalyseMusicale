@@ -34,6 +34,9 @@ body {
 
 img { max-width: 100%; height: auto; }
 
+/* Cases à cocher : agrandies (charte) */
+input[type=checkbox] { font-size: inherit; width: 1.1em; height: 1.1em; margin: 0; vertical-align: middle; flex-shrink: 0; }
+
 main a { overflow-wrap: anywhere; }
 
 /* Liens */
