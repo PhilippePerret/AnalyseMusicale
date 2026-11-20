@@ -22,7 +22,7 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
   <div class="row colonne adoc">
   {morceaux.map((m, i) => i % 2 === 0 ? <Fragment set:html={m} /> : m === 'demonstration' ? (
     demo
-      ? <video class="demo" src={demo} controls preload="metadata"></video>
+      ? <video class="demo" src={demo} poster={TABLE_ANALYSE.demoVignette} controls preload="metadata"></video>
       : <p class="demo-absente">La vidéo de démonstration sera bientôt disponible.</p>
   ) : (
     <>
