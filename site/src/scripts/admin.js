@@ -101,14 +101,19 @@ function message(zone, texte, ok = false) {
 
 const nombre = (n) => `${n} adresse${n > 1 ? 's' : ''}`;
 
+// Liste affichée seulement pour l'administrateur identifié ; sinon (ou sans PHP) : message d'accès
 async function charger() {
-  const r = await fetch(API, { credentials: 'same-origin' });
-  if (r.status === 403) {
+  let reponse = null;
+  try {
+    const r = await fetch(API, { credentials: 'same-origin' });
+    if (r.ok) reponse = await r.json();
+  } catch {}
+  if (!reponse?.ok) {
     $('acces').hidden = false;
     $('contenu').hidden = true;
     return;
   }
-  personnes = (await r.json()).personnes;
+  personnes = reponse.personnes;
   $('contenu').hidden = false;
   afficher();
 }

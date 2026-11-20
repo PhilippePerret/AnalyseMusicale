@@ -50,7 +50,10 @@ $corps = "Bonjour,\n\n"
   . "Bonnes analyses !\n\nPhilippe Perret\nCours d’Analyse Musicale — " . SITE . "\n";
 if (!envoyer_mail($email, 'Votre lien de téléchargement de la Table d’analyse', $corps)) reponse(false, 'envoi');
 
+$date = date('Y-m-d H:i:s');
+$version = version_fichier($fichier);
 db()->prepare('INSERT INTO telechargements (email, systeme, fichier, version, jeton, le) VALUES (?, ?, ?, ?, ?, ?)')
-  ->execute([$email, $systeme, $fichier, version_fichier($fichier), $jeton, date('Y-m-d H:i:s')]);
+  ->execute([$email, $systeme, $fichier, $version, $jeton, $date]);
+envoyer_mail(NOTIFICATIONS, 'CAMI • Demande de lien de la Table d’analyse', "Adresse : $email\nPlateforme : $systeme\nVersion : $version\nDate : $date\n");
 
 reponse(true);

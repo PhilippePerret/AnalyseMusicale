@@ -204,7 +204,7 @@ test('téléchargement : adresse confirmée au premier clic sur le lien du mail'
   assert.equal(rep.headers.get('location'), FICHIER_TA);
   t = personne(await liste(admin), 'lecteur@example.com').telechargements[0];
   assert.match(t.telecharge_le, /^\d{4}-\d{2}-\d{2} /);
-  assert.match(readFileSync(mailFile, 'utf-8'), /Version : 2\.1\.6/);
+  assert.equal(readFileSync(mailFile, 'utf-8').match(/Version : 2\.1\.6/g).length, 2);   // avis de demande + avis de téléchargement
 
   assert.equal((await client().get('/api/telecharger.php?jeton=' + '0'.repeat(32))).headers.get('location'), '/table-analyse/');
 });
