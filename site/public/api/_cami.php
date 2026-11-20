@@ -14,6 +14,7 @@ ini_set('log_errors', '1');
 const ADMINS     = ['philippe.perret@analyse-musicale.fr'];
 const EXPEDITEUR = 'contact@analyse-musicale.fr';
 const SITE       = 'https://www.analyse-musicale.fr';
+const NOTIFICATIONS = 'philippe.perret@analyse-musicale.fr';   // reçoit les avis du site
 
 // Préférences (users.prefs, champ de bits)
 const PREF_AVERTIR  = 1;   // être averti des prochains jeudis
@@ -30,7 +31,8 @@ CREATE TABLE IF NOT EXISTS users (
   confirme INTEGER NOT NULL DEFAULT 0,
   jeton TEXT,                       -- jeton de confirmation de l'adresse
   presence_attente TEXT,            -- jeudi à enregistrer à la confirmation
-  cree_le TEXT NOT NULL
+  cree_le TEXT NOT NULL,
+  source TEXT NOT NULL DEFAULT 'site'   -- site | main (saisi par l'administrateur)
 );
 CREATE TABLE IF NOT EXISTS seances (
   jour TEXT PRIMARY KEY,            -- AAAA-MM-JJ (un jeudi)
@@ -42,12 +44,16 @@ CREATE TABLE IF NOT EXISTS seances (
   youtube TEXT NOT NULL DEFAULT '',
   partition TEXT NOT NULL DEFAULT ''   -- URL de la partition
 );
-CREATE TABLE IF NOT EXISTS telechargements (   -- demandes de lien de la Table d'analyse
+CREATE TABLE IF NOT EXISTS telechargements (   -- Table d'analyse : demandes de lien et téléchargements
   id INTEGER PRIMARY KEY,
   email TEXT NOT NULL,
   systeme TEXT NOT NULL,
   fichier TEXT NOT NULL,
-  le TEXT NOT NULL
+  le TEXT NOT NULL,                 -- date de la demande (ou de la saisie)
+  version TEXT NOT NULL DEFAULT '',
+  jeton TEXT,                       -- jeton du lien envoyé par mail
+  telecharge_le TEXT,               -- premier clic sur le lien : adresse confirmée
+  source TEXT NOT NULL DEFAULT 'site'   -- site | main (saisi par l'administrateur)
 );
 CREATE TABLE IF NOT EXISTS presences (
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -77,8 +83,22 @@ function db(): PDO {
 
 // Colonnes ajoutées après la création de la base
 function migrer(PDO $pdo): void {
-  $colonnes = $pdo->query('PRAGMA table_info(seances)')->fetchAll(PDO::FETCH_COLUMN, 1);
-  if (!in_array('partition', $colonnes, true)) $pdo->exec("ALTER TABLE seances ADD COLUMN partition TEXT NOT NULL DEFAULT ''");
+  $ajouts = [
+    'seances' => ['partition' => "TEXT NOT NULL DEFAULT ''"],
+    'users' => ['source' => "TEXT NOT NULL DEFAULT 'site'"],
+    'telechargements' => [
+      'version' => "TEXT NOT NULL DEFAULT ''",
+      'jeton' => 'TEXT',
+      'telecharge_le' => 'TEXT',
+      'source' => "TEXT NOT NULL DEFAULT 'site'",
+    ],
+  ];
+  foreach ($ajouts as $table => $definitions) {
+    $colonnes = $pdo->query("PRAGMA table_info($table)")->fetchAll(PDO::FETCH_COLUMN, 1);
+    foreach ($definitions as $colonne => $definition) {
+      if (!in_array($colonne, $colonnes, true)) $pdo->exec("ALTER TABLE $table ADD COLUMN $colonne $definition");
+    }
+  }
 }
 
 // --- Session (fichiers dans le dossier des données, 90 jours) ---
@@ -172,6 +192,19 @@ function ajouter_presence(int $uid, string $jour): bool {
   return true;
 }
 
+// --- Table d'analyse ---
+
+const SYSTEMES = ['macOS', 'Windows', 'Linux'];
+
+// Fichier d'une Release GitHub de l'application
+function fichier_valide(string $fichier): bool {
+  return (bool) preg_match('#^https://github\.com/PhilippePerret/TableAnalyse-nodejs/releases/download/v[\d.]+/[\w.-]+$#', $fichier);
+}
+
+function version_fichier(string $fichier): string {
+  return preg_match('#/download/v([\d.]+)/#', $fichier, $m) ? $m[1] : '';
+}
+
 // --- Mails ---
 
 // Texte genré : [masculin|féminin] — « inscrit[|e] » ; N (discret) → masculin
@@ -181,12 +214,25 @@ function g(string $texte, string $genre): string {
   }, $texte);
 }
 
-function envoyer_mail(string $a, string $sujet, string $corps): bool {
-  $entetes = implode("\r\n", [
+// $piece : pièce jointe facultative ['nom' => …, 'type' => …, 'contenu' => …]
+function envoyer_mail(string $a, string $sujet, string $corps, ?array $piece = null, string $repondre_a = ''): bool {
+  $entetes = [
     'From: ' . mb_encode_mimeheader('CAMI — Cours d’Analyse Musicale', 'UTF-8') . ' <' . EXPEDITEUR . '>',
     'MIME-Version: 1.0',
-    'Content-Type: text/plain; charset=UTF-8',
-    'Content-Transfer-Encoding: 8bit',
-  ]);
-  return mail($a, mb_encode_mimeheader($sujet, 'UTF-8'), $corps, $entetes);
+  ];
+  if ($repondre_a !== '') $entetes[] = 'Reply-To: ' . $repondre_a;
+  if ($piece === null) {
+    $entetes[] = 'Content-Type: text/plain; charset=UTF-8';
+    $entetes[] = 'Content-Transfer-Encoding: 8bit';
+  } else {
+    $frontiere = 'cami-' . bin2hex(random_bytes(12));
+    $nom = str_replace(['"', "\r", "\n"], '', $piece['nom']);
+    $entetes[] = 'Content-Type: multipart/mixed; boundary="' . $frontiere . '"';
+    $corps = "--$frontiere\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n$corps\r\n"
+      . "--$frontiere\r\nContent-Type: {$piece['type']}; name=\"" . mb_encode_mimeheader($nom, 'UTF-8') . "\"\r\n"
+      . "Content-Transfer-Encoding: base64\r\n"
+      . "Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($nom) . "\r\n\r\n"
+      . chunk_split(base64_encode($piece['contenu'])) . "--$frontiere--\r\n";
+  }
+  return mail($a, mb_encode_mimeheader($sujet, 'UTF-8'), $corps, implode("\r\n", $entetes));
 }

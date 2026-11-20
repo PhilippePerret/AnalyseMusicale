@@ -11,9 +11,10 @@ interface Props {
   description?: string;
   objetContact?: ObjetContact;
   piedDePage?: boolean;   // false : pas de liens en bas de page (accueil)
+  indexer?: boolean;      // false : page exclue des moteurs de recherche
 }
 
-const { title, heading, bande, description, objetContact = 'renseignements', piedDePage = true } = Astro.props;
+const { title, heading, bande, description, objetContact = 'renseignements', piedDePage = true, indexer = true } = Astro.props;
 const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} — CAMI`;
 ---
 <!doctype html>
@@ -23,6 +24,7 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{fullTitle}</title>
   {description && <meta name="description" content={description}>}
+  {!indexer && <meta name="robots" content="noindex, nofollow">}
   <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)}>
   <link rel="icon" href="/logo-carres-lettres-portee-200.jpg">
 </head>

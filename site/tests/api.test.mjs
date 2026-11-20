@@ -46,6 +46,10 @@ function client() {
       return { status: rep.status, ...(await rep.json()) };
     },
     etat: async () => (await fetch(`${base}/api/etat.php`, { headers: { cookie } })).json(),
+    multipart: async (script, form) => {
+      const rep = await fetch(`${base}/api/${script}`, { method: 'POST', headers: { cookie, 'X-Cami': '1' }, body: form });
+      return { status: rep.status, ...(await rep.json()) };
+    },
   };
 }
 
@@ -169,4 +173,101 @@ test('adresse déjà confirmée : nouvelle inscription refusée ; piège à robo
   const avant = readFileSync(mailFile, 'utf-8').length;
   assert.equal((await c.post('compte.php', { action: 'inscription', email: 'robot@example.com', mdp: 'motdepasse', site_web: 'x' })).ok, true);
   assert.equal(readFileSync(mailFile, 'utf-8').length, avant);
+});
+
+// --- Table d'analyse : lien de téléchargement suivi, page /admin/ ---
+
+const FICHIER_TA = 'https://github.com/PhilippePerret/TableAnalyse-nodejs/releases/download/v2.1.6/Table-Analyse-2.1.6.dmg';
+const dernierLienTA = () => [...readFileSync(mailFile, 'utf-8').matchAll(/telecharger\.php\?jeton=([0-9a-f]{32})/g)].pop()?.[1];
+
+async function adminConnecte() {
+  const admin = client();
+  const r = await admin.post('compte.php', { action: 'connexion', email: 'philippe.perret@analyse-musicale.fr', mdp: 'motdepasse' });
+  assert.equal(r.ok, true);
+  return admin;
+}
+const liste = async (c) => (await c.get('/api/personnes.php')).json();
+const personne = (l, email) => l.personnes.find((p) => p.email === email);
+
+test('téléchargement : adresse confirmée au premier clic sur le lien du mail', { skip }, async () => {
+  const demande = new URLSearchParams({ email: 'Lecteur@Example.com', fichier: FICHIER_TA, systeme: 'macOS' });
+  const r = await (await fetch(`${base}/telechargement.php`, { method: 'POST', body: demande })).json();
+  assert.equal(r.ok, true);
+  const admin = await adminConnecte();
+  let t = personne(await liste(admin), 'lecteur@example.com').telechargements[0];
+  assert.equal(t.telecharge_le, null);
+  assert.equal(t.version, '2.1.6');
+
+  const jeton = dernierLienTA();
+  const rep = await client().get(`/api/telecharger.php?jeton=${jeton}`);
+  assert.equal(rep.status, 302);
+  assert.equal(rep.headers.get('location'), FICHIER_TA);
+  t = personne(await liste(admin), 'lecteur@example.com').telechargements[0];
+  assert.match(t.telecharge_le, /^\d{4}-\d{2}-\d{2} /);
+  assert.match(readFileSync(mailFile, 'utf-8'), /Version : 2\.1\.6/);
+
+  assert.equal((await client().get('/api/telecharger.php?jeton=' + '0'.repeat(32))).headers.get('location'), '/table-analyse/');
+});
+
+test('téléchargement direct d’un visiteur identifié enregistré', { skip }, async () => {
+  const c = client();
+  await c.post('compte.php', { action: 'connexion', email: 'membre@example.com', mdp: 'motdepasse' });
+  const rep = await c.get(`/api/telecharger.php?fichier=${encodeURIComponent(FICHIER_TA)}&systeme=macOS`);
+  assert.equal(rep.headers.get('location'), FICHIER_TA);
+  const p = personne(await liste(await adminConnecte()), 'membre@example.com');
+  assert.equal(p.telechargements[0].systeme, 'macOS');
+  assert.ok(p.telechargements[0].telecharge_le);
+  assert.equal(p.inscription.confirme, true);
+  // Anonyme : rien d'enregistré
+  assert.equal((await client().get(`/api/telecharger.php?fichier=${encodeURIComponent(FICHIER_TA)}`)).headers.get('location'), '/table-analyse/');
+});
+
+test('liste des adresses refusée à un non-administrateur', { skip }, async () => {
+  assert.equal((await client().get('/api/personnes.php')).status, 403);
+  const c = client();
+  await c.post('compte.php', { action: 'connexion', email: 'membre@example.com', mdp: 'motdepasse' });
+  assert.equal((await c.post('personnes.php', { action: 'supprimer', emails: ['lecteur@example.com'] })).status, 403);
+});
+
+test('administrateur : ajout à la main, message avec pièce jointe, suppression', { skip }, async () => {
+  const admin = await adminConnecte();
+  let r = await admin.post('personnes.php', { action: 'ajouter', comme: 'telechargement', email: 'main@example.com', systeme: 'Linux', version: '2.0', date: '2026-11-01' });
+  assert.equal(r.ok, true);
+  assert.equal((await admin.post('personnes.php', { action: 'ajouter', comme: 'telechargement', email: 'x@example.com', systeme: 'Linux', version: 'v2', date: '2026-11-01' })).erreur, 'version');
+  assert.equal((await admin.post('personnes.php', { action: 'ajouter', comme: 'telechargement', email: 'x@example.com', systeme: 'Linux', version: '2', date: '2999-01-01' })).erreur, 'date');
+  r = await admin.post('personnes.php', { action: 'ajouter', comme: 'inscrit', email: 'ami@example.com', pseudo: 'Ami', genre: 'F', avertir: true });
+  assert.equal(r.ok, true);
+  assert.equal((await admin.post('personnes.php', { action: 'ajouter', comme: 'inscrit', email: 'ami@example.com' })).erreur, 'existe');
+
+  let l = await liste(admin);
+  const t = personne(l, 'main@example.com').telechargements[0];
+  assert.deepEqual([t.systeme, t.version, t.telecharge_le, t.source], ['Linux', '2.0', '2026-11-01', 'main']);
+  assert.equal(personne(l, 'ami@example.com').inscription.source, 'main');
+  assert.equal(personne(l, 'ami@example.com').inscription.avertir, true);
+
+  // Personne saisie à la main : peut ensuite s'inscrire elle-même
+  assert.equal((await client().post('compte.php', { action: 'inscription', email: 'ami@example.com', mdp: 'motdepasse' })).ok, true);
+
+  const form = new FormData();
+  form.append('action', 'envoyer');
+  form.append('emails', JSON.stringify(['main@example.com', 'ami@example.com']));
+  form.append('objet', 'Nouvelle version');
+  form.append('message', 'Bonjour,\nLa version 2.2 est sortie.');
+  form.append('piece', new Blob(['contenu joint']), 'notes.txt');
+  const avant = readFileSync(mailFile, 'utf-8').length;
+  r = await admin.multipart('personnes.php', form);
+  assert.equal(r.ok, true);
+  assert.equal(r.envoyes, 2);
+  const mails = readFileSync(mailFile, 'utf-8').slice(avant);
+  assert.equal(mails.match(/filename\*=UTF-8''notes\.txt/g).length, 2);
+  assert.match(mails, /Reply-To: philippe\.perret@analyse-musicale\.fr/);
+  assert.match(mails, /La version 2\.2 est sortie/);
+  assert.match(mails, new RegExp(Buffer.from('contenu joint').toString('base64')));
+
+  r = await admin.post('personnes.php', { action: 'supprimer', emails: ['main@example.com', 'ami@example.com', 'philippe.perret@analyse-musicale.fr'] });
+  assert.equal(r.supprimees, 2);
+  l = await liste(admin);
+  assert.equal(personne(l, 'main@example.com'), undefined);
+  assert.equal(personne(l, 'ami@example.com'), undefined);
+  assert.ok(personne(l, 'philippe.perret@analyse-musicale.fr'));
 });

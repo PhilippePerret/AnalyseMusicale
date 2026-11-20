@@ -97,8 +97,13 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
     (function () {
       var form = document.getElementById('telechargement');
       var message = form.querySelector('.message');
+      // Liens par /api/telecharger.php : téléchargement enregistré (fichier lu au clic, après mise à jour de la version)
       function afficherLiens() {
-        document.querySelectorAll('#liens a[data-href]').forEach(function (a) { a.href = a.dataset.href; });
+        document.querySelectorAll('#liens a[data-href]').forEach(function (a) {
+          function lien() { return '/api/telecharger.php?fichier=' + encodeURIComponent(a.dataset.href) + '&systeme=' + encodeURIComponent(a.dataset.systeme); }
+          a.href = lien();
+          a.addEventListener('click', function () { a.href = lien(); });
+        });
         form.hidden = true;
         document.getElementById('liens').hidden = false;
       }

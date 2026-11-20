@@ -4,5 +4,5 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://www.analyse-musicale.fr',
   trailingSlash: 'always',
-  integrations: [sitemap({ filter: (page) => !/\/contact\/(merci|erreur)\/$/.test(page) })],
+  integrations: [sitemap({ filter: (page) => !/\/contact\/(merci|erreur)\/$|\/admin\//.test(page) })],
 });

@@ -1,0 +1,113 @@
+---
+// Administration : adresses connues du site (inscrits, téléchargements de la Table d'analyse,
+// saisies à la main). Données et actions : /api/personnes.php, par src/scripts/admin.js.
+import Base from '../../layouts/Base.astro';
+import '../../styles/admin.css';
+---
+<Base title="Adresses" indexer={false}>
+  <div class="row admin">
+    <h1 class="titre-page">Adresses</h1>
+
+    <p class="acces" id="acces" hidden>Page réservée à l’administrateur : <a href="/jeudis-analyse/?compte=connexion&retour=/admin/">s’identifier</a>.</p>
+
+    <div id="contenu" hidden>
+      <div class="barre">
+        <label>Afficher
+          <select id="filtre">
+            <option value="">toutes les adresses</option>
+            <option value="telechargement">téléchargements de la Table d’analyse</option>
+            <option value="inscrit">inscrits</option>
+            <option value="main">saisies à la main</option>
+          </select>
+        </label>
+        <span class="compte" id="compte"></span>
+      </div>
+
+      <table class="adresses">
+        <thead>
+          <tr>
+            <th class="case"><input type="checkbox" id="toutes" title="Tout sélectionner"></th>
+            <th>Adresse</th>
+            <th>Origine</th>
+            <th>Détail</th>
+          </tr>
+        </thead>
+        <tbody id="lignes"></tbody>
+      </table>
+
+      <div class="actions">
+        <button type="button" class="bouton" id="ouvrirMessage" disabled>Écrire à la sélection…</button>
+        <button type="button" class="bouton supprimer" id="ouvrirSuppression" disabled>Supprimer la sélection…</button>
+      </div>
+
+      <form class="panneau" id="formMessage" hidden>
+        <h3>Message à <span class="nombre"></span></h3>
+        <label class="en-regard">Objet <input type="text" name="objet" required maxlength="200"></label>
+        <label class="en-regard haut">Message <textarea name="message" required rows="8"></textarea></label>
+        <label class="en-regard">Pièce jointe <input type="file" name="piece"></label>
+        <p class="message" hidden></p>
+        <div class="boutons">
+          <button type="button" class="bouton annuler">Annuler</button>
+          <button class="bouton">Envoyer</button>
+        </div>
+      </form>
+
+      <div class="panneau danger" id="panneauSuppression" hidden>
+        <h3>Supprimer définitivement <span class="nombre"></span></h3>
+        <p class="liste"></p>
+        <p class="message" hidden></p>
+        <div class="boutons">
+          <button type="button" class="bouton confirmer">Supprimer définitivement</button>
+          <button type="button" class="bouton annuler">Annuler</button>
+        </div>
+      </div>
+
+      <h2 class="rubrique-admin">Ajouter une adresse</h2>
+      <form class="panneau ajout" id="formAjout">
+        <label class="en-regard">Enregistrer comme…
+          <select name="comme">
+            <option value="telechargement">téléchargement</option>
+            <option value="inscrit">inscrit</option>
+          </select>
+        </label>
+        <label class="en-regard">Adresse e-mail <input type="email" name="email" required maxlength="200"></label>
+        <fieldset data-comme="telechargement">
+          <div class="une-ligne">
+            <label>Plateforme
+              <select name="systeme">
+                <option>macOS</option>
+                <option>Windows</option>
+                <option>Linux</option>
+              </select>
+            </label>
+            <label>Version <input type="text" name="version" class="version" pattern="\d+(\.\d+){0,3}" placeholder="2.1.6"></label>
+            <label>Téléchargé le <input type="date" name="date"></label>
+          </div>
+        </fieldset>
+        <fieldset data-comme="inscrit" hidden>
+          <div class="une-ligne">
+            <label>Pseudo <input type="text" name="pseudo" maxlength="60"></label>
+            <label>Genre
+              <select name="genre">
+                <option value="N">discret</option>
+                <option value="F">une femme</option>
+                <option value="H">un homme</option>
+              </select>
+            </label>
+          </div>
+          <div class="une-ligne">
+            <label><input type="checkbox" name="avertir" checked> à avertir des prochains jeudis</label>
+            <label><input type="checkbox" name="auditeur"> auditeur ou auditrice libre</label>
+          </div>
+        </fieldset>
+        <p class="message" hidden></p>
+        <div class="boutons">
+          <span></span>
+          <button class="bouton">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../../scripts/admin.js"></script>
+</Base>

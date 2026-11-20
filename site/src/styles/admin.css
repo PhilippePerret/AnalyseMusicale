@@ -1,0 +1,70 @@
+/* Page /admin/ : adresses connues du site */
+
+.admin { font-size: 0.75em; }
+.admin [hidden] { display: none !important; }
+.admin h1.titre-page { padding: 0; }
+.admin .acces { font-size: 1.2em; }
+.admin input, .admin select, .admin textarea {
+  font: inherit;
+  line-height: 1.25;
+  padding: 0.12em 0.4em;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  background: var(--fond);
+}
+.admin button.bouton:disabled { opacity: 0.45; cursor: default; }
+.admin button.bouton:disabled:hover { border-color: #aaa; color: var(--texte); background: #f4f4f4; }
+
+.admin .barre { display: flex; justify-content: space-between; align-items: center; gap: 0.8em; margin-bottom: 0.5em; }
+.admin .barre label { display: flex; align-items: center; gap: 0.5em; }
+.admin .compte { color: #777; white-space: nowrap; }
+
+/* Listing */
+table.adresses { width: 100%; border-collapse: collapse; }
+table.adresses th { text-align: left; font-weight: 700; color: var(--principal); border-bottom: 2px solid var(--principal); padding: 0.3em 0.5em; }
+table.adresses td { border-bottom: 1px solid #e2e2e2; padding: 0.35em 0.5em; vertical-align: top; }
+table.adresses tbody tr:hover { background: #f6f8fa; }
+table.adresses .case { width: 1.8em; }
+table.adresses td.email { overflow-wrap: anywhere; }
+table.adresses td.origine { white-space: nowrap; }
+table.adresses td.detail { font-size: 0.9em; color: #444; }
+table.adresses .attente { color: #999; font-style: italic; }
+.badge { display: inline-block; font-size: 0.85em; padding: 0 0.5em; margin: 0 0.3em 0.2em 0; border-radius: 3px; border: 1px solid; }
+.badge.ta { color: #fff; background: var(--principal); border-color: var(--principal); }
+.badge.inscrit { color: var(--survol); border-color: var(--survol); }
+.badge.main { color: #8a5a00; border-color: #d18700; }
+.badge.attente { color: #999; border-color: #ccc; }
+
+/* Actions sur la sélection : suppression à l'écart */
+.admin .actions { display: flex; justify-content: space-between; margin-top: 0.8em; }
+.admin button.supprimer { color: #a33; background: var(--fond); }
+.admin button.supprimer:not(:disabled):hover { background: #a33; color: #fff; border-color: #a33; }
+
+/* Panneaux (message, suppression, ajout) */
+.admin .panneau { display: grid; gap: 0.6em; margin-top: 1em; padding: 0.9em 1.2em; border-top: 4px solid var(--principal); background: #f7f7f7; }
+.admin .panneau h3 { margin: 0; color: var(--principal); font-size: 1.05em; }
+.admin .panneau label.en-regard { display: grid; grid-template-columns: 9.5em 1fr; align-items: center; gap: 0.8em; }
+.admin .panneau label.en-regard.haut { align-items: start; }
+.admin .panneau label.en-regard > input[type=text],
+.admin .panneau label.en-regard > input[type=email] { max-width: 26em; }
+.admin .panneau label.en-regard > select { justify-self: start; }
+.admin .panneau textarea { width: 100%; resize: vertical; }
+.admin .panneau input[type=file] { border: none; padding: 0; background: none; justify-self: start; }
+.admin .panneau .boutons { display: flex; justify-content: space-between; align-items: center; }
+.admin .panneau .message { margin: 0; color: #a33; }
+.admin .panneau .message.ok { color: var(--courant); }
+.admin .panneau.danger { border-top-color: #a33; background: #fbf3f3; }
+.admin .panneau.danger h3 { color: #a33; }
+.admin .panneau.danger .liste { margin: 0; overflow-wrap: anywhere; }
+.admin .panneau.danger button.confirmer { color: #fff; background: #a33; border-color: #a33; }
+.admin .panneau fieldset { border: none; margin: 0; padding: 0; display: grid; gap: 0.6em; }
+.admin .panneau .une-ligne { display: flex; flex-wrap: wrap; gap: 0.6em 1.6em; align-items: center; padding-left: 10.3em; }
+.admin .panneau .une-ligne label { display: flex; align-items: center; gap: 0.5em; white-space: nowrap; }
+.admin .panneau input.version { width: 5em; }
+h2.rubrique-admin { color: var(--principal); font-size: 1.2em; text-transform: uppercase; letter-spacing: 0.06em; margin: 2em 0 0; }
+
+@media (max-width: 600px) {
+  .admin .panneau label.en-regard { grid-template-columns: 1fr; gap: 0.2em; }
+  .admin .panneau .une-ligne { padding-left: 0; }
+  table.adresses td.origine { white-space: normal; }
+}
