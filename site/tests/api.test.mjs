@@ -192,9 +192,7 @@ const liste = async (c) => (await c.get('/api/personnes.php')).json();
 const personne = (l, email) => l.personnes.find((p) => p.email === email);
 
 test('téléchargement : adresse confirmée au premier clic sur le lien du mail', { skip }, async () => {
-  const sansCgu = new URLSearchParams({ email: 'lecteur@example.com', fichier: FICHIER_TA, systeme: 'macOS' });
-  assert.equal((await (await fetch(`${base}/telechargement.php`, { method: 'POST', body: sansCgu })).json()).error, 'cgu');
-  const demande = new URLSearchParams({ email: 'Lecteur@Example.com', fichier: FICHIER_TA, systeme: 'macOS', cgu: 'on' });
+  const demande = new URLSearchParams({ email: 'Lecteur@Example.com', fichier: FICHIER_TA, systeme: 'macOS' });
   const r = await (await fetch(`${base}/telechargement.php`, { method: 'POST', body: demande })).json();
   assert.equal(r.ok, true);
   const admin = await adminConnecte();

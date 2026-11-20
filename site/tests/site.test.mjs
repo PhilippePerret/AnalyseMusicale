@@ -163,8 +163,7 @@ test('chaque page : bandeau des cookies', () => {
   }
 });
 
-test('acceptation des CGU demandée à l’inscription et au téléchargement', () => {
-  for (const page of ['/jeudis-analyse/', '/table-analyse/']) {
-    assert.match(readFileSync(resolveLocal(page), 'utf-8'), /<input type="checkbox" name="cgu" required>/, page);
-  }
+test('acceptation des CGU demandée à l’inscription, pas au téléchargement', () => {
+  assert.match(readFileSync(resolveLocal('/jeudis-analyse/'), 'utf-8'), /<input type="checkbox" name="cgu" required>/);
+  assert.doesNotMatch(readFileSync(resolveLocal('/table-analyse/'), 'utf-8'), /name="cgu"/);
 });
