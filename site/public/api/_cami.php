@@ -55,6 +55,13 @@ CREATE TABLE IF NOT EXISTS telechargements (   -- Table d'analyse : demandes de 
   telecharge_le TEXT,               -- premier clic sur le lien : adresse confirmée
   source TEXT NOT NULL DEFAULT 'site'   -- site | main (saisi par l'administrateur)
 );
+CREATE TABLE IF NOT EXISTS contacts (   -- adresses seules, saisies par l'administrateur
+  id INTEGER PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  pseudo TEXT NOT NULL DEFAULT '',
+  genre TEXT NOT NULL DEFAULT 'N',
+  cree_le TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS presences (
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   jour TEXT NOT NULL REFERENCES seances(jour) ON DELETE CASCADE,

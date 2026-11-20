@@ -18,6 +18,7 @@ import '../../styles/admin.css';
             <option value="telechargement">téléchargements de la Table d’analyse</option>
             <option value="inscrit">inscrits</option>
             <option value="main">saisies à la main</option>
+            <option value="contact">emails seuls</option>
           </select>
         </label>
         <span class="compte" id="compte"></span>
@@ -68,6 +69,7 @@ import '../../styles/admin.css';
           <select name="comme">
             <option value="telechargement">téléchargement</option>
             <option value="inscrit">inscrit</option>
+            <option value="contact">email seul</option>
           </select>
         </label>
         <label class="en-regard">Adresse e-mail <input type="email" name="email" required maxlength="200"></label>
@@ -84,7 +86,7 @@ import '../../styles/admin.css';
             <label>Téléchargé le <input type="date" name="date"></label>
           </div>
         </fieldset>
-        <fieldset data-comme="inscrit" hidden>
+        <fieldset data-comme="inscrit contact" hidden>
           <div class="une-ligne">
             <label>Pseudo <input type="text" name="pseudo" maxlength="60"></label>
             <label>Le site doit s’adresser à vous en tant que…
@@ -96,6 +98,8 @@ import '../../styles/admin.css';
               </select>
             </label>
           </div>
+        </fieldset>
+        <fieldset data-comme="inscrit" hidden>
           <div class="une-ligne">
             <label><input type="checkbox" name="avertir" checked> à avertir des prochains jeudis</label>
             <label><input type="checkbox" name="auditeur"> auditeur ou auditrice libre</label>

@@ -1,5 +1,6 @@
 <?php
-// Adresses connues du site (administrateur) : inscrits et téléchargements de la Table d'analyse.
+// Adresses connues du site (administrateur) : inscrits, téléchargements de la Table d'analyse,
+// adresses seules (contacts).
 // GET : liste, une entrée par adresse.
 // POST JSON {action: ajouter | supprimer, …}
 // POST multipart (en-tête X-Cami) {action: envoyer, emails (JSON), objet, message, piece?} : message à chaque adresse.
@@ -11,7 +12,7 @@ function liste(): array {
   $personnes = [];
   $personne = function (string $email) use (&$personnes): array {
     $cle = strtolower($email);
-    return $personnes[$cle] ?? ['email' => $cle, 'admin' => in_array($cle, ADMINS, true), 'inscription' => null, 'telechargements' => [], 'derniere' => ''];
+    return $personnes[$cle] ?? ['email' => $cle, 'admin' => in_array($cle, ADMINS, true), 'inscription' => null, 'contact' => null, 'telechargements' => [], 'derniere' => ''];
   };
   foreach (db()->query('SELECT email, pseudo, genre, prefs, confirme, source, cree_le FROM users') as $u) {
     $p = $personne($u['email']);
@@ -31,6 +32,12 @@ function liste(): array {
     $p = $personne($t['email']);
     $p['telechargements'][] = $t;
     $p['derniere'] = max($p['derniere'], $t['telecharge_le'] ?: $t['le']);
+    $personnes[$p['email']] = $p;
+  }
+  foreach (db()->query('SELECT email, pseudo, genre, cree_le FROM contacts') as $c) {
+    $p = $personne($c['email']);
+    $p['contact'] = ['pseudo' => $c['pseudo'], 'genre' => $c['genre'], 'le' => $c['cree_le']];
+    $p['derniere'] = max($p['derniere'], $c['cree_le']);
     $personnes[$p['email']] = $p;
   }
   usort($personnes, function ($a, $b) { return strcmp($b['derniere'], $a['derniere']); });
@@ -68,6 +75,7 @@ if ($action === 'supprimer') {
   foreach ($emails as $email) {
     db()->prepare('DELETE FROM users WHERE lower(email) = ?')->execute([$email]);
     db()->prepare('DELETE FROM telechargements WHERE lower(email) = ?')->execute([$email]);
+    db()->prepare('DELETE FROM contacts WHERE lower(email) = ?')->execute([$email]);
   }
   repondre(['ok' => true, 'supprimees' => count($emails)]);
 }
@@ -121,6 +129,16 @@ if ($action === 'ajouter') {
     // Sans mot de passe connu ni confirmation : la personne peut ensuite s'inscrire elle-même
     db()->prepare("INSERT INTO users (email, pseudo, mdp, genre, prefs, confirme, cree_le, source) VALUES (?, ?, ?, ?, ?, 0, ?, 'main')")
       ->execute([$email, texte($e['pseudo'] ?? '', 60), password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT), $genre, $prefs, $maintenant]);
+    repondre(['ok' => true]);
+  }
+
+  if (($e['comme'] ?? '') === 'contact') {
+    if (!in_array($e['genre'] ?? '', ['F', 'H', 'N'], true)) repondre(['ok' => false, 'erreur' => 'genre'], 422);
+    $st = db()->prepare('SELECT 1 FROM contacts WHERE email = ?');
+    $st->execute([$email]);
+    if ($st->fetch()) repondre(['ok' => false, 'erreur' => 'existe'], 409);
+    db()->prepare('INSERT INTO contacts (email, pseudo, genre, cree_le) VALUES (?, ?, ?, ?)')
+      ->execute([$email, texte($e['pseudo'] ?? '', 60), $e['genre'], $maintenant]);
     repondre(['ok' => true]);
   }
 

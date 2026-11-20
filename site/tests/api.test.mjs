@@ -241,7 +241,13 @@ test('administrateur : ajout à la main, message avec pièce jointe, suppression
   assert.equal((await admin.post('personnes.php', { action: 'ajouter', comme: 'inscrit', email: 'ami@example.com', genre: 'N' })).erreur, 'existe');
   assert.equal((await admin.post('personnes.php', { action: 'ajouter', comme: 'inscrit', email: 'autre@example.com' })).erreur, 'genre');
 
+  r = await admin.post('personnes.php', { action: 'ajouter', comme: 'contact', email: 'seul@example.com', pseudo: 'Seul', genre: 'H' });
+  assert.equal(r.ok, true);
+  assert.equal((await admin.post('personnes.php', { action: 'ajouter', comme: 'contact', email: 'seul@example.com', genre: 'H' })).erreur, 'existe');
+  assert.equal((await admin.post('personnes.php', { action: 'ajouter', comme: 'contact', email: 'seul2@example.com' })).erreur, 'genre');
+
   let l = await liste(admin);
+  assert.deepEqual([personne(l, 'seul@example.com').contact.pseudo, personne(l, 'seul@example.com').contact.genre], ['Seul', 'H']);
   const t = personne(l, 'main@example.com').telechargements[0];
   assert.deepEqual([t.systeme, t.version, t.telecharge_le, t.source], ['Linux', '2.0', '2026-11-01', 'main']);
   assert.equal(personne(l, 'ami@example.com').inscription.source, 'main');
@@ -266,10 +272,11 @@ test('administrateur : ajout à la main, message avec pièce jointe, suppression
   assert.match(mails, /La version 2\.2 est sortie/);
   assert.match(mails, new RegExp(Buffer.from('contenu joint').toString('base64')));
 
-  r = await admin.post('personnes.php', { action: 'supprimer', emails: ['main@example.com', 'ami@example.com', 'philippe.perret@analyse-musicale.fr'] });
-  assert.equal(r.supprimees, 2);
+  r = await admin.post('personnes.php', { action: 'supprimer', emails: ['main@example.com', 'ami@example.com', 'seul@example.com', 'philippe.perret@analyse-musicale.fr'] });
+  assert.equal(r.supprimees, 3);
   l = await liste(admin);
   assert.equal(personne(l, 'main@example.com'), undefined);
   assert.equal(personne(l, 'ami@example.com'), undefined);
+  assert.equal(personne(l, 'seul@example.com'), undefined);
   assert.ok(personne(l, 'philippe.perret@analyse-musicale.fr'));
 });

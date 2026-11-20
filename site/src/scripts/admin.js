@@ -4,7 +4,7 @@ const API = '/api/personnes.php';
 const $ = (id) => document.getElementById(id);
 const ERREURS = {
   email: 'Adresse e-mail invalide.',
-  existe: 'Cette adresse est déjà inscrite.',
+  existe: 'Cette adresse est déjà enregistrée.',
   genre: 'Genre à préciser.',
   version: 'Version invalide (ex. 2.1.6).',
   date: 'Date invalide.',
@@ -27,11 +27,17 @@ function el(tag, classe, texte) {
   return e;
 }
 
+// « Pseudo : flo (F) » ; genre non précisé : non indiqué
+function qui(x) {
+  return [x.pseudo && `Pseudo : ${x.pseudo}`, x.genre !== 'N' && `(${x.genre})`].filter(Boolean).join(' ');
+}
+
 function origines(p) {
   const o = [];
   if (p.telechargements.some((t) => t.telecharge_le)) o.push('telechargement');
   if (p.inscription && p.inscription.source === 'site') o.push('inscrit');
-  if (p.inscription?.source === 'main' || p.telechargements.some((t) => t.source === 'main')) o.push('main');
+  if (p.contact) o.push('contact');
+  if (p.contact || p.inscription?.source === 'main' || p.telechargements.some((t) => t.source === 'main')) o.push('main');
   return o;
 }
 
@@ -53,6 +59,7 @@ function ligne(p) {
     if (i.source === 'main') tdOrigine.append(el('span', 'badge main', 'inscrit (saisie)'));
     else tdOrigine.append(el('span', i.confirme ? 'badge inscrit' : 'badge attente', i.confirme ? 'inscrit' : 'inscription non confirmée'));
   }
+  if (p.contact) tdOrigine.append(el('span', 'badge main', 'email seul'));
   tr.append(tdOrigine);
 
   const tdDetail = el('td', 'detail');
@@ -62,11 +69,10 @@ function ligne(p) {
   });
   if (p.inscription) {
     const i = p.inscription;
-    const genre = i.genre === 'N' ? '' : `(${i.genre})`;
-    const qui = [i.pseudo && `Pseudo : ${i.pseudo}`, genre].filter(Boolean).join(' ');
-    const parties = [qui, i.avertir && 'à avertir', i.auditeur && 'auditeur libre', date(i.le)].filter(Boolean);
+    const parties = [qui(i), i.avertir && 'à avertir', i.auditeur && 'auditeur libre', date(i.le)].filter(Boolean);
     tdDetail.append(el('div', '', parties.join(' · ')));
   }
+  if (p.contact) tdDetail.append(el('div', '', [qui(p.contact), date(p.contact.le)].filter(Boolean).join(' · ')));
   tr.append(tdDetail);
   return tr;
 }
@@ -189,8 +195,9 @@ $('panneauSuppression').querySelector('.confirmer').addEventListener('click', as
 // Ajout à la main : champs selon « Enregistrer comme… »
 const formAjout = $('formAjout');
 function majComme() {
-  formAjout.querySelectorAll('fieldset').forEach((f) => { f.hidden = f.dataset.comme !== formAjout.elements.comme.value; });
-  formAjout.elements.genre.required = formAjout.elements.comme.value === 'inscrit';
+  const comme = formAjout.elements.comme.value;
+  formAjout.querySelectorAll('fieldset').forEach((f) => { f.hidden = !f.dataset.comme.split(' ').includes(comme); });
+  formAjout.elements.genre.required = comme !== 'telechargement';
 }
 formAjout.elements.comme.addEventListener('change', majComme);
 formAjout.elements.date.value = new Date().toLocaleDateString('sv');
@@ -200,6 +207,7 @@ formAjout.addEventListener('submit', async (e) => {
   const el = formAjout.elements;
   const donnees = { action: 'ajouter', comme: el.comme.value, email: el.email.value };
   if (el.comme.value === 'telechargement') Object.assign(donnees, { systeme: el.systeme.value, version: el.version.value, date: el.date.value });
+  else if (el.comme.value === 'contact') Object.assign(donnees, { pseudo: el.pseudo.value, genre: el.genre.value });
   else Object.assign(donnees, { pseudo: el.pseudo.value, genre: el.genre.value, avertir: el.avertir.checked, auditeur: el.auditeur.checked });
   const r = await poster(donnees);
   if (!r.ok) return message(formAjout, ERREURS[r.erreur] || 'Enregistrement impossible.');
