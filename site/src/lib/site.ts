@@ -24,7 +24,7 @@ export const TABLE_ANALYSE = {
     { systeme: 'Windows', fichier: `${RELEASE}/Table-Analyse-${TABLE_ANALYSE_VERSION}.exe` },
     { systeme: 'Linux',   fichier: `${RELEASE}/Table-Analyse-${TABLE_ANALYSE_VERSION}.AppImage` },
   ],
-  demo: '/telechargements/demo-table-analyse.mp4',
+  demo: 'https://pub-5a52415c078f488e91f8d3fdc8d51585.r2.dev/table-analyse/premiere-utilisation.mp4',
   // Commande Terminal sortant l'application de la quarantaine (macOS, application non signée)
   deblocageMac: 'xattr -dr com.apple.quarantine /Applications/Table-d-analyse.app',
 };
