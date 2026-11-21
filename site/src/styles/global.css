@@ -3,7 +3,7 @@
 :root {
   --principal: #3e4a54;   /* ardoise : titres, liens, bordures */
   --survol: #3d6a96;      /* bleu : survol */
-  --courant: #2f7a3e;     /* vert : séance du jour uniquement */
+  --courant: #368746;     /* vert : séance du jour uniquement */
   --vert-titre: var(--principal);
   --vert-lien: #d18700;
   --vert-survol: var(--survol);
