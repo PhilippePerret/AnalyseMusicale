@@ -60,9 +60,13 @@ import '../../styles/admin.css';
       <dialog class="panneau invitation" id="dialogInvitation">
         <form id="formInvitation">
           <h3>Inviter</h3>
-          <label class="en-regard">Objet <input type="text" name="objet" required maxlength="200"></label>
-          <label class="en-regard haut">Message <textarea name="message" required rows="8"></textarea></label>
-          <label class="en-regard haut">Adresses <textarea name="adresses" required rows="3" placeholder="une ou plusieurs adresses (séparées par virgules, espaces ou retours à la ligne)"></textarea></label>
+          <div class="colonnes">
+            <div class="redaction">
+              <label class="en-regard">Objet <input type="text" name="objet" required maxlength="200"></label>
+              <label class="en-regard haut">Message <textarea name="message" required rows="14"></textarea></label>
+            </div>
+            <label class="adresses">Adresses <textarea name="adresses" required placeholder="une adresse par ligne"></textarea></label>
+          </div>
           <p class="message" hidden></p>
           <div class="boutons">
             <button type="button" class="bouton annuler">Fermer</button>
