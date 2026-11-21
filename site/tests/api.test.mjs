@@ -295,3 +295,49 @@ test('conservation : données sans contact depuis 3 ans supprimées à la connex
   assert.equal(personne(l, 'vieux@example.com'), undefined);
   assert.ok(personne(l, 'recent@example.com'));
 });
+
+test('invitations : enregistrement, programmation, envoi immédiat, envoi programmé, suppression', { skip }, async () => {
+  assert.equal((await client().get('/api/invitations.php')).status, 403);
+  const admin = await adminConnecte();
+  const futur = new Date(Date.now() + 86400000).toLocaleDateString('sv') + ' 09:00';
+  let r = await admin.post('invitations.php', { action: 'enregistrer', objet: 'Invitation', message: 'Venez !', adresses: ['Invite1@Example.com', 'invite1@example.com', 'invite2@example.com'], programmee_le: futur });
+  assert.equal(r.ok, true);
+  assert.deepEqual(r.invitation.adresses, ['invite1@example.com', 'invite2@example.com']);
+  assert.equal(r.invitation.programmee_le, futur);
+  const id = r.invitation.id;
+  assert.equal((await admin.post('invitations.php', { action: 'enregistrer', objet: 'X', message: 'Y', adresses: ['a@example.com'], programmee_le: '2000-01-01 09:00' })).erreur, 'passe');
+  assert.equal((await admin.post('invitations.php', { action: 'enregistrer', objet: 'X', message: 'Y', adresses: ['pas-une-adresse'] })).erreur, 'adresses');
+
+  // Modification : même invitation
+  r = await admin.post('invitations.php', { action: 'enregistrer', id, objet: 'Invitation modifiée', message: 'Venez !', adresses: ['invite1@example.com'], programmee_le: '' });
+  assert.equal(r.invitation.id, id);
+  assert.equal(r.invitation.programmee_le, null);
+
+  // Envoi immédiat
+  const avant = readFileSync(mailFile, 'utf-8').length;
+  r = await admin.post('invitations.php', { action: 'envoyer', id, objet: 'Invitation modifiée', message: 'Venez !', adresses: ['invite1@example.com'] });
+  assert.equal(r.invitation.envoyes, 1);
+  assert.ok(r.invitation.envoyee_le);
+  assert.match(readFileSync(mailFile, 'utf-8').slice(avant), /To: invite1@example\.com/);
+  // Invitation envoyée : une modification crée une nouvelle invitation
+  r = await admin.post('invitations.php', { action: 'enregistrer', id, objet: 'Copie', message: 'Venez !', adresses: ['invite1@example.com'] });
+  assert.notEqual(r.invitation.id, id);
+
+  // Envoi programmé arrivé à échéance : script de la tâche planifiée
+  const { DatabaseSync } = await import('node:sqlite').catch(() => ({}));
+  if (DatabaseSync) {
+    const bd = new DatabaseSync(join(tmp, 'cami.sqlite'));
+    bd.prepare("UPDATE invitations SET programmee_le = '2000-01-01 09:00' WHERE id = ?").run(r.invitation.id);
+    bd.close();
+    const sortie = spawnSync('php', ['-d', `sendmail_path=cat >> ${mailFile}`, join(DIST, 'api', '_envoi_invitations.php')], { env: { ...process.env, CAMI_DB: join(tmp, 'cami.sqlite') }, encoding: 'utf-8' });
+    assert.match(sortie.stdout, /1 invitation\(s\) envoyée\(s\)/);
+    const l = (await (await admin.get('/api/invitations.php')).json()).invitations;
+    assert.ok(l.find((i) => i.id === r.invitation.id).envoyee_le);
+  }
+
+  r = await admin.post('invitations.php', { action: 'supprimer', id });
+  assert.equal(r.ok, true);
+  assert.equal((await (await admin.get('/api/invitations.php')).json()).invitations.some((i) => i.id === id), false);
+  // Script de la tâche planifiée : inaccessible par le web
+  assert.equal((await client().get('/api/_envoi_invitations.php')).status, 404);
+});

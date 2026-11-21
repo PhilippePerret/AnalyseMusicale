@@ -173,41 +173,124 @@ $('formMessage').addEventListener('submit', async (e) => {
   }
 });
 
-// Invitations : objet, message et adresses saisies (un envoi par adresse)
+// Invitations : enregistrées, envoyées tout de suite ou programmées (API /api/invitations.php)
+const API_INVITATIONS = '/api/invitations.php';
 const dialogInvitation = $('dialogInvitation');
 const formInvitation = $('formInvitation');
-$('ouvrirInvitation').addEventListener('click', () => {
+const choixInvitation = $('choixInvitation');
+let invitations = [];
+Object.assign(ERREURS, {
+  adresses: 'Au moins une adresse valide.',
+  programmation: 'Date ou heure d’envoi invalide.',
+  passe: 'L’envoi programmé doit être dans le futur.',
+});
+
+// « 2026-11-22 09:00 » → « 22/11/26 à 09:00 »
+const dateHeure = (d) => `${date(d)} à ${d.slice(11, 16)}`;
+
+function etatInvitation(i) {
+  if (!i) return '';
+  if (i.envoyee_le) return `Envoyée le ${dateHeure(i.envoyee_le)} à ${nombre(i.envoyes ?? 0)}` + (i.echecs.length ? ` (échec : ${i.echecs.join(', ')})` : '');
+  if (i.programmee_le) return `Programmée pour le ${dateHeure(i.programmee_le)}`;
+  return 'Enregistrée';
+}
+
+function libelleInvitation(i) {
+  const quand = i.envoyee_le ? `envoyée ${date(i.envoyee_le)}` : i.programmee_le ? `programmée ${dateHeure(i.programmee_le)}` : 'enregistrée';
+  return `${i.objet} — ${quand}`;
+}
+
+async function chargerInvitations(idChoisi = '') {
+  const r = await (await fetch(API_INVITATIONS, { credentials: 'same-origin' })).json();
+  invitations = r.ok ? r.invitations : [];
+  choixInvitation.replaceChildren(new Option('nouvelle invitation', ''), ...invitations.map((i) => new Option(libelleInvitation(i), i.id)));
+  choixInvitation.value = String(idChoisi);
+  remplirInvitation();
+}
+
+const invitationChoisie = () => invitations.find((i) => String(i.id) === choixInvitation.value);
+
+function remplirInvitation() {
+  const i = invitationChoisie();
+  const el = formInvitation.elements;
+  el.objet.value = i?.objet ?? '';
+  el.message.value = i?.message ?? '';
+  el.adresses.value = (i?.adresses ?? []).join('\n');
+  el.date.value = i?.programmee_le ? i.programmee_le.slice(0, 10) : '';
+  el.heure.value = i?.programmee_le ? i.programmee_le.slice(11, 16) : '';
+  $('etatInvitation').textContent = etatInvitation(i);
+  $('supprimerInvitation').hidden = !i;
+  $('confirmerSuppressionInvitation').hidden = true;
   message(formInvitation, '');
+}
+
+// Adresses saisies (une par ligne ; virgules, points-virgules et espaces acceptés)
+function adressesSaisies() {
+  return [...new Set(formInvitation.elements.adresses.value.split(/[\s,;]+/).map((a) => a.trim().toLowerCase()).filter(Boolean))];
+}
+
+async function posterInvitation(action) {
+  const el = formInvitation.elements;
+  const adresses = adressesSaisies();
+  const invalides = adresses.filter((a) => !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(a));
+  if (!el.objet.value.trim() || !el.message.value.trim()) return message(formInvitation, ERREURS.message);
+  if (!adresses.length) return message(formInvitation, ERREURS.adresses);
+  if (invalides.length) return message(formInvitation, `Adresse${invalides.length > 1 ? 's' : ''} invalide${invalides.length > 1 ? 's' : ''} : ${invalides.join(', ')}`);
+  if (action === 'enregistrer' && (!el.date.value !== !el.heure.value)) return message(formInvitation, 'Date ET heure requises pour programmer l’envoi.');
+  const donnees = {
+    action,
+    id: choixInvitation.value || undefined,
+    objet: el.objet.value,
+    message: el.message.value,
+    adresses,
+    programmee_le: action === 'enregistrer' && el.date.value ? `${el.date.value} ${el.heure.value}` : '',
+  };
+  const boutons = formInvitation.querySelectorAll('.envois button');
+  boutons.forEach((b) => { b.disabled = true; });
+  try {
+    const r = await (await fetch(API_INVITATIONS, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'X-Cami': '1', 'Content-Type': 'application/json' },
+      body: JSON.stringify(donnees),
+    })).json();
+    if (!r.ok) return message(formInvitation, ERREURS[r.erreur] || 'Opération impossible.');
+    await chargerInvitations(r.invitation.id);
+    const i = r.invitation;
+    if (action === 'envoyer') message(formInvitation, `Invitation envoyée à ${nombre(i.envoyes)}.` + (i.echecs.length ? ` Échec : ${i.echecs.join(', ')}.` : ''), i.echecs.length === 0);
+    else message(formInvitation, i.programmee_le ? `Invitation enregistrée, envoi programmé le ${dateHeure(i.programmee_le)}.` : 'Invitation enregistrée.', true);
+  } catch {
+    message(formInvitation, 'Opération impossible.');
+  } finally {
+    boutons.forEach((b) => { b.disabled = false; });
+  }
+}
+
+$('ouvrirInvitation').addEventListener('click', async () => {
+  await chargerInvitations(choixInvitation.value);
   dialogInvitation.showModal();
   formInvitation.elements.objet.focus();
 });
 // Fermeture seulement par le bouton « Fermer »
 dialogInvitation.addEventListener('cancel', (e) => e.preventDefault());
 formInvitation.querySelector('.annuler').addEventListener('click', () => dialogInvitation.close());
-formInvitation.addEventListener('submit', async (e) => {
+choixInvitation.addEventListener('change', remplirInvitation);
+$('enregistrerInvitation').addEventListener('click', () => posterInvitation('enregistrer'));
+formInvitation.addEventListener('submit', (e) => {
   e.preventDefault();
-  const el = formInvitation.elements;
-  const adresses = [...new Set(el.adresses.value.split(/[\s,;]+/).map((a) => a.trim().toLowerCase()).filter(Boolean))];
-  const invalides = adresses.filter((a) => !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(a));
-  if (!adresses.length) return message(formInvitation, 'Au moins une adresse.');
-  if (invalides.length) return message(formInvitation, `Adresse${invalides.length > 1 ? 's' : ''} invalide${invalides.length > 1 ? 's' : ''} : ${invalides.join(', ')}`);
-  const donnees = new FormData();
-  donnees.append('action', 'envoyer');
-  donnees.append('objet', el.objet.value);
-  donnees.append('message', el.message.value);
-  donnees.append('emails', JSON.stringify(adresses));
-  const bouton = formInvitation.querySelector('button:not(.annuler)');
-  bouton.disabled = true;
-  try {
-    const r = await poster(donnees);
-    if (!r.ok) return message(formInvitation, ERREURS[r.erreur] || 'Envoi impossible.');
-    message(formInvitation, `Invitation envoyée à ${nombre(r.envoyes)}.` + (r.echecs.length ? ` Échec : ${r.echecs.join(', ')}.` : ''), r.echecs.length === 0);
-    if (!r.echecs.length) formInvitation.reset();
-  } catch {
-    message(formInvitation, 'Envoi impossible.');
-  } finally {
-    bouton.disabled = false;
-  }
+  posterInvitation('envoyer');
+});
+// Suppression : lien à l'écart, puis confirmation explicite
+$('supprimerInvitation').addEventListener('click', () => { $('confirmerSuppressionInvitation').hidden = false; });
+$('confirmerSuppressionInvitation').addEventListener('click', async () => {
+  const r = await (await fetch(API_INVITATIONS, {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'X-Cami': '1', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'supprimer', id: choixInvitation.value }),
+  })).json();
+  if (!r.ok) return message(formInvitation, ERREURS[r.erreur] || 'Suppression impossible.');
+  await chargerInvitations();
 });
 
 // Suppression : panneau de confirmation séparé

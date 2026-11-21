@@ -75,6 +75,17 @@ table.adresses .attente { color: #999; font-style: italic; }
 .admin dialog.invitation .redaction input[type=text] { max-width: none; }
 .admin dialog.invitation label.adresses { display: grid; grid-template-rows: auto 1fr; gap: 0.3em; }
 .admin dialog.invitation label.adresses textarea { resize: none; }
+.admin dialog.invitation .entete { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5em 1.2em; }
+.admin dialog.invitation .entete label { display: flex; align-items: center; gap: 0.5em; }
+.admin dialog.invitation .entete select { max-width: 26em; }
+.admin dialog.invitation .etat { color: #777; font-style: italic; }
+.admin dialog.invitation .suppression { margin-left: auto; display: flex; align-items: center; gap: 0.6em; }
+.admin dialog.invitation .lien-supprimer { border: none; background: none; padding: 0; font: inherit; font-size: 0.9em; color: #a33; cursor: pointer; }
+.admin dialog.invitation .lien-supprimer:hover { text-decoration: underline; }
+.admin dialog.invitation button.confirmer { color: #fff; background: #a33; border-color: #a33; }
+.admin dialog.invitation .programmation { display: flex; gap: 0.6em; align-items: center; margin-left: auto; margin-right: 1.6em; }
+.admin dialog.invitation .programmation label { display: flex; align-items: center; gap: 0.4em; white-space: nowrap; }
+.admin dialog.invitation .envois { display: flex; gap: 0.6em; }
 @media (max-width: 700px) { .admin dialog.invitation .colonnes { grid-template-columns: 1fr; } .admin dialog.invitation label.adresses textarea { min-height: 8em; } }
 
 h2.rubrique-admin { color: var(--principal); font-size: 1.2em; text-transform: uppercase; letter-spacing: 0.06em; margin: 2em 0 0; }

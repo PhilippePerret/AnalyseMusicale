@@ -65,6 +65,18 @@ CREATE TABLE IF NOT EXISTS contacts (   -- adresses seules, saisies par l'admini
   genre TEXT NOT NULL DEFAULT 'N',
   cree_le TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS invitations (   -- invitations de l'administrateur (adresses : JSON)
+  id INTEGER PRIMARY KEY,
+  objet TEXT NOT NULL,
+  message TEXT NOT NULL,
+  adresses TEXT NOT NULL,
+  programmee_le TEXT,        -- envoi programmé (AAAA-MM-JJ HH:MM), NULL sinon
+  envoyee_le TEXT,
+  envoyes INTEGER,
+  echecs TEXT,               -- adresses en échec (JSON)
+  cree_le TEXT NOT NULL,
+  modifiee_le TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS presences (
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   jour TEXT NOT NULL REFERENCES seances(jour) ON DELETE CASCADE,

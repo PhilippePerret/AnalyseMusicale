@@ -59,7 +59,17 @@ import '../../styles/admin.css';
 
       <dialog class="panneau invitation" id="dialogInvitation">
         <form id="formInvitation">
-          <h3>Inviter</h3>
+          <div class="entete">
+            <h3>Inviter</h3>
+            <label>Invitation
+              <select id="choixInvitation"><option value="">nouvelle invitation</option></select>
+            </label>
+            <span class="etat" id="etatInvitation"></span>
+            <span class="suppression">
+              <button type="button" class="lien-supprimer" id="supprimerInvitation" hidden>Supprimer cette invitation…</button>
+              <button type="button" class="bouton confirmer" id="confirmerSuppressionInvitation" hidden>Confirmer la suppression</button>
+            </span>
+          </div>
           <div class="colonnes">
             <div class="redaction">
               <label class="en-regard">Objet <input type="text" name="objet" required maxlength="200"></label>
@@ -70,7 +80,14 @@ import '../../styles/admin.css';
           <p class="message" hidden></p>
           <div class="boutons">
             <button type="button" class="bouton annuler">Fermer</button>
-            <button class="bouton">Envoyer</button>
+            <span class="programmation">
+              <label>Envoi programmé le <input type="date" name="date"></label>
+              <label>à <input type="time" name="heure" step="300"></label>
+            </span>
+            <span class="envois">
+              <button type="button" class="bouton" id="enregistrerInvitation">Enregistrer</button>
+              <button class="bouton">Envoyer maintenant</button>
+            </span>
           </div>
         </form>
       </dialog>
