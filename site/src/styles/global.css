@@ -342,7 +342,7 @@ pre.terminal::before { content: '% '; color: #7fd27f; user-select: none; }
 }
 
 /* Blocs NOTE:, TIP:, etc. (AsciiDoc) : libellé à gauche, trait, texte */
-.admonitionblock { margin: 1.2em 0; }
+.admonitionblock { margin: 1.2em 0 1.2em 2em; font-size: 0.85em; }
 .admonitionblock > table { border-collapse: collapse; width: 100%; }
 .admonitionblock td.icon {
   vertical-align: middle;
