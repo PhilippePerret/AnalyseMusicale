@@ -173,6 +173,43 @@ $('formMessage').addEventListener('submit', async (e) => {
   }
 });
 
+// Invitations : objet, message et adresses saisies (un envoi par adresse)
+const dialogInvitation = $('dialogInvitation');
+const formInvitation = $('formInvitation');
+$('ouvrirInvitation').addEventListener('click', () => {
+  message(formInvitation, '');
+  dialogInvitation.showModal();
+  formInvitation.elements.objet.focus();
+});
+// Fermeture seulement par le bouton « Fermer »
+dialogInvitation.addEventListener('cancel', (e) => e.preventDefault());
+formInvitation.querySelector('.annuler').addEventListener('click', () => dialogInvitation.close());
+formInvitation.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const el = formInvitation.elements;
+  const adresses = [...new Set(el.adresses.value.split(/[\s,;]+/).map((a) => a.trim().toLowerCase()).filter(Boolean))];
+  const invalides = adresses.filter((a) => !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(a));
+  if (!adresses.length) return message(formInvitation, 'Au moins une adresse.');
+  if (invalides.length) return message(formInvitation, `Adresse${invalides.length > 1 ? 's' : ''} invalide${invalides.length > 1 ? 's' : ''} : ${invalides.join(', ')}`);
+  const donnees = new FormData();
+  donnees.append('action', 'envoyer');
+  donnees.append('objet', el.objet.value);
+  donnees.append('message', el.message.value);
+  donnees.append('emails', JSON.stringify(adresses));
+  const bouton = formInvitation.querySelector('button:not(.annuler)');
+  bouton.disabled = true;
+  try {
+    const r = await poster(donnees);
+    if (!r.ok) return message(formInvitation, ERREURS[r.erreur] || 'Envoi impossible.');
+    message(formInvitation, `Invitation envoyée à ${nombre(r.envoyes)}.` + (r.echecs.length ? ` Échec : ${r.echecs.join(', ')}.` : ''), r.echecs.length === 0);
+    if (!r.echecs.length) formInvitation.reset();
+  } catch {
+    message(formInvitation, 'Envoi impossible.');
+  } finally {
+    bouton.disabled = false;
+  }
+});
+
 // Suppression : panneau de confirmation séparé
 $('ouvrirSuppression').addEventListener('click', () => {
   fermerPanneaux();

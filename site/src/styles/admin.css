@@ -61,6 +61,15 @@ table.adresses .attente { color: #999; font-style: italic; }
 .admin .panneau .une-ligne { display: flex; flex-wrap: wrap; gap: 0.6em 1.6em; align-items: center; padding-left: 10.3em; }
 .admin .panneau .une-ligne label { display: flex; align-items: center; gap: 0.5em; white-space: nowrap; }
 .admin .panneau input.version { width: 5em; }
+/* Invitations : bouton avec picto, fenêtre modale */
+.admin .barre .compte { margin-left: auto; }
+.admin button.inviter { display: inline-flex; align-items: center; gap: 0.4em; }
+.admin button.inviter svg { width: 1.2em; height: 1.2em; }
+.admin dialog.invitation { width: min(44em, calc(100vw - 2em)); border: none; margin: auto; box-shadow: 0 6px 30px rgba(0,0,0,0.25); }
+.admin dialog.invitation:not([open]) { display: none; }
+.admin dialog.invitation::backdrop { background: rgba(0,0,0,0.35); }
+.admin dialog.invitation form { display: grid; gap: 0.6em; }
+
 h2.rubrique-admin { color: var(--principal); font-size: 1.2em; text-transform: uppercase; letter-spacing: 0.06em; margin: 2em 0 0; }
 
 @media (max-width: 600px) {
