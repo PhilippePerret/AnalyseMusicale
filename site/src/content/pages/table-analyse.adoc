@@ -1,7 +1,7 @@
 = La Table d’analyse
 :description: Télécharger la Table d’analyse de Philippe Perret, application d’analyse musicale pour macOS, Windows et Linux.
 
-**Application de bureau MacOs/Windows/Unix pour analyser une partition avec un confort maximale et l’exporter ensuite en PDF ou SVG.**
+**Application de bureau MacOs/Windows/Unix pour analyser une partition avec un confort maximal et l’exporter ensuite en PDF ou SVG.**
 
 <<telechargement-application,Télécharger l’application>>
 
