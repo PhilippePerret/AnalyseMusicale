@@ -37,6 +37,15 @@ const dateLongue = (k) => { const d = new Date(k + 'T12:00'); return `Jeudi ${jo
 const jeudisDuMois = (a, m) => { const r = []; const d = new Date(a, m, 1); while (d.getDay() !== 4) d.setDate(d.getDate() + 1); while (d.getMonth() === m) { r.push(new Date(d)); d.setDate(d.getDate() + 7); } return r; };
 const aujourdhui = () => etat.maintenant.slice(0, 10);
 const admin = () => !!etat.user?.admin;
+// Heure du serveur à cet instant (heure reçue au chargement + temps écoulé depuis)
+let chargeLe = Date.now();
+const maintenant = () => new Date(new Date(etat.maintenant.replace(' ', 'T')).getTime() + Date.now() - chargeLe);
+// Pastille « DIRECT » : le jour même, de 30 minutes avant le début jusqu'à la fin, si le lien du direct existe
+const pastilleDirect = (k, s) => {
+  if (!s.youtube || k !== aujourdhui()) return false;
+  const t = maintenant().getTime();
+  return t >= new Date(`${k}T${s.debut}`).getTime() - 30 * 60000 && t < new Date(`${k}T${s.fin}`).getTime();
+};
 const prochain = () => Object.keys(etat.seances).sort().find((k) => etat.seances[k].etat !== 'apres' && k !== aujourdhui());
 
 async function api(script, donnees) {
@@ -49,6 +58,7 @@ async function charger() {
   const r = await api('etat.php');
   if (!r.ok) { $('cal').innerHTML = '<p class="vide">Le calendrier n’a pas pu être chargé.</p>'; return; }
   etat = r;
+  chargeLe = Date.now();
   if (r.user) genre = r.user.genre;
   appliquerGenre();
   rendreCompte();
@@ -82,7 +92,9 @@ function caseJeudi(d) {
   const k = cle(d), s = etat.seances[k];
   const libelle = `<span class="num">Jeudi ${jour(d.getDate())}</span>`;
   if (!s) return admin() ? `<div class="jeudi editable" role="button" tabindex="0" data-k="${k}">${libelle}</div>` : `<div class="jeudi">${libelle}</div>`;
-  const cls = ['jeudi', 'seance', s.etat === 'apres' ? 'passe' : '', k === aujourdhui() ? 'courant' : '', k === prochain() ? 'prochain' : ''].join(' ');
+  const direct = pastilleDirect(k, s);
+  const cls = ['jeudi', 'seance', s.etat === 'apres' ? 'passe' : '', k === aujourdhui() ? 'courant' : '', k === prochain() ? 'prochain' : '', direct ? 'endirect' : ''].join(' ');
+  if (direct) return `<div class="${cls}" role="button" tabindex="0" data-k="${k}">${libelle}<span class="piece">${txt(s.compositeur || 'à venir')}</span><a class="pastille-direct" href="${esc(s.youtube)}" target="_blank" rel="noopener" title="Rejoindre l’analyse en direct"><i>●</i> DIRECT</a></div>`;
   let oeil = '';
   if (s.youtube && s.etat === 'apres') oeil = `<a class="oeil" href="${esc(s.youtube)}" target="_blank" rel="noopener" title="Revoir l’analyse">${OEIL}</a>`;
   if (s.youtube && s.etat === 'direct') oeil = `<a class="oeil" href="${esc(s.youtube)}" target="_blank" rel="noopener" title="Suivre l’analyse en direct">${OEIL}</a>`;
@@ -291,7 +303,7 @@ async function sInscrire(form) {
 // --- Événements ---
 
 $('cal').addEventListener('click', (e) => {
-  if (e.target.closest('.oeil')) return;
+  if (e.target.closest('.oeil, .pastille-direct')) return;
   const j = e.target.closest('.jeudi[data-k]');
   if (j) { afficherDetail(j.dataset.k); montrerDetail(); }
 });
@@ -367,3 +379,5 @@ if (alertes) {
 
 appliquerGenre();
 charger();
+// Calendrier redessiné chaque minute (apparition / disparition de la pastille « DIRECT »)
+setInterval(() => { if (etat.maintenant) rendreCalendrier(); }, 60000);

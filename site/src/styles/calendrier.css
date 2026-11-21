@@ -18,7 +18,7 @@ h2.annee:first-child { margin-top: 0; }
 
 table.grille { border-collapse: separate; border-spacing: 0.4em; width: 100%; min-width: 40em; table-layout: fixed; }
 table.grille th.mois { color: var(--principal); font-weight: 700; text-align: left; white-space: nowrap; width: 8.5em; vertical-align: middle; letter-spacing: 0.04em; font-size: 0.9em; }
-table.grille td { vertical-align: top; }
+table.grille td { vertical-align: middle; }
 
 .jeudi { position: relative; display: block; width: 100%; min-height: 3.6em; text-align: left; border: 1px solid transparent; border-radius: 4px; padding: 0.3em 0.5em; color: var(--gris-logo); transition: background 0.15s, color 0.15s; }
 .jeudi .num { font-size: 0.95em; white-space: nowrap; }
@@ -38,6 +38,15 @@ table.grille td { vertical-align: top; }
 .oeil { position: absolute; right: 0.3em; bottom: 0.25em; line-height: 0; color: var(--principal); padding: 0.15em; }
 .oeil svg { width: 1.1em; height: 1.1em; }
 .jeudi.courant .oeil, .jeudi:hover .oeil { color: #fff; }
+
+/* Jour du direct (30 min avant le début → fin) : date, compositeur et pastille « DIRECT » centrés */
+.jeudi.endirect { display: flex; flex-direction: column; align-items: center; gap: 0.25em; text-align: center; padding-bottom: 0.4em; }
+.jeudi.endirect .piece { padding-right: 0; text-align: center; }
+.pastille-direct { font-size: 0.7em; font-weight: 700; letter-spacing: 0.08em; line-height: 1; white-space: nowrap; border: 2px solid #fff; border-radius: 3px; padding: 0.2em 0.6em; }
+a.pastille-direct, a.pastille-direct:link, a.pastille-direct:visited, a.pastille-direct:hover { color: #fff; }
+a.pastille-direct:hover { background: rgba(255, 255, 255, 0.18); }
+.pastille-direct i { font-style: normal; animation: clignote 1.4s ease-in-out infinite; }
+@keyframes clignote { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
 
 /* Fiche du jeudi */
 .detail { position: relative; margin-top: 1rem; padding: 0.9em 1.1em; border-left: 4px solid var(--principal); background: #f6f7f6; min-height: 3.2em; }
