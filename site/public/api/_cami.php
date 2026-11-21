@@ -85,6 +85,19 @@ CREATE TABLE IF NOT EXISTS invites (   -- une ligne par personne et par invitati
   invite_le TEXT NOT NULL,
   UNIQUE (email, invitation_id)
 );
+CREATE TABLE IF NOT EXISTS alertes_envoyees (   -- alertes des directs : palier (3j, 1j, 1h) traité pour une séance
+  jour TEXT NOT NULL,
+  palier TEXT NOT NULL,
+  envoyee_le TEXT NOT NULL,
+  envoyes INTEGER,              -- NULL : palier sauté (un palier plus proche était déjà dû)
+  PRIMARY KEY (jour, palier)
+);
+CREATE TABLE IF NOT EXISTS alertes_refus (   -- refus des alertes : jour = '' → toutes les séances
+  email TEXT NOT NULL,
+  jour TEXT NOT NULL DEFAULT '',
+  le TEXT NOT NULL,
+  PRIMARY KEY (email, jour)
+);
 CREATE TABLE IF NOT EXISTS presences (
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   jour TEXT NOT NULL REFERENCES seances(jour) ON DELETE CASCADE,

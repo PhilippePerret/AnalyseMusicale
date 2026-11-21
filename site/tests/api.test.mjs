@@ -349,3 +349,65 @@ test('invitations : enregistrement, programmation, envoi immédiat, envoi progra
   // Script de la tâche planifiée : inaccessible par le web
   assert.equal((await client().get('/api/_taches.php')).status, 404);
 });
+
+test('alertes des directs : 3 jours, 1 jour, 1 heure avant ; refus pour la session ou pour toujours', { skip }, async () => {
+  const admin = await adminConnecte();
+  const jour = jeudiFutur(6);
+  let r = await admin.post('seance.php', { action: 'enregistrer', jour, compositeur: 'Bach', oeuvre: 'Prélude', analyste: '', debut: '19:00', fin: '22:00', youtube: '' });
+  assert.equal(r.ok, true);
+  await admin.post('personnes.php', { action: 'ajouter', comme: 'contact', email: 'contact-alerte@example.com', pseudo: 'Flo', genre: 'F' });
+  const decale = (jours, heure) => { const d = new Date(`${jour}T12:00:00`); d.setDate(d.getDate() + jours); return `${d.toLocaleDateString('sv')} ${heure}`; };
+  const taches = (maintenant) => spawnSync('php', ['-d', `sendmail_path=cat >> ${mailFile}`, join(DIST, 'api', '_taches.php')], {
+    env: { ...process.env, CAMI_DB: join(tmp, 'cami.sqlite'), CAMI_MAINTENANT: maintenant }, encoding: 'utf-8',
+  });
+  // Mails reçus depuis `avant`, par destinataire
+  const recus = (avant) => readFileSync(mailFile, 'utf-8').slice(avant).split(/(?=^To: )/m).filter((m) => m.startsWith('To: '));
+  const pour = (mails, email) => mails.find((m) => m.startsWith(`To: ${email}\r\n`));
+
+  // Rien une semaine avant
+  let avant = readFileSync(mailFile, 'utf-8').length;
+  taches(decale(-7, '12:00'));
+  assert.equal(recus(avant).length, 0);
+
+  // 3 jours avant : tout le monde (inscrits, contacts, invités, téléchargements)
+  avant = readFileSync(mailFile, 'utf-8').length;
+  taches(decale(-2, '12:00'));
+  let mails = recus(avant);
+  for (const e of ['membre@example.com', 'contact-alerte@example.com', 'invite1@example.com', 'lecteur@example.com']) assert.ok(pour(mails, e), e);
+  const flo = pour(mails, 'contact-alerte@example.com');
+  assert.match(flo, /Bonjour Flo,/);
+  assert.match(flo, /de 19 h à 22 h/);
+  assert.match(flo, /parmi les participantes/);
+  assert.match(pour(mails, 'lecteur@example.com'), /Bonjour,\n/);
+  // Une seule fois par palier
+  avant = readFileSync(mailFile, 'utf-8').length;
+  taches(decale(-2, '12:05'));
+  assert.equal(recus(avant).length, 0);
+
+  // Refus pour cette session (lien du mail)
+  const lienSession = flo.match(/https:\/\/www\.analyse-musicale\.fr(\/api\/alertes\.php\?email=[^\s]+&jour=\d{4}-\d{2}-\d{2}&cle=[0-9a-f]+)/)[1];
+  let rep = await client().get(lienSession);
+  assert.equal(rep.headers.get('location'), '/jeudis-analyse/?alertes=session');
+  assert.equal((await client().get(lienSession.replace(/cle=[0-9a-f]+/, 'cle=' + '0'.repeat(32)))).headers.get('location'), '/jeudis-analyse/?alertes=invalide');
+  // Refus pour toujours
+  const lienJamais = pour(mails, 'invite1@example.com').match(/https:\/\/www\.analyse-musicale\.fr(\/api\/alertes\.php\?email=[^\s]+&jour=&cle=[0-9a-f]+)/)[1];
+  rep = await client().get(lienJamais);
+  assert.equal(rep.headers.get('location'), '/jeudis-analyse/?alertes=jamais');
+
+  // 1 jour avant : sans les refus
+  avant = readFileSync(mailFile, 'utf-8').length;
+  taches(decale(-1, '19:30'));
+  mails = recus(avant);
+  assert.ok(pour(mails, 'membre@example.com'));
+  assert.equal(pour(mails, 'contact-alerte@example.com'), undefined);
+  assert.equal(pour(mails, 'invite1@example.com'), undefined);
+
+  // 1 heure avant : sans lien de refus pour la session
+  avant = readFileSync(mailFile, 'utf-8').length;
+  taches(decale(0, '18:10'));
+  mails = recus(avant);
+  const dernier = pour(mails, 'membre@example.com');
+  assert.ok(dernier);
+  assert.doesNotMatch(dernier, /pour cette session/);
+  assert.match(dernier, /plus jamais recevoir/);
+});

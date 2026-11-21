@@ -355,5 +355,15 @@ if (confirmation) {
     : '<p class="erreur">Ce lien de confirmation n’est pas (ou plus) valide.</p>';
 }
 
+// Retour d'un lien de refus des alertes (mail d'alerte des directs)
+const alertes = new URLSearchParams(location.search).get('alertes');
+if (alertes) {
+  history.replaceState(null, '', location.pathname);
+  $('detail').innerHTML = {
+    session: '<p class="message">C’est noté : vous ne recevrez plus d’alerte pour cette session.</p>',
+    jamais: '<p class="message">C’est noté : vous ne recevrez plus aucune alerte pour les « Jeudis de l’analyse ».</p>',
+  }[alertes] || '<p class="erreur">Ce lien n’est pas (ou plus) valide.</p>';
+}
+
 appliquerGenre();
 charger();
