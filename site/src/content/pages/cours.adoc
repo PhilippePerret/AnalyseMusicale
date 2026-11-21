@@ -29,5 +29,5 @@ Le COURS D’ANALYSE MUSICALE de Philippe Perret, c’est…
 
 
 La fréquence des cours est à la convenance de chacun +
-(1 cours par semaine, 1 à 2 cours par mois, 1 cours toutes les 6 semaines, etc.)
+(1 cours par semaine, 1 à 2 cours par mois, 1 cours toutes les 6 semaines, séance définissable la semaine précédente, etc.)
 --
