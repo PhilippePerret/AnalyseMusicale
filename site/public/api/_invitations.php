@@ -1,6 +1,6 @@
 <?php
 // Invitations de l'administrateur : enregistrement, envoi immédiat ou programmé.
-// Envoi programmé : _envoi_invitations.php, lancé par une tâche planifiée Alwaysdata.
+// Envoi programmé : _taches.php, lancé par une tâche planifiée Alwaysdata.
 require_once __DIR__ . '/_cami.php';
 
 // Adresses valides, en minuscules, sans doublon

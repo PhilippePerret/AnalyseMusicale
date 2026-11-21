@@ -329,8 +329,8 @@ test('invitations : enregistrement, programmation, envoi immédiat, envoi progra
     const bd = new DatabaseSync(join(tmp, 'cami.sqlite'));
     bd.prepare("UPDATE invitations SET programmee_le = '2000-01-01 09:00' WHERE id = ?").run(r.invitation.id);
     bd.close();
-    const sortie = spawnSync('php', ['-d', `sendmail_path=cat >> ${mailFile}`, join(DIST, 'api', '_envoi_invitations.php')], { env: { ...process.env, CAMI_DB: join(tmp, 'cami.sqlite') }, encoding: 'utf-8' });
-    assert.match(sortie.stdout, /1 invitation\(s\) envoyée\(s\)/);
+    const sortie = spawnSync('php', ['-d', `sendmail_path=cat >> ${mailFile}`, join(DIST, 'api', '_taches.php')], { env: { ...process.env, CAMI_DB: join(tmp, 'cami.sqlite') }, encoding: 'utf-8' });
+    assert.match(sortie.stdout, /invitations programmées : 1/);
     const l = (await (await admin.get('/api/invitations.php')).json()).invitations;
     assert.ok(l.find((i) => i.id === r.invitation.id).envoyee_le);
   }
@@ -339,5 +339,5 @@ test('invitations : enregistrement, programmation, envoi immédiat, envoi progra
   assert.equal(r.ok, true);
   assert.equal((await (await admin.get('/api/invitations.php')).json()).invitations.some((i) => i.id === id), false);
   // Script de la tâche planifiée : inaccessible par le web
-  assert.equal((await client().get('/api/_envoi_invitations.php')).status, 404);
+  assert.equal((await client().get('/api/_taches.php')).status, 404);
 });
