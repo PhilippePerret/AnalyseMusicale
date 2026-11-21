@@ -184,7 +184,7 @@ h1.titre-page {
 .blocs li { display: contents; }
 .blocs li p { display: contents; }
 .blocs a {
-  flex: 0 1 30%;
+  flex: 0 1 calc(50% - 1em);   /* deux blocs par ligne */
   min-width: min(100%, 14em);
   border: 1px solid;
   padding: 2em 1em;

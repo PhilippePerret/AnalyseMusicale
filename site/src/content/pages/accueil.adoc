@@ -6,3 +6,4 @@
 * link:/jeudis-analyse/[Les _Jeudis de l’analyse_]
 * link:/cours/[Les cours d’analyse]
 * link:/table-analyse/[La Table d’analyse]
+* link:/ressources/[Les ressources]

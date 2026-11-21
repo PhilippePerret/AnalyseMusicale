@@ -1,0 +1,9 @@
+= Les livres
+:description: Livres recommandés pour apprendre et pratiquer l’analyse musicale.
+:bande: Espace virtuel du Cours d’Analyse Musicale (CAMI) de Philippe PERRET.
+
+link:/ressources/[← Les ressources]
+
+Les livres recommandés pour apprendre et pratiquer l’analyse musicale.
+
+_Liste en préparation._
