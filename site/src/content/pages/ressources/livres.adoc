@@ -1,9 +1,15 @@
 = Les livres
 :description: Livres recommandés pour apprendre et pratiquer l’analyse musicale.
-:bande: Espace virtuel du Cours d’Analyse Musicale (CAMI) de Philippe PERRET.
 
 link:/ressources/[← Les ressources]
 
 Les livres recommandés pour apprendre et pratiquer l’analyse musicale.
 
-_Liste en préparation._
+* https://bibliotheques.paris.fr/cinema/doc/BFS/73873-pf0000330812/manuel-pratique-pour-l-etude-des-cles-de-sol-fa-et-ut[**« Le Dandelot »**^]. [.medium]#De son vrai nom **__Manuel pratique pour l'étude des clés de Sol, Fa et Ut__**, cet ouvrage est le manuel de référence par excellence pour apprendre à lire plus vite la musique, la vitesse de lecture étant une aptitude très intéressante à développer non seulement pour sa pratique personnelle ou professionnelle de la musique mais également pour l'analyse.#
+* https://fr.wikisource.org/wiki/Théorie_de_la_musique_(Danhauser,_1889)/Texte_entier[**« Le Danhauser »**^]. [.medium]#Là aussi, un vieil ouvrage portant le nom de son auteur, qui s'appelle en vérité **__Théorie de la musique__**. Il date de 1872 mais est encore d'actualité puisque la théorie a très peu évolué.#
+* https://imslp.org/wiki/Précis_des_Règles_du_Contrepoint_(Koechlin%2C_Charles)[**« Le Koechlin »**^]. [.medium]#Le titre original est **__Précis des règles du Contrepoint__**, de Charles Koechlin. Connaitre les règles qu'ont étudiées les compositrices et compositeurs est une ressource inestimable pour mieux appréhender leur écriture.#
+* https://www.laflutedepan.com/livre/5000264/marcel-bitsch-precis-d-harmonie-tonale-.html[**« Le Bitsch »**^]. [.medium]#Autre livre portant le nom de son auteur dans le langage courant des musiciens et des musiciennes, le **__Précis d'Harmonie tonale__** est là aussi un concentré des règles apprises par les compositeurs et compositrices concernant l'harmonie.#
+* https://artotheque.mediatheques-grandpoitiers.fr/detailstatic.aspx?RSC_BASE=SYRACUSE&RSC_DOCID=4586015&TITLE=l-ecriture-tonale-cours-et-methode-jean-louis-fabre&_lg=fr-FR[**L'Écriture tonale**^]. [.medium]#Même s'il n'est pas (encore) considéré comme un ouvrage de référence, on ne peut éviter de citer cet ouvrage de Jean-Louis Fabre, pédagogue généreux qui a donné tant d'énergie à rendre l'harmonie accessible gratuitement au plus grand nombre sur YouTube par le biais de sa chaine https://www.youtube.com/channel/UC1kz30iAcNahlzfPcKFZGpA[Gradus ad parnassum^].#
+* https://www.amazon.fr/dp/2364413184[**Guide de l'analyse musicale**^]. [.medium]#Ouvrage considéré comme une référence pour la connaissance de l'analyse musicale, écrit par le professeur d'analyse musicale du CNSMP.#
+* https://www.amazon.fr/dp/248761305X[**Gammes et Accords dans tous les Tons**^]. [.medium]#Un précis très utile pour bien comprendre les gammes et les accords et les retrouver en un clin d'œil. Ce précis développe aussi la notion de __note symptômatiques__ qu'il suffit de connaitre pour repérer très vite toutes les modulations.#
+* https://www.icare-editions.fr/?s=publications&c=mus&p=pub&y=des&d=ord[**Analyses des éditions ICARE**^]. [.medium]#Vous trouverez aux éditions Icare des analyses musicales complètes menées par Philippe Perret, l'hôte de ces lieux.#

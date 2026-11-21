@@ -1,0 +1,13 @@
+= Les vidéos
+:description: Vidéos recommandées pour apprendre et pratiquer l’analyse musicale.
+
+link:/ressources/[← Les ressources]
+
+Quelques vidéos recommandées pour apprendre et pratiquer l’analyse musicale.
+
+NOTE: Si vous en connaissez d'autres, n'hésitez pas à link:/contact/[nous le faire savoir].
+
+* https://www.youtube.com/watch?v=dT6RSHmyoN0/[Initiation à l'analyse musicale] [.medium]#(1 heure consacrée au chiffrage détaillé du premier prélude de Bach, pour les débutants)#
+* https://www.youtube.com/watch?v=35jiLLXF9Vc&t=349[Harmonie et Analyse musicale]. [.medium]#Les excellents cours de Jean-Louis Fabre (alias __Gradus ad parnassum__), surtout en matière d'harmonie#.
+
+Et bien entendu, vous pouvez voir ou revoir toutes les « **Analyses Musicales en direct** » au cours des link:/jeudis-analyse/[**Jeudis de l'analyse**] qui ont eu lieu et ont lieu sur Youtube.
