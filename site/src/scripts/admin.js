@@ -180,7 +180,7 @@ const formInvitation = $('formInvitation');
 const choixInvitation = $('choixInvitation');
 let invitations = [];
 Object.assign(ERREURS, {
-  adresses: 'Au moins une adresse valide.',
+  adresses: 'Au moins une ligne « adresse H » ou « adresse F ».',
   programmation: 'Date ou heure d’envoi invalide.',
   passe: 'L’envoi programmé doit être dans le futur.',
 });
@@ -215,7 +215,7 @@ function remplirInvitation() {
   const el = formInvitation.elements;
   el.objet.value = i?.objet ?? '';
   el.message.value = i?.message ?? '';
-  el.adresses.value = (i?.adresses ?? []).join('\n');
+  el.adresses.value = (i?.adresses ?? []).map((d) => `${d.email} ${d.genre}`.trim()).join('\n');
   el.date.value = i?.programmee_le ? i.programmee_le.slice(0, 10) : '';
   el.heure.value = i?.programmee_le ? i.programmee_le.slice(11, 16) : '';
   $('etatInvitation').textContent = etatInvitation(i);
@@ -224,18 +224,24 @@ function remplirInvitation() {
   message(formInvitation, '');
 }
 
-// Adresses saisies (une par ligne ; virgules, points-virgules et espaces acceptés)
-function adressesSaisies() {
-  return [...new Set(formInvitation.elements.adresses.value.split(/[\s,;]+/).map((a) => a.trim().toLowerCase()).filter(Boolean))];
+// Destinataires saisis : une ligne par personne, « adresse H » ou « adresse F »
+function destinatairesSaisis() {
+  const destinataires = [];
+  const erreurs = [];
+  formInvitation.elements.adresses.value.split('\n').map((l) => l.trim()).filter(Boolean).forEach((ligne) => {
+    const [email, genre, ...reste] = ligne.split(/\s+/);
+    if (reste.length || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !/^[HF]$/i.test(genre || '')) erreurs.push(ligne);
+    else if (!destinataires.some((d) => d.email === email.toLowerCase())) destinataires.push({ email: email.toLowerCase(), genre: genre.toUpperCase() });
+  });
+  return { destinataires, erreurs };
 }
 
 async function posterInvitation(action) {
   const el = formInvitation.elements;
-  const adresses = adressesSaisies();
-  const invalides = adresses.filter((a) => !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(a));
+  const { destinataires: adresses, erreurs } = destinatairesSaisis();
   if (!el.objet.value.trim() || !el.message.value.trim()) return message(formInvitation, ERREURS.message);
+  if (erreurs.length) return message(formInvitation, `Ligne${erreurs.length > 1 ? 's' : ''} invalide${erreurs.length > 1 ? 's' : ''} (format « adresse H » ou « adresse F ») : ${erreurs.join(' ; ')}`);
   if (!adresses.length) return message(formInvitation, ERREURS.adresses);
-  if (invalides.length) return message(formInvitation, `Adresse${invalides.length > 1 ? 's' : ''} invalide${invalides.length > 1 ? 's' : ''} : ${invalides.join(', ')}`);
   if (action === 'enregistrer' && (!el.date.value !== !el.heure.value)) return message(formInvitation, 'Date ET heure requises pour programmer l’envoi.');
   const donnees = {
     action,

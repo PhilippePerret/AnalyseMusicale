@@ -2,7 +2,7 @@
 // Ignorés si PHP n'est pas disponible.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { readFileSync, existsSync, mkdtempSync, writeFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -300,27 +300,32 @@ test('invitations : enregistrement, programmation, envoi immédiat, envoi progra
   assert.equal((await client().get('/api/invitations.php')).status, 403);
   const admin = await adminConnecte();
   const futur = new Date(Date.now() + 86400000).toLocaleDateString('sv') + ' 09:00';
-  let r = await admin.post('invitations.php', { action: 'enregistrer', objet: 'Invitation', message: 'Venez !', adresses: ['Invite1@Example.com', 'invite1@example.com', 'invite2@example.com'], programmee_le: futur });
+  let r = await admin.post('invitations.php', { action: 'enregistrer', objet: 'Invitation', message: 'Venez !', adresses: [{ email: 'Invite1@Example.com', genre: 'f' }, { email: 'invite1@example.com', genre: 'F' }, { email: 'invite2@example.com', genre: 'H' }], programmee_le: futur });
   assert.equal(r.ok, true);
-  assert.deepEqual(r.invitation.adresses, ['invite1@example.com', 'invite2@example.com']);
+  assert.deepEqual(r.invitation.adresses, [{ email: 'invite1@example.com', genre: 'F' }, { email: 'invite2@example.com', genre: 'H' }]);
   assert.equal(r.invitation.programmee_le, futur);
   const id = r.invitation.id;
-  assert.equal((await admin.post('invitations.php', { action: 'enregistrer', objet: 'X', message: 'Y', adresses: ['a@example.com'], programmee_le: '2000-01-01 09:00' })).erreur, 'passe');
-  assert.equal((await admin.post('invitations.php', { action: 'enregistrer', objet: 'X', message: 'Y', adresses: ['pas-une-adresse'] })).erreur, 'adresses');
+  assert.equal((await admin.post('invitations.php', { action: 'enregistrer', objet: 'X', message: 'Y', adresses: [{ email: 'a@example.com', genre: 'H' }], programmee_le: '2000-01-01 09:00' })).erreur, 'passe');
+  assert.equal((await admin.post('invitations.php', { action: 'enregistrer', objet: 'X', message: 'Y', adresses: [{ email: 'a@example.com' }] })).erreur, 'adresses');
+  assert.equal((await admin.post('invitations.php', { action: 'enregistrer', objet: 'X', message: 'Y', adresses: [{ email: 'pas-une-adresse', genre: 'H' }] })).erreur, 'adresses');
 
   // Modification : même invitation
-  r = await admin.post('invitations.php', { action: 'enregistrer', id, objet: 'Invitation modifiée', message: 'Venez !', adresses: ['invite1@example.com'], programmee_le: '' });
+  r = await admin.post('invitations.php', { action: 'enregistrer', id, objet: 'Invitation modifiée', message: 'Ch[er|ère] ami[|e], venez !', adresses: [{ email: 'invite1@example.com', genre: 'F' }], programmee_le: '' });
   assert.equal(r.invitation.id, id);
   assert.equal(r.invitation.programmee_le, null);
 
   // Envoi immédiat
   const avant = readFileSync(mailFile, 'utf-8').length;
-  r = await admin.post('invitations.php', { action: 'envoyer', id, objet: 'Invitation modifiée', message: 'Venez !', adresses: ['invite1@example.com'] });
+  r = await admin.post('invitations.php', { action: 'envoyer', id, objet: 'Invitation modifiée', message: 'Ch[er|ère] ami[|e], venez !', adresses: [{ email: 'invite1@example.com', genre: 'F' }] });
   assert.equal(r.invitation.envoyes, 1);
   assert.ok(r.invitation.envoyee_le);
   assert.match(readFileSync(mailFile, 'utf-8').slice(avant), /To: invite1@example\.com/);
+  assert.match(readFileSync(mailFile, 'utf-8').slice(avant), /Chère amie, venez !/);
+  // Sauvegarde de l'invitation envoyée
+  const sauvegardes = readdirSync(join(tmp, 'sauvegardes', 'invitations'));
+  assert.ok(sauvegardes.some((f) => new RegExp(`^${id}-\\d{4}-\\d{2}-\\d{2}-\\d{6}\\.json$`).test(f)));
   // Invitation envoyée : une modification crée une nouvelle invitation
-  r = await admin.post('invitations.php', { action: 'enregistrer', id, objet: 'Copie', message: 'Venez !', adresses: ['invite1@example.com'] });
+  r = await admin.post('invitations.php', { action: 'enregistrer', id, objet: 'Copie', message: 'Venez !', adresses: [{ email: 'invite1@example.com', genre: 'F' }] });
   assert.notEqual(r.invitation.id, id);
 
   // Envoi programmé arrivé à échéance : script de la tâche planifiée
@@ -328,11 +333,14 @@ test('invitations : enregistrement, programmation, envoi immédiat, envoi progra
   if (DatabaseSync) {
     const bd = new DatabaseSync(join(tmp, 'cami.sqlite'));
     bd.prepare("UPDATE invitations SET programmee_le = '2000-01-01 09:00' WHERE id = ?").run(r.invitation.id);
-    bd.close();
     const sortie = spawnSync('php', ['-d', `sendmail_path=cat >> ${mailFile}`, join(DIST, 'api', '_taches.php')], { env: { ...process.env, CAMI_DB: join(tmp, 'cami.sqlite') }, encoding: 'utf-8' });
     assert.match(sortie.stdout, /invitations programmées : 1/);
     const l = (await (await admin.get('/api/invitations.php')).json()).invitations;
     assert.ok(l.find((i) => i.id === r.invitation.id).envoyee_le);
+    // Invités consignés : une ligne par personne et par invitation envoyée
+    const invites = bd.prepare('SELECT email, genre, invitation_id FROM invites WHERE email = ? ORDER BY invitation_id').all('invite1@example.com');
+    assert.deepEqual(invites.map((x) => [x.genre, x.invitation_id]), [['F', id], ['F', r.invitation.id]]);
+    bd.close();
   }
 
   r = await admin.post('invitations.php', { action: 'supprimer', id });

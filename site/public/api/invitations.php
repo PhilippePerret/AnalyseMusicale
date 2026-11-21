@@ -1,7 +1,7 @@
 <?php
 // Invitations (administrateur).
 // GET : liste.
-// POST JSON {action: enregistrer | envoyer | supprimer, id?, objet, message, adresses[], programmee_le?}
+// POST JSON {action: enregistrer | envoyer | supprimer, id?, objet, message, adresses [{email, genre H|F}], programmee_le?}
 //   enregistrer : création ou modification (une invitation déjà envoyée est copiée) ;
 //   programmee_le « AAAA-MM-JJ HH:MM » (futur) ou vide ;
 //   envoyer : enregistrement puis envoi immédiat.
@@ -22,7 +22,7 @@ if ($action === 'supprimer') {
 if ($action === 'enregistrer' || $action === 'envoyer') {
   $objet = texte($e['objet'] ?? '', 200);
   $message = trim(str_replace("\r\n", "\n", (string) ($e['message'] ?? '')));
-  $adresses = adresses_valides($e['adresses'] ?? null);
+  $adresses = destinataires_valides($e['adresses'] ?? null);
   if ($objet === '' || $message === '') repondre(['ok' => false, 'erreur' => 'message'], 422);
   if (!$adresses) repondre(['ok' => false, 'erreur' => 'adresses'], 422);
   $programmee = null;

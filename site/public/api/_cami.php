@@ -69,13 +69,21 @@ CREATE TABLE IF NOT EXISTS invitations (   -- invitations de l'administrateur (a
   id INTEGER PRIMARY KEY,
   objet TEXT NOT NULL,
   message TEXT NOT NULL,
-  adresses TEXT NOT NULL,
+  adresses TEXT NOT NULL,     -- JSON [{email, genre (H|F)}]
   programmee_le TEXT,        -- envoi programmé (AAAA-MM-JJ HH:MM), NULL sinon
   envoyee_le TEXT,
   envoyes INTEGER,
   echecs TEXT,               -- adresses en échec (JSON)
   cree_le TEXT NOT NULL,
   modifiee_le TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS invites (   -- une ligne par personne et par invitation envoyée
+  id INTEGER PRIMARY KEY,
+  email TEXT NOT NULL,
+  genre TEXT NOT NULL,
+  invitation_id INTEGER NOT NULL,
+  invite_le TEXT NOT NULL,
+  UNIQUE (email, invitation_id)
 );
 CREATE TABLE IF NOT EXISTS presences (
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,

@@ -75,6 +75,7 @@ table.adresses .attente { color: #999; font-style: italic; }
 .admin dialog.invitation .redaction input[type=text] { max-width: none; }
 .admin dialog.invitation label.adresses { display: grid; grid-template-rows: auto 1fr; gap: 0.3em; }
 .admin dialog.invitation label.adresses textarea { resize: none; }
+.admin dialog.invitation label.adresses .aide { color: #777; font-size: 0.9em; }
 .admin dialog.invitation .entete { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5em 1.2em; }
 .admin dialog.invitation .entete label { display: flex; align-items: center; gap: 0.5em; }
 .admin dialog.invitation .entete select { max-width: 26em; }
