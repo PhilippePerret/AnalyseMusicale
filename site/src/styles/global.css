@@ -32,6 +32,9 @@ body {
   line-height: 1.5;
 }
 
+/* Gras du texte : 600 (moins appuyé que 700) */
+b, strong { font-weight: 600; }
+
 img { max-width: 100%; height: auto; }
 
 /* Cases à cocher : agrandies (charte) */
