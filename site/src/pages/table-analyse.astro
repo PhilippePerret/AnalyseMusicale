@@ -15,7 +15,6 @@ const morceaux = (page.rendered?.html ?? '').split(/<div class="paragraph">\s*<p
 
 // Fichier local (public/) absent : non proposé
 const disponible = (chemin: string) => !chemin.startsWith('/') || existsSync(join(process.cwd(), 'public', chemin));
-const telechargements = TABLE_ANALYSE.telechargements.filter((t) => disponible(t.fichier));
 const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
 ---
 <Base title={title} heading={title} bande={bande} description={description}>
@@ -46,15 +45,6 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
       </div>
       <p class="message" hidden></p>
     </form>
-
-    <div id="liens" hidden>
-      <p><span id="merci">Merci ! </span>Choisissez la version pour votre système (version <span class="version-table">{TABLE_ANALYSE.version}</span>) :</p>
-      <ul class="telechargements">
-        {telechargements.map((t) => (
-          <li><a data-href={t.fichier} data-systeme={t.systeme}>{t.systeme}</a></li>
-        ))}
-      </ul>
-    </div>
 
     <div id="deblocageMac" class="deblocage-mac" hidden>
       <p>Pour débloquer l’application, jouer ce code dans votre application Terminal</p>
@@ -92,21 +82,10 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
         .catch(function () {});
     })();
 
-    // Visiteur identifié : liens affichés directement.
-    // Sinon : adresse + plateforme envoyées à /telechargement.php, qui envoie le lien par mail.
+    // Adresse + plateforme envoyées à /telechargement.php, qui envoie le lien par mail.
     (function () {
       var form = document.getElementById('telechargement');
       var message = form.querySelector('.message');
-      // Liens par /api/telecharger.php : téléchargement enregistré (fichier lu au clic, après mise à jour de la version)
-      function afficherLiens() {
-        document.querySelectorAll('#liens a[data-href]').forEach(function (a) {
-          function lien() { return '/api/telecharger.php?fichier=' + encodeURIComponent(a.dataset.href) + '&systeme=' + encodeURIComponent(a.dataset.systeme); }
-          a.href = lien();
-          a.addEventListener('click', function () { a.href = lien(); });
-        });
-        form.hidden = true;
-        document.getElementById('liens').hidden = false;
-      }
       // Plateforme macOS choisie : commande de déblocage affichée
       var deblocage = document.getElementById('deblocageMac');
       form.elements.fichier.addEventListener('change', function () {
@@ -121,13 +100,6 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
           setTimeout(function () { ok.hidden = true; }, 1800);
         });
       });
-      document.querySelectorAll('#liens a[data-systeme="macOS"]').forEach(function (a) {
-        a.addEventListener('click', function () { deblocage.hidden = false; });
-      });
-      fetch('/api/moi.php', { credentials: 'same-origin' })
-        .then(function (r) { return r.json(); })
-        .then(function (res) { if (res.user) { document.getElementById('merci').hidden = true; afficherLiens(); } })
-        .catch(function () {});
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         message.hidden = true;
