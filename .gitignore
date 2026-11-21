@@ -16,3 +16,4 @@ site/.astro/
 site/public/telechargements/*
 !site/public/telechargements/demo-table-analyse.mp4
 .claude/MEMORY.md
+scripts/surveille-direct/
