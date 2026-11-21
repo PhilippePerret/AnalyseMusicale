@@ -37,7 +37,8 @@ table.grille td { vertical-align: middle; }
 /* Œil : revoir (passé) ou suivre (en cours) */
 .oeil { position: absolute; right: 0.3em; bottom: 0.25em; line-height: 0; color: var(--principal); padding: 0.15em; }
 .oeil svg { width: 1.1em; height: 1.1em; }
-.jeudi.courant .oeil, .jeudi:hover .oeil { color: #fff; }
+a.oeil, a.oeil:link, a.oeil:visited { color: var(--principal); }
+.jeudi.courant a.oeil, .jeudi:hover a.oeil { color: #fff; }
 
 /* Jour du direct (30 min avant le début → fin) : date, compositeur et pastille « DIRECT » centrés */
 .jeudi.endirect { display: flex; flex-direction: column; align-items: center; gap: 0.25em; text-align: center; padding-bottom: 0.4em; }
