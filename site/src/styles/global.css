@@ -86,12 +86,10 @@ header.site .logo .marque span {
   color: var(--gris-logo);
   font-size: 24px;
 }
-header.site .nom {
-  color: var(--vert-titre);
-  text-align: right;
-  font-size: clamp(1.1rem, 3vw, 28pt);
-  line-height: 1.15;
-}
+/* Menu de l'en-tête (blocs de l'accueil) */
+header.site nav.menu { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.3em 1.6em; }
+header.site nav.menu a { font-size: 0.6em; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; }
+header.site nav.menu a.actif { color: var(--principal); }
 
 /* Grand titre de page */
 h1.titre-page {

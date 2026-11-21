@@ -16,6 +16,13 @@ interface Props {
 }
 
 const { title, heading, bande, description, objetContact = 'renseignements', piedDePage = true, indexer = true } = Astro.props;
+// Menu de l'en-tête : les blocs de la page d'accueil
+const MENU = [
+  ['/jeudis-analyse/', 'Les Jeudis de l’analyse'],
+  ['/cours/', 'Les cours d’analyse'],
+  ['/table-analyse/', 'La Table d’analyse'],
+  ['/ressources/', 'Les ressources'],
+];
 const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} — CAMI`;
 ---
 <!doctype html>
@@ -39,7 +46,9 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
       <span class="accueil">ACCUEIL</span>
     </a>
     {Astro.url.pathname !== '/' && (
-      <div class="nom" set:html={marqueCami('Cours d’Analyse Musicale')} />
+      <nav class="menu">
+        {MENU.map(([href, texte]) => <a href={href} class={Astro.url.pathname.startsWith(href) ? 'actif' : undefined}>{texte}</a>)}
+      </nav>
     )}
   </header>
 
