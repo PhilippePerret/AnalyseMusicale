@@ -3,7 +3,7 @@ import '@fontsource/quicksand/latin-400.css';
 import '@fontsource/quicksand/latin-600.css';
 import '@fontsource/quicksand/latin-700.css';
 import '../styles/global.css';
-import type { ObjetContact } from '../lib/site';
+import { marqueCami, type ObjetContact } from '../lib/site';
 
 interface Props {
   title: string;          // Titre de l'onglet
@@ -39,12 +39,12 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
       <span class="accueil">ACCUEIL</span>
     </a>
     {Astro.url.pathname !== '/' && (
-      <div class="nom">Cours d’Analyse Mus<span style="color:ardoise;font-size:1.2em;">i</span>cale</div>
+      <div class="nom" set:html={marqueCami('Cours d’Analyse Musicale')} />
     )}
   </header>
 
   <main>
-    {heading && <h1 class="row titre-page">{heading}</h1>}
+    {heading && <h1 class="row titre-page" set:html={marqueCami(heading.replace(/&/g, '&amp;').replace(/</g, '&lt;'))} />}
     {bande && <div class="row bande-grise" set:html={bande} />}
     <slot />
   </main>

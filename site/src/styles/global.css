@@ -32,6 +32,13 @@ body {
   line-height: 1.5;
 }
 
+/* « Cours d’Analyse Musicale » : initiales aux couleurs du logo (marqueCami) */
+.cami .c, .cami .a, .cami .m, .cami .i { font-weight: 600; }
+.cami .c { color: #1f5fe0; }
+.cami .a { color: #e8264f; }
+.cami .m { color: #1a9e45; }
+.cami .i { color: #e0b800; }
+
 /* Gras du texte : 600 (moins appuyé que 700) */
 b, strong { font-weight: 600; }
 

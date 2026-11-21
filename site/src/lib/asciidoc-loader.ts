@@ -5,6 +5,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join, resolve, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { load, convert } from '@asciidoctor/core';
+import { marqueCami } from './site';
 import type { Loader, LoaderContext } from 'astro/loaders';
 
 export function asciidocLoader({ base }: { base: string }): Loader {
@@ -32,7 +33,7 @@ export function asciidocLoader({ base }: { base: string }): Loader {
             title: (doc.getDocumentTitle({ sanitize: true }) as string | null) ?? id,
             description: attrs['description'],
             objetContact: attrs['objet-contact'],
-            bande: attrs['bande'] && (await convert(attrs['bande'], { doctype: 'inline' })) as string,
+            bande: attrs['bande'] && marqueCami((await convert(attrs['bande'], { doctype: 'inline' })) as string),
           },
         });
         context.store.set({
@@ -41,7 +42,7 @@ export function asciidocLoader({ base }: { base: string }): Loader {
           body: source,
           filePath: relative(root, path),
           digest,
-          rendered: { html: await doc.convert() },
+          rendered: { html: marqueCami(await doc.convert()) },
         });
       };
 
