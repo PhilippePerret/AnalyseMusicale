@@ -7,12 +7,14 @@
 Contact, renseignements et inscription +
 link:/contact/?objet=cours[→ formulaire de contact]
 
-Le COURS D’ANALYSE MUSICALE, c’est…
+Le COURS D’ANALYSE MUSICALE de Philippe Perret, c’est…
 
 [square]
 * Un apprentissage fondé sur la pratique concrète et dynamique de l’analyse.
-* Des œuvres choisies par celui qui apprend ou qui lui sont proposées.
-* Des cours individualisés ou en groupe, n’importe où, n’importe quand (par https://zoom.us[Zoom,window=_blank] ou autre logiciel de visioconférence).
+* Une alternance de pièces imposées (pour proposer une progression harmonieuse) et des œuvres choisies par celui ou celle qui apprend.
+* Des cours individualisés ou en binôme, n’importe où, n’importe quand (type Zoom, Meet ou autre logiciel de visioconférence).
+* Un apprentissage qui s'adapte et part de votre niveau musical actuel, quel qu'il soit, aussi basique soit-il (on peut ne partir de rien, même d'une capacité de lecteur ou de lectrice faible).
+* Un apprentissage stimulant qui s'adapte à votre rythme, bienveillant et sans pression.
 
 [.clear.text-center]
 --
@@ -26,6 +28,6 @@ Le COURS D’ANALYSE MUSICALE, c’est…
 |====
 
 
-Fréquence à la convenance de chacun +
-(1 à 2 cours par mois, 1 cours toutes les 6 semaines, etc.)
+La fréquence des cours est à la convenance de chacun +
+(1 cours par semaine, 1 à 2 cours par mois, 1 cours toutes les 6 semaines, etc.)
 --

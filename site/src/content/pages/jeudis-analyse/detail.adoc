@@ -1,7 +1,7 @@
 = Les Jeudis de l’Analyse (musicale) =
 :description: Les Jeudis de l’analyse : rendez-vous hebdomadaires en visioconférence pour découvrir et approfondir la pratique de l’analyse musicale.
 :objet-contact: jeudis
-:bande: _Espace virtuel du Cours d’Analyse Musicale (CAMI) de Philippe PERRET._
+:bande: Espace virtuel du Cours d’Analyse Musicale (CAMI) de Philippe PERRET.
 
 [.contact-bloc]
 Contact et renseignements +
@@ -23,11 +23,11 @@ Ces __Jeudis de l’analyse__ se déroulent en direct sur YouTube. Chaque séanc
 
 Ces sessions en direct sont destinées et accessibles à **toute personne sachant au moins lire une partition**. C’est vraiment la seule condition un peu incontournable (et encore…) pour être en mesure de les suivre.
 
-Un rudiment de théorie est un atout certain, comme la connaissance des accords, des gammes, des cadences et autres éléments de solfège.
+Un rudiment de théorie est un atout certain, comme la connaissance des accords, des gammes, des cadences et autres éléments de solfège. N'hésitez pas à consulter les link:/ressources/[ressources^] que Philippe Perret recommande pour se former.
 
-Cependant, les analyses étant menées exclusivement, dans un premier temps, par link:/pedagogue/[Philippe Perret^] lui-même, l’hôte de ces lieux, il est possible qu’il faille vous accrocher pour suivre (ou pas). Rassurez-vous : ces sessions sont enregistrées et vous pouvez y revenir quand bon vous semble pour les suivre à votre tempo.
+Cependant, les analyses étant menées exclusivement, dans un premier temps, par link:/pedagogue/[Philippe Perret^] lui-même, l’hôte de ces lieux, il est possible qu’il faille s'accrocher pour suivre… ou pas. Rassurez-vous : ces réunions étant enregistrées, vous pouvez y revenir quand bon vous semble pour les suivre à votre tempo.
 
-NOTE: Bien entendu, si vous voulez augmenter vos compétences musicales en stimulant votre capacité à lire et à analiser, link:/pedagogue/[Philippe Perret] propose des link:/cours/[cours d'analyse musicale] en solo ou en binôme.
+NOTE: Bien entendu, si vous voulez augmenter vos compétences musicales en stimulant votre capacité à lire et à analiser, en plus des ressources recommandées, link:/pedagogue/[Philippe Perret^] propose des link:/cours/[cours d'analyse musicale^] en solo ou en binôme.
 
 == Pour quoi ?
 
@@ -55,7 +55,7 @@ Pour résumer, voici la liste des buts vers lesquels tendent ces __Jeudis de l�
 
 Les pièces seront principalement choisies **dans le répertoire classique**. Le piano sera mis à l’honneur pour la grande diversité de son répertoire, sa lecture plus facile (plus facile qu’un quatuor à cordes par exemple), sa simplicité (seulement deux portées simultanées) qui offre pourtant une densité d’écriture, une variété de dispositifs et un ambitus élevé (plus de huit octaves, une écriture qui peut être parfois __orchestrale__).
 
-Néanmoins seront abordées régulièrement des pièces d’autres instruments, proposées par exemple par les participants.
+Néanmoins seront abordées régulièrement des pièces d’autres instruments, proposées par exemple par les participants. N'hésitez surtout pas à link:/contact/[proposer des pièces à étudier].
 
 Chaque année, **un compositeur sera mis à l’honneur**, en fonction de la relation qu’il entretient avec l’année en question. Par exemple, 2027 fêtant les 200 ans de la mort de BEETHOVEN, c’est lui qui sera mis à l’honneur. 2028 fêtant les 200 ans du décès de SCHUBERT, c’est lui qui sera mis à l’honneur, etc.
 
@@ -66,26 +66,26 @@ D’abord, sachez que vous pouvez rejoindre ces analyses quand vous le voulez en
 __Précisons avant de commencer que le challenge, pour Philippe, l’hôte et principal acteur de ces sessions (ou l’analyste qui se sera proposé peut-être), est d’aborder une pièce qu’il connait d’oreille (ou de lecture) mais qu’il n’a jamais analysée auparavant.__
 
 
-* Vous rejoignez, si possible un quart d’heure avant le début, la salle de Direct YouTube depuis le link:/jeudis-analyse/[calendrier des Jeudis^].
+* Vous rejoignez, si possible dix minutes avant le début, la salle de Direct YouTube depuis le link:/jeudis-analyse/[calendrier des Jeudis^].
 * Dès l’heure de début fixée, Philippe (ou l’analyste volontaire) procède à la **présentation rapide la pièce**. On aborde tout de suite la partition.
 * Philippe (ou l’analyste volontaire) regarde la pièce qu’il découvre, de façon générale, pour en dégager, justement,les **généralités** (compositeur, genre, date, tonalités, parties visibles, points remarquables, etc.), le maximum d’informations.
 * Puis vient le gros de l’analyse : **le chiffrage de la partition**. Le plus rapidement possible, Philippe (ou l’analyste) donne le nom et le chiffrage de tous les accords, identifie les notes, les modulations, les cadences^*^.
+* Les directs YouTube ne permettant pas d'intervenir oralement, si vous désirez poser une question, vous devez le faire dans le chat. Philippe le guettant du coin de l'œil, il devrait répondre assez rapidement à votre demande.
 * Ensuite, sur la base de ce chiffrage, on peut commencer la **recherche de la forme**, en identifiant les parties.
 * Au cours de ce travail, on fait aussi une **analyse mélodique succincte** mais qui aidera à comprendre comment la pièce est construite.
 * Une fois les éléments principaux dégagés, une fois la forme établie, une **conclusion** achèvera le travail d’analyse et la session. Cette conclusion peut essayer de proposer une __thèse__ qu'il serait intéressant de développer dans un mémoire par exemple.
 * En espérant, chaque fois, pouvoir aller au bout de la partition avant la fin de la session afin qu'il y reste **un temps consacré aux questions**.
+* Le direct s'achèvera par un temps consacré aux questions. N'hésitez pas à mettre les vôtres de côté, lorsqu'elles ne concernent pas un point particulier, pour les soumettre pendant ce temps.
 
 ^*^ _Les analyses sont menées sur la link:/table-analyse/[Table d’analyse^], application conçue par Philippe Perret, que vous pouvez découvrir et télécharger sur sa page._
 
-Vous noterez, donc, que pour le moment on peut __assister__ à ces sessions, mais pas __participer__ (à part lors du temps final des questions). Néanmoins, si de nombreuses auditrices et auditeurs en émettent le désir, une participation sera peu à peu possible, en s'arrangeant pour garder le rythme soutenu que ces analyses devraient avoir.
+Vous noterez, donc, que pour le moment on peut __assister__ à ces sessions, mais pas vraiment __participer activement__, si ce n'est par le chat.
 
-Notez que pour une pratique active, Philippe donne link:/cours/[des cours d'analyse musicale] en particulier ou en binôme où, là au contraire, c'est celui ou celle qui apprend qui fait tout le travail, accompagné — avec bienveillance toujours — du pédagogue.
+Notez que si c'est vraiment une pratique active que vous recherchez, Philippe donne link:/cours/[des cours d'analyse musicale] en solo ou en binôme où là, au contraire, c'est vous qui faites tout le travail, accompagné(e) — avec bienveillance toujours — par Philippe Perret, en commençant depuis votre niveau actuel, quel qu'il soit.
 
-== À quelles conditions ?
+== Quelles conditions ?
 
-Il n’y a aucune condition à la participation à ces rendez-vous hebdomadaires du Jeudi, ni financière, ni de diplôme ou de formation. L’entrée est libre et gratuite pour tout un chacun, et ce quel que soit le nombre de séances auxquelles vous participeriez.
-
-La seule exigence est de ne pas perturber le déroulement de la réunion quand vous arrivez, surtout si vous arrivez en cours de session.
+Pour revenir à ces __Jeudis de l'analyse__, il n’y a aucune condition à la participation à ces rendez-vous hebdomadaires, ni financière, ni de diplôme ou de formation. L’entrée est libre et gratuite pour tout un chacun, et ce quel que soit le nombre de séances auxquelles vous participeriez.
 
 == Par qui ? ==
 
