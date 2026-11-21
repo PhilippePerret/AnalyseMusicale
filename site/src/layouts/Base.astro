@@ -18,10 +18,10 @@ interface Props {
 const { title, heading, bande, description, objetContact = 'renseignements', piedDePage = true, indexer = true } = Astro.props;
 // Menu de l'en-tête : les blocs de la page d'accueil
 const MENU = [
-  ['/jeudis-analyse/', 'Les Jeudis de l’analyse'],
-  ['/cours/', 'Les cours d’analyse'],
-  ['/table-analyse/', 'La Table d’analyse'],
-  ['/ressources/', 'Les ressources'],
+  ['/jeudis-analyse/', 'Jeudis de l’analyse'],
+  ['/cours/', 'Cours d’analyse'],
+  ['/ressources/', 'Ressources'],
+  ['/table-analyse/', 'Table d’analyse'],
 ];
 const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} — CAMI`;
 ---
