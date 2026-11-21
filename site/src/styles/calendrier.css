@@ -25,8 +25,12 @@ table.grille td { vertical-align: middle; }
 .jeudi .piece { display: block; font-size: 0.75em; line-height: 1.25; color: var(--principal); padding-right: 1.4em; }
 .jeudi.seance { color: var(--texte); border-color: var(--principal); cursor: pointer; }
 .jeudi.prochain { border-width: 2px; }
-.jeudi.passe { opacity: 0.55; }
-.jeudi.courant { background: var(--courant); border-color: var(--courant); color: #fff; opacity: 1; }
+/* Séances passées : ardoise plein ; à venir : bleu pâle ; du jour (toute la journée) : vert */
+.jeudi.passe { background: var(--principal); border-color: var(--principal); color: #fff; }
+.jeudi.passe .piece { color: #dfe4e8; }
+.jeudi.avenir { background: #eaf1f8; border-color: var(--survol); }
+.jeudi.avenir .piece { color: #2c5178; }
+.jeudi.courant { background: var(--courant); border-color: var(--courant); color: #fff; }
 .jeudi.courant .piece { color: #e6f2e8; }
 .jeudi.editable { cursor: pointer; border-style: dashed; border-color: #ccc; }
 /* Survol : bleu */
@@ -38,7 +42,7 @@ table.grille td { vertical-align: middle; }
 .oeil { position: absolute; right: 0.3em; bottom: 0.25em; line-height: 0; color: var(--principal); padding: 0.15em; }
 .oeil svg { width: 1.1em; height: 1.1em; }
 a.oeil, a.oeil:link, a.oeil:visited { color: var(--principal); }
-.jeudi.courant a.oeil, .jeudi:hover a.oeil { color: #fff; }
+.jeudi.passe a.oeil, .jeudi.courant a.oeil, .jeudi:hover a.oeil { color: #fff; }
 
 /* Jour du direct (30 min avant le début → fin) : date, compositeur et pastille « DIRECT » centrés */
 .jeudi.endirect { display: flex; flex-direction: column; align-items: center; gap: 0.25em; text-align: center; padding-bottom: 0.4em; }

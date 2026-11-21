@@ -93,7 +93,9 @@ function caseJeudi(d) {
   const libelle = `<span class="num">Jeudi ${jour(d.getDate())}</span>`;
   if (!s) return admin() ? `<div class="jeudi editable" role="button" tabindex="0" data-k="${k}">${libelle}</div>` : `<div class="jeudi">${libelle}</div>`;
   const direct = pastilleDirect(k, s);
-  const cls = ['jeudi', 'seance', s.etat === 'apres' ? 'passe' : '', k === aujourdhui() ? 'courant' : '', k === prochain() ? 'prochain' : '', direct ? 'endirect' : ''].join(' ');
+  // Du jour (toute la journée) ; sinon passée ou à venir
+  const moment = k === aujourdhui() ? 'courant' : s.etat === 'apres' ? 'passe' : 'avenir';
+  const cls = ['jeudi', 'seance', moment, k === prochain() ? 'prochain' : '', direct ? 'endirect' : ''].join(' ');
   if (direct) return `<div class="${cls}" role="button" tabindex="0" data-k="${k}">${libelle}<span class="piece">${txt(s.compositeur || 'à venir')}</span><a class="pastille-direct" href="${esc(s.youtube)}" target="_blank" rel="noopener" title="Rejoindre l’analyse en direct"><i>●</i> DIRECT</a></div>`;
   let oeil = '';
   if (s.youtube && s.etat === 'apres') oeil = `<a class="oeil" href="${esc(s.youtube)}" target="_blank" rel="noopener" title="Revoir l’analyse">${OEIL}</a>`;
