@@ -15,10 +15,10 @@
 @demonstration
 
 [[telechargement-application]]
-== Téléchargement de l’application
+== Téléchargement
 
 [.bloc-telechargement]
-.Télécharger Table d’Analyse
+.Télécharger l'application __Table d’Analyse__
 --
 @telechargement
 --
