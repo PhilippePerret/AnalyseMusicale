@@ -2,7 +2,7 @@
 // Lien de téléchargement de la Table d'analyse → redirection vers le fichier (Release GitHub).
 // GET ?jeton=… : lien envoyé par mail ; le premier clic confirme l'adresse (telecharge_le).
 // GET ?fichier=…&systeme=… : visiteur identifié (liens directs de /table-analyse/), téléchargement enregistré.
-require __DIR__ . '/_cami.php';
+require __DIR__ . '/_brevo.php';
 
 function aller(string $url): void {
   header('Location: ' . $url, true, 302);
@@ -10,6 +10,7 @@ function aller(string $url): void {
 }
 
 function signaler(array $t): void {
+  brevo_ajouter($t['email'], 'telechargement');
   envoyer_mail(NOTIFICATIONS, 'CAMI • Table d’analyse téléchargée',
     "Adresse : {$t['email']}\nPlateforme : {$t['systeme']}\nVersion : {$t['version']}\nDate : {$t['telecharge_le']}\n");
 }

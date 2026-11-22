@@ -4,7 +4,7 @@
 // GET : liste, une entrée par adresse.
 // POST JSON {action: ajouter | supprimer, …}
 // POST multipart (en-tête X-Cami) {action: envoyer, emails (JSON), objet, message, piece?} : message à chaque adresse.
-require __DIR__ . '/_cami.php';
+require __DIR__ . '/_brevo.php';
 
 const PIECE_MAX = 15 * 1024 * 1024;   // taille maximale de la pièce jointe
 
@@ -76,6 +76,7 @@ if ($action === 'supprimer') {
     db()->prepare('DELETE FROM users WHERE lower(email) = ?')->execute([$email]);
     db()->prepare('DELETE FROM telechargements WHERE lower(email) = ?')->execute([$email]);
     db()->prepare('DELETE FROM contacts WHERE lower(email) = ?')->execute([$email]);
+    brevo_supprimer($email);
   }
   repondre(['ok' => true, 'supprimees' => count($emails)]);
 }
@@ -116,6 +117,7 @@ if ($action === 'ajouter') {
     if (!$d || $d->format('Y-m-d') !== $date || $date > date('Y-m-d')) repondre(['ok' => false, 'erreur' => 'date'], 422);
     db()->prepare("INSERT INTO telechargements (email, systeme, fichier, version, le, telecharge_le, source) VALUES (?, ?, '', ?, ?, ?, 'main')")
       ->execute([$email, $systeme, $version, $maintenant, $date]);
+    brevo_ajouter($email, 'telechargement');
     repondre(['ok' => true]);
   }
 
@@ -129,6 +131,7 @@ if ($action === 'ajouter') {
     // Sans mot de passe connu ni confirmation : la personne peut ensuite s'inscrire elle-même
     db()->prepare("INSERT INTO users (email, pseudo, mdp, genre, prefs, confirme, cree_le, source) VALUES (?, ?, ?, ?, ?, 0, ?, 'main')")
       ->execute([$email, texte($e['pseudo'] ?? '', 60), password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT), $genre, $prefs, $maintenant]);
+    brevo_ajouter($email, 'inscrit', $genre);
     repondre(['ok' => true]);
   }
 
@@ -139,6 +142,7 @@ if ($action === 'ajouter') {
     if ($st->fetch()) repondre(['ok' => false, 'erreur' => 'existe'], 409);
     db()->prepare('INSERT INTO contacts (email, pseudo, genre, cree_le) VALUES (?, ?, ?, ?)')
       ->execute([$email, texte($e['pseudo'] ?? '', 60), $e['genre'], $maintenant]);
+    brevo_ajouter($email, 'contact', $e['genre']);
     repondre(['ok' => true]);
   }
 
