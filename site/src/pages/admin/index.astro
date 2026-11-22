@@ -5,19 +5,26 @@ import Base from '../../layouts/Base.astro';
 import '../../styles/admin.css';
 import { getCollection } from 'astro:content';
 
-// Adresses absolues des pages publiques du site (menu « Copier l’adresse d’une page » de la boîte Inviter)
+// Pages publiques du site (menu « Copier l’adresse d’une page… » de la boîte Inviter) :
+// libellé = titre de la page, valeur = adresse absolue
 const SITE = Astro.site!.href.replace(/\/$/, '');
 const EXCLUES = /^\/(admin|404|contact\/(merci|erreur))\/$/;
-const cheminsAstro = Object.keys(import.meta.glob('../**/*.astro'))
-  .filter((f) => !f.includes('['))
-  .map((f) => f.replace(/^\.\.\//, '/').replace(/(index)?\.astro$/, '').replace(/([^/])$/, '$1/'));
-const cheminsAdoc = (await getCollection('pages'))
+const pagesAdoc = await getCollection('pages');
+const titreAdoc = (id: string) => pagesAdoc.find((p) => p.id === id)?.data.title;
+const pagesAstro = Object.entries(import.meta.glob('../**/*.astro', { query: '?raw', import: 'default', eager: true }) as Record<string, string>)
+  .filter(([f]) => !f.includes('['))
+  .map(([f, source]) => {
+    const chemin = f.replace(/^\.\.\//, '/').replace(/(index)?\.astro$/, '').replace(/([^/])$/, '$1/');
+    const titre = source.match(/<Base\b[^>]*?\btitle="([^"]+)"/)?.[1] ?? titreAdoc(chemin === '/' ? 'accueil' : chemin.slice(1, -1));
+    return { chemin, titre };
+  });
+const pagesContenu = pagesAdoc
   .filter((p) => !['accueil', 'table-analyse'].includes(p.id))
-  .map((p) => `/${p.id}/`);
-const urlsPages = [...new Set([...cheminsAstro, ...cheminsAdoc])]
-  .filter((c) => !EXCLUES.test(c))
-  .sort()
-  .map((c) => SITE + c);
+  .map((p) => ({ chemin: `/${p.id}/`, titre: p.data.title }));
+const pagesSite = [...pagesAstro, ...pagesContenu]
+  .filter((p) => !EXCLUES.test(p.chemin))
+  .map((p) => ({ url: SITE + p.chemin, titre: p.titre ?? p.chemin }))
+  .sort((x, y) => x.titre.localeCompare(y.titre, 'fr'));
 ---
 <Base title="Adresses" indexer={false}>
   <div class="row admin">
@@ -94,12 +101,6 @@ const urlsPages = [...new Set([...cheminsAstro, ...cheminsAdoc])]
             <div class="redaction">
               <label class="en-regard">Objet <input type="text" name="objet" required maxlength="200"></label>
               <label class="en-regard haut">Message <textarea name="message" required rows="14"></textarea></label>
-              <div class="copier-url">
-                <select id="copierUrl">
-                  <option value="">Copier l’adresse d’une page…</option>
-                  {urlsPages.map((u) => <option value={u}>{u}</option>)}
-                </select>
-              </div>
             </div>
             <label class="adresses"><span>Adresses <span class="aide">(adresse H ou F)</span></span> <textarea name="adresses" required placeholder="une personne par ligne :
 adresse H
@@ -109,6 +110,10 @@ adresse F"></textarea></label>
           <div class="boutons colonnes">
             <span class="gauche">
               <button type="button" class="bouton annuler">Fermer</button>
+              <select id="copierUrl">
+                <option value="">Copier l’adresse d’une page…</option>
+                {pagesSite.map((p) => <option value={p.url}>{p.titre}</option>)}
+              </select>
               <button type="button" class="bouton" id="enregistrerInvitation">Enregistrer</button>
             </span>
             <span class="envois">

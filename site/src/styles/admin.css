@@ -91,9 +91,9 @@ table.adresses .attente { color: #999; font-style: italic; }
 .admin dialog.invitation .programmation label { display: flex; align-items: center; gap: 0.4em; white-space: nowrap; }
 .admin dialog.invitation .envois { display: flex; gap: 0.6em; justify-content: flex-end; }
 .admin dialog.invitation .boutons.colonnes { display: grid; }
-.admin dialog.invitation .boutons .gauche { display: flex; justify-content: space-between; align-items: center; }
-.admin dialog.invitation .copier-url { padding-left: 5.8em; }
-.admin dialog.invitation .copier-url select { max-width: 100%; }
+.admin dialog.invitation .boutons .gauche { display: grid; grid-template-columns: 5em minmax(0, 18em) 1fr auto; gap: 0.8em; align-items: center; }
+.admin dialog.invitation .boutons .gauche select { width: 100%; }
+.admin dialog.invitation .boutons .gauche .bouton:last-child { grid-column: 4; }
 @media (max-width: 700px) { .admin dialog.invitation .colonnes { grid-template-columns: 1fr; } .admin dialog.invitation .entete { flex-wrap: wrap; } .admin dialog.invitation label.adresses textarea { min-height: 8em; } }
 
 h2.rubrique-admin { color: var(--principal); font-size: 1.2em; text-transform: uppercase; letter-spacing: 0.06em; margin: 2em 0 0; }
