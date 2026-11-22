@@ -265,6 +265,7 @@ async function posterInvitation(action) {
     const i = r.invitation;
     if (action === 'envoyer') message(formInvitation, `Invitation envoyée à ${nombre(i.envoyes)}.` + (i.echecs.length ? ` Échec : ${i.echecs.join(', ')}.` : ''), i.echecs.length === 0);
     else message(formInvitation, i.programmee_le ? `Invitation enregistrée, envoi programmé le ${dateHeure(i.programmee_le)}.` : 'Invitation enregistrée.', true);
+    return true;
   } catch {
     message(formInvitation, 'Opération impossible.');
   } finally {
@@ -282,6 +283,15 @@ dialogInvitation.addEventListener('cancel', (e) => e.preventDefault());
 formInvitation.querySelector('.annuler').addEventListener('click', () => dialogInvitation.close());
 choixInvitation.addEventListener('change', remplirInvitation);
 $('enregistrerInvitation').addEventListener('click', () => posterInvitation('enregistrer'));
+// « Programmer l'envoi le » : contrôle de la date, confirmation, enregistrement et fermeture
+$('programmerInvitation').addEventListener('click', async () => {
+  const el = formInvitation.elements;
+  if (!el.date.value || !el.heure.value) return message(formInvitation, 'Date ET heure requises pour programmer l’envoi.');
+  const quand = `${el.date.value} ${el.heure.value}`;
+  if (new Date(`${el.date.value}T${el.heure.value}`) <= new Date()) return message(formInvitation, ERREURS.passe);
+  if (!confirm(`Programmer l’envoi de cette invitation le ${dateHeure(quand)} ?`)) return;
+  if (await posterInvitation('enregistrer')) dialogInvitation.close();
+});
 formInvitation.addEventListener('submit', (e) => {
   e.preventDefault();
   posterInvitation('envoyer');

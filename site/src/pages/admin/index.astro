@@ -79,36 +79,39 @@ const urlsPages = [...new Set([...cheminsAstro, ...cheminsAdoc])]
             <label>Invitation
               <select id="choixInvitation"><option value="">nouvelle invitation</option></select>
             </label>
-            <label>Copier l’adresse
-              <select id="copierUrl">
-                <option value="">d’une page…</option>
-                {urlsPages.map((u) => <option value={u}>{u}</option>)}
-              </select>
-            </label>
-            <span class="etat" id="etatInvitation"></span>
             <span class="suppression">
               <button type="button" class="lien-supprimer" id="supprimerInvitation" hidden>Supprimer cette invitation…</button>
               <button type="button" class="bouton confirmer" id="confirmerSuppressionInvitation" hidden>Confirmer la suppression</button>
             </span>
+            <span class="programmation">
+              <button type="button" class="bouton" id="programmerInvitation">Programmer l’envoi le</button>
+              <input type="date" name="date" aria-label="Date d’envoi">
+              <label>à <input type="time" name="heure" step="300"></label>
+            </span>
           </div>
+          <span class="etat" id="etatInvitation"></span>
           <div class="colonnes">
             <div class="redaction">
               <label class="en-regard">Objet <input type="text" name="objet" required maxlength="200"></label>
               <label class="en-regard haut">Message <textarea name="message" required rows="14"></textarea></label>
+              <div class="copier-url">
+                <select id="copierUrl">
+                  <option value="">Copier l’adresse d’une page…</option>
+                  {urlsPages.map((u) => <option value={u}>{u}</option>)}
+                </select>
+              </div>
             </div>
             <label class="adresses"><span>Adresses <span class="aide">(adresse H ou F)</span></span> <textarea name="adresses" required placeholder="une personne par ligne :
 adresse H
 adresse F"></textarea></label>
           </div>
           <p class="message" hidden></p>
-          <div class="boutons">
-            <button type="button" class="bouton annuler">Fermer</button>
-            <span class="programmation">
-              <label>Envoi programmé le <input type="date" name="date"></label>
-              <label>à <input type="time" name="heure" step="300"></label>
+          <div class="boutons colonnes">
+            <span class="gauche">
+              <button type="button" class="bouton annuler">Fermer</button>
+              <button type="button" class="bouton" id="enregistrerInvitation">Enregistrer</button>
             </span>
             <span class="envois">
-              <button type="button" class="bouton" id="enregistrerInvitation">Enregistrer</button>
               <button class="bouton">Envoyer maintenant</button>
             </span>
           </div>
