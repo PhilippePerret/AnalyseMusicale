@@ -355,7 +355,25 @@ formAjout.addEventListener('submit', async (e) => {
 
 charger();
 
-// Menu « Copier l’adresse d’une page » : l’URL choisie va dans le presse-papier
+// Menu « Copier l’adresse d’une page » : l’URL choisie va dans le presse-papier.
+// Copie synchrone par un champ temporaire placé DANS la boîte (seule zone active
+// d’un <dialog> modal), puis API Clipboard en secours.
+function copierTexte(texte) {
+  const champ = document.createElement('textarea');
+  champ.value = texte;
+  champ.setAttribute('readonly', '');
+  champ.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;';
+  dialogInvitation.appendChild(champ);
+  champ.focus();
+  champ.select();
+  champ.setSelectionRange(0, texte.length);
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch { ok = false; }
+  champ.remove();
+  if (ok) return Promise.resolve();
+  return navigator.clipboard.writeText(texte);
+}
+
 const copierUrl = $('copierUrl');
 copierUrl.addEventListener('change', async () => {
   const url = copierUrl.value;
@@ -363,7 +381,7 @@ copierUrl.addEventListener('change', async () => {
   const invite = copierUrl.options[0];
   const texte = invite.textContent;
   try {
-    await navigator.clipboard.writeText(url);
+    await copierTexte(url);
     invite.textContent = 'adresse copiée ✓';
   } catch {
     invite.textContent = 'copie impossible';
