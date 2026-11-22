@@ -3,6 +3,21 @@
 // saisies à la main). Données et actions : /api/personnes.php, par src/scripts/admin.js.
 import Base from '../../layouts/Base.astro';
 import '../../styles/admin.css';
+import { getCollection } from 'astro:content';
+
+// Adresses absolues des pages publiques du site (menu « Copier l’adresse d’une page » de la boîte Inviter)
+const SITE = Astro.site!.href.replace(/\/$/, '');
+const EXCLUES = /^\/(admin|404|contact\/(merci|erreur))\/$/;
+const cheminsAstro = Object.keys(import.meta.glob('../**/*.astro'))
+  .filter((f) => !f.includes('['))
+  .map((f) => f.replace(/^\.\.\//, '/').replace(/(index)?\.astro$/, '').replace(/([^/])$/, '$1/'));
+const cheminsAdoc = (await getCollection('pages'))
+  .filter((p) => !['accueil', 'table-analyse'].includes(p.id))
+  .map((p) => `/${p.id}/`);
+const urlsPages = [...new Set([...cheminsAstro, ...cheminsAdoc])]
+  .filter((c) => !EXCLUES.test(c))
+  .sort()
+  .map((c) => SITE + c);
 ---
 <Base title="Adresses" indexer={false}>
   <div class="row admin">
@@ -63,6 +78,12 @@ import '../../styles/admin.css';
             <h3>Inviter</h3>
             <label>Invitation
               <select id="choixInvitation"><option value="">nouvelle invitation</option></select>
+            </label>
+            <label>Copier l’adresse
+              <select id="copierUrl">
+                <option value="">d’une page…</option>
+                {urlsPages.map((u) => <option value={u}>{u}</option>)}
+              </select>
             </label>
             <span class="etat" id="etatInvitation"></span>
             <span class="suppression">

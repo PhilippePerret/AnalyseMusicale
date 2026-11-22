@@ -344,3 +344,20 @@ formAjout.addEventListener('submit', async (e) => {
 });
 
 charger();
+
+// Menu « Copier l’adresse d’une page » : l’URL choisie va dans le presse-papier
+const copierUrl = $('copierUrl');
+copierUrl.addEventListener('change', async () => {
+  const url = copierUrl.value;
+  if (!url) return;
+  const invite = copierUrl.options[0];
+  const texte = invite.textContent;
+  try {
+    await navigator.clipboard.writeText(url);
+    invite.textContent = 'adresse copiée ✓';
+  } catch {
+    invite.textContent = 'copie impossible';
+  }
+  copierUrl.value = '';
+  setTimeout(() => { invite.textContent = texte; }, 1800);
+});
