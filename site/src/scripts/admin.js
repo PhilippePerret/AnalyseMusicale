@@ -190,15 +190,20 @@ const dateHeure = (d) => `${date(d)} à ${d.slice(11, 16)}`;
 
 function etatInvitation(i) {
   if (!i) return '';
-  if (i.envoyee_le) return `Envoyée le ${dateHeure(i.envoyee_le)} à ${nombre(i.envoyes ?? 0)}` + (i.echecs.length ? ` (échec : ${i.echecs.join(', ')})` : '');
-  if (i.programmee_le) return `Programmée pour le ${dateHeure(i.programmee_le)}`;
-  return 'Enregistrée';
+  const etats = [];
+  if (i.envoyee_le) etats.push(`Dernier envoi le ${dateHeure(i.envoyee_le)} à ${nombre(i.envoyes ?? 0)}` + (i.echecs.length ? ` (échec : ${i.echecs.join(', ')})` : ''));
+  if (i.programmee_le) etats.push(`Prochain envoi programmé le ${dateHeure(i.programmee_le)}`);
+  return etats.join(' — ') || 'Enregistrée';
 }
 
 function libelleInvitation(i) {
-  const quand = i.envoyee_le ? `envoyée ${date(i.envoyee_le)}` : i.programmee_le ? `programmée ${dateHeure(i.programmee_le)}` : 'enregistrée';
+  const quand = i.programmee_le ? `programmée ${dateHeure(i.programmee_le)}` : i.envoyee_le ? `envoyée ${date(i.envoyee_le)}` : 'enregistrée';
   return `${i.objet} — ${quand}`;
 }
+
+// Texte d'une invitation (comparaison : même texte = même invitation)
+const texteInvitation = (objet, message) => `${objet.trim()}\n${message.trim().replace(/\r\n/g, '\n')}`;
+let texteOrigine = '';
 
 async function chargerInvitations(idChoisi = '') {
   const r = await (await fetch(API_INVITATIONS, { credentials: 'same-origin' })).json();
@@ -218,6 +223,12 @@ function remplirInvitation() {
   el.adresses.value = (i?.adresses ?? []).map((d) => `${d.email} ${d.genre}`.trim()).join('\n');
   el.date.value = i?.programmee_le ? i.programmee_le.slice(0, 10) : '';
   el.heure.value = i?.programmee_le ? i.programmee_le.slice(11, 16) : '';
+  texteOrigine = i ? texteInvitation(i.objet, i.message) : '';
+  // Personnes déjà invitées (liste à part)
+  const invites = i?.invites ?? [];
+  $('invitesInvitation').hidden = !invites.length;
+  $('invitesInvitation').querySelector('.titre').textContent = `Déjà invité·es (${invites.length})`;
+  $('invitesInvitation').querySelector('ul').replaceChildren(...invites.map((d) => Object.assign(document.createElement('li'), { textContent: `${d.email} ${d.genre}` })));
   $('etatInvitation').textContent = etatInvitation(i);
   $('supprimerInvitation').hidden = !i;
   $('confirmerSuppressionInvitation').hidden = true;
@@ -238,18 +249,39 @@ function destinatairesSaisis() {
 
 async function posterInvitation(action) {
   const el = formInvitation.elements;
-  const { destinataires: adresses, erreurs } = destinatairesSaisis();
+  let { destinataires: adresses, erreurs } = destinatairesSaisis();
   if (!el.objet.value.trim() || !el.message.value.trim()) return message(formInvitation, ERREURS.message);
   if (erreurs.length) return message(formInvitation, `Ligne${erreurs.length > 1 ? 's' : ''} invalide${erreurs.length > 1 ? 's' : ''} (format « adresse H » ou « adresse F ») : ${erreurs.join(' ; ')}`);
-  if (!adresses.length) return message(formInvitation, ERREURS.adresses);
   if (action === 'enregistrer' && (!el.date.value !== !el.heure.value)) return message(formInvitation, 'Date ET heure requises pour programmer l’envoi.');
+  const programmee = action === 'enregistrer' && el.date.value ? `${el.date.value} ${el.heure.value}` : '';
+  const envoi = action === 'envoyer' || programmee !== '';
+  if (envoi && !adresses.length) return message(formInvitation, ERREURS.adresses);
+  // Même invitation ? Invitation choisie dont le texte a changé : modification ou nouvelle invitation ;
+  // « nouvelle invitation » au texte identique à une invitation enregistrée : cette invitation.
+  const texte = texteInvitation(el.objet.value, el.message.value);
+  let cible = invitationChoisie();
+  let nouvelle = false;
+  if (cible && texte !== texteOrigine) {
+    nouvelle = !confirm('Le texte de l’invitation a été modifié.\n\nOK : modifier le texte de cette invitation.\nAnnuler : créer une nouvelle invitation.');
+  } else if (!cible) {
+    cible = invitations.find((i) => texteInvitation(i.objet, i.message) === texte);
+  }
+  // Personnes déjà invitées par cette invitation
+  if (envoi && cible && !nouvelle) {
+    const deja = adresses.filter((d) => cible.invites.some((x) => x.email === d.email));
+    if (deja.length && !confirm(`Déjà invité·es par cette invitation :\n${deja.map((d) => d.email).join('\n')}\n\nOK : les inviter de nouveau.\nAnnuler : les retirer de l’envoi.`)) {
+      adresses = adresses.filter((d) => !deja.includes(d));
+      if (!adresses.length) return message(formInvitation, 'Toutes ces adresses sont déjà invitées : envoi annulé.');
+    }
+  }
   const donnees = {
     action,
-    id: choixInvitation.value || undefined,
+    id: cible?.id,
+    nouvelle,
     objet: el.objet.value,
     message: el.message.value,
     adresses,
-    programmee_le: action === 'enregistrer' && el.date.value ? `${el.date.value} ${el.heure.value}` : '',
+    programmee_le: programmee,
   };
   const boutons = formInvitation.querySelectorAll('.envois button');
   boutons.forEach((b) => { b.disabled = true; });
@@ -263,7 +295,7 @@ async function posterInvitation(action) {
     if (!r.ok) return message(formInvitation, ERREURS[r.erreur] || 'Opération impossible.');
     await chargerInvitations(r.invitation.id);
     const i = r.invitation;
-    if (action === 'envoyer') message(formInvitation, `Invitation envoyée à ${nombre(i.envoyes)}.` + (i.echecs.length ? ` Échec : ${i.echecs.join(', ')}.` : ''), i.echecs.length === 0);
+    if (action === 'envoyer') message(formInvitation, `Invitation envoyée à ${nombre(i.envoyes ?? 0)}.` + (i.echecs.length ? ` Échec : ${i.echecs.join(', ')}.` : ''), i.echecs.length === 0);
     else message(formInvitation, i.programmee_le ? `Invitation enregistrée, envoi programmé le ${dateHeure(i.programmee_le)}.` : 'Invitation enregistrée.', true);
     return true;
   } catch {

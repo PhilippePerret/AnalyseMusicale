@@ -324,8 +324,21 @@ test('invitations : enregistrement, programmation, envoi immédiat, envoi progra
   // Sauvegarde de l'invitation envoyée
   const sauvegardes = readdirSync(join(tmp, 'sauvegardes', 'invitations'));
   assert.ok(sauvegardes.some((f) => new RegExp(`^${id}-\\d{4}-\\d{2}-\\d{2}-\\d{6}\\.json$`).test(f)));
-  // Invitation envoyée : une modification crée une nouvelle invitation
-  r = await admin.post('invitations.php', { action: 'enregistrer', id, objet: 'Copie', message: 'Venez !', adresses: [{ email: 'invite1@example.com', genre: 'F' }] });
+  // Copie systématique à l'administrateur
+  assert.match(readFileSync(mailFile, 'utf-8').slice(avant), /To: philippe\.perret@analyse-musicale\.fr[\s\S]*\[Copie\]/);
+  assert.deepEqual(r.invitation.adresses, []);
+  assert.deepEqual(r.invitation.invites.map((d) => d.email), ['invite1@example.com']);
+
+  // Invitation envoyée : même invitation, nouvelles adresses ; adresse administrateur jamais mémorisée
+  r = await admin.post('invitations.php', { action: 'envoyer', id, objet: 'Invitation modifiée', message: 'Ch[er|ère] ami[|e], venez !', adresses: [{ email: 'invite3@example.com', genre: 'H' }, { email: 'Philippe.Perret@analyse-musicale.fr', genre: 'H' }] });
+  assert.equal(r.invitation.id, id);
+  assert.equal(r.invitation.envoyes, 1);
+  assert.deepEqual(r.invitation.invites.map((d) => d.email).sort(), ['invite1@example.com', 'invite3@example.com']);
+  // Envoi sans adresse : refusé ; enregistrement du seul texte : accepté
+  assert.equal((await admin.post('invitations.php', { action: 'envoyer', id, objet: 'X', message: 'Y', adresses: [] })).erreur, 'adresses');
+  assert.equal((await admin.post('invitations.php', { action: 'enregistrer', id, objet: 'Invitation modifiée', message: 'Ch[er|ère] ami[|e], venez !', adresses: [] })).invitation.id, id);
+  // Nouvelle invitation demandée explicitement
+  r = await admin.post('invitations.php', { action: 'enregistrer', id, nouvelle: true, objet: 'Copie', message: 'Venez !', adresses: [{ email: 'invite1@example.com', genre: 'F' }] });
   assert.notEqual(r.invitation.id, id);
 
   // Envoi programmé arrivé à échéance : script de la tâche planifiée

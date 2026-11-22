@@ -73,13 +73,19 @@ table.adresses .attente { color: #999; font-style: italic; }
 .admin dialog.invitation .redaction { display: grid; gap: 0.6em; align-content: start; }
 .admin dialog.invitation .redaction label.en-regard { grid-template-columns: 5em 1fr; }
 .admin dialog.invitation .redaction input[type=text] { max-width: none; }
+.admin dialog.invitation .colonne-adresses { display: grid; grid-template-rows: 1fr auto; gap: 0.6em; min-height: 0; }
+.admin dialog.invitation .invites { display: grid; gap: 0.2em; font-size: 0.9em; }
+.admin dialog.invitation .invites[hidden] { display: none; }
+.admin dialog.invitation .invites .titre { color: #777; }
+.admin dialog.invitation .invites ul { margin: 0; padding: 0.3em 0.5em; list-style: none; max-height: 7.5em; overflow-y: auto; background: #fff; border: 1px solid #ddd; color: #555; }
 .admin dialog.invitation label.adresses { display: grid; grid-template-rows: auto 1fr; gap: 0.3em; }
 .admin dialog.invitation label.adresses textarea { resize: none; }
 .admin dialog.invitation label.adresses .aide { color: #777; font-size: 0.9em; }
 .admin dialog.invitation .entete { display: flex; align-items: center; gap: 0.5em 1em; }
 .admin dialog.invitation .entete label { display: flex; align-items: center; gap: 0.5em; }
 .admin dialog.invitation .entete label { min-width: 0; }
-.admin dialog.invitation .entete select { min-width: 0; max-width: 18em; }
+.admin dialog.invitation .entete select { min-width: 0; width: 100%; max-width: 18em; }
+.admin dialog.invitation form > * { min-width: 0; }
 .admin dialog.invitation .etat:empty { display: none; }
 .admin dialog.invitation .etat { color: #777; font-style: italic; }
 .admin dialog.invitation .suppression { display: flex; align-items: center; gap: 0.6em; }

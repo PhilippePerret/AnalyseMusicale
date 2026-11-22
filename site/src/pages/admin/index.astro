@@ -102,9 +102,15 @@ const pagesSite = [...pagesAstro, ...pagesContenu]
               <label class="en-regard">Objet <input type="text" name="objet" required maxlength="200"></label>
               <label class="en-regard haut">Message <textarea name="message" required rows="14"></textarea></label>
             </div>
-            <label class="adresses"><span>Adresses <span class="aide">(adresse H ou F)</span></span> <textarea name="adresses" required placeholder="une personne par ligne :
+            <div class="colonne-adresses">
+              <label class="adresses"><span>Adresses <span class="aide">(adresse H ou F)</span></span> <textarea name="adresses" placeholder="une personne par ligne :
 adresse H
 adresse F"></textarea></label>
+              <div class="invites" id="invitesInvitation" hidden>
+                <span class="titre"></span>
+                <ul></ul>
+              </div>
+            </div>
           </div>
           <p class="message" hidden></p>
           <div class="boutons colonnes">
