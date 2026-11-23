@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS demandes_cours (   -- formulaire « Je veux prendre d
   nom TEXT NOT NULL,
   email TEXT NOT NULL,
   frequence TEXT NOT NULL,          -- clé de FREQUENCES (_cours.php)
-  creneaux TEXT NOT NULL,           -- JSON [{jour (1 lundi … 7 dimanche), debut HH:MM, fin HH:MM}]
+  creneaux TEXT NOT NULL,           -- JSON [{jour (1 lundi … 7 dimanche), debut HH:MM, fin HH:MM}], par ordre de préférence
   niveaux TEXT NOT NULL,            -- JSON {cle de CONNAISSANCES: cle de NIVEAUX}
   jeton TEXT,                       -- jeton du lien de confirmation de l'adresse
   confirmee_le TEXT,                -- adresse confirmée : demande transmise à l'administrateur

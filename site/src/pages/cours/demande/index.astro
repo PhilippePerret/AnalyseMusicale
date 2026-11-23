@@ -11,10 +11,10 @@ const heureFr = (h: string) => `${Number(h.slice(0, 2))} h${h.endsWith('30') ? '
 const FREQUENCES = [['semaine', 'Un par semaine'], ['quinzaine', 'Un tous les 15 jours'], ['mois', 'Un par mois'], ['ponctuel', 'Au coup par coup']];
 const CONNAISSANCES = [
   ['generales', 'Connaissances théoriques générales'],
-  ['gammes', 'Connaissances des gammes, accords et chiffrages'],
-  ['harmonie', 'Connaissances en harmonie'],
-  ['contrepoint', 'Connaissances en contrepoint'],
-  ['analyse', 'Connaissances en analyse musicale'],
+  ['gammes', 'Gammes, accords et chiffrages'],
+  ['harmonie', 'Harmonie'],
+  ['contrepoint', 'Contrepoint'],
+  ['analyse', 'Analyse musicale'],
 ];
 const NIVEAUX = [['excellentes', 'Excellentes'], ['bonnes', 'Bonnes'], ['moyennes', 'Moyennes'], ['aucune', 'Aucune']];
 ---
@@ -26,45 +26,51 @@ const NIVEAUX = [['excellentes', 'Excellentes'], ['bonnes', 'Bonnes'], ['moyenne
     <p class="confirmation ok" id="confirmationOk" hidden>Adresse confirmée : votre demande m’a été transmise. Merci de votre intérêt.</p>
     <p class="confirmation erreur" id="confirmationInvalide" hidden>Lien de confirmation invalide ou déjà utilisé.</p>
 
-    <form class="contact-form" id="formDemande">
+    <form class="form-demande" id="formDemande">
       <fieldset>
-        <legend>Identité</legend>
-        <label class="en-regard">Votre nom complet
+        <legend>Votre identité</legend>
+        <label class="en-regard"><span>Nom complet</span>
           <input type="text" name="nom" required maxlength="120" autocomplete="name">
         </label>
-        <label class="en-regard">Votre adresse e-mail
+        <label class="en-regard"><span>Adresse e-mail</span>
           <input type="email" name="email" required maxlength="200" autocomplete="email">
         </label>
       </fieldset>
 
       <fieldset>
         <legend>Cours</legend>
-        <p class="note">La durée d’un cours est de 1 heure.</p>
-        <label class="en-regard">Fréquence
-          <select name="frequence">
-            {FREQUENCES.map(([v, l]) => <option value={v}>{l}</option>)}
-          </select>
-        </label>
-        <p class="consigne">Vos créneaux pour ces cours : définissez les tranches horaires qui vous conviendraient, sous la forme « Le mardi dans la tranche 8 h — 13 h ». Vous pouvez indiquer plusieurs tranches par jour.</p>
-        <div class="saisie-creneau">
-          <span>Le</span>
-          <select id="jour">{JOURS.map((j, i) => <option value={i + 1}>{j}</option>)}</select>
-          <span>dans la tranche</span>
-          <select id="debut">{HEURES.slice(0, -1).map((h) => <option value={h}>{heureFr(h)}</option>)}</select>
-          <span>—</span>
-          <select id="fin">{HEURES.slice(1).map((h) => <option value={h} selected={h === '13:00'}>{heureFr(h)}</option>)}</select>
-          <button type="button" class="bouton" id="ajouter">+ Ajouter</button>
-          <span class="comme">
-            <button type="button" class="bouton" id="comme" disabled>Comme le jour…</button>
-            <select id="jourSource" hidden></select>
-          </span>
-        </div>
-        <ul class="creneaux" id="creneaux"><li class="vide">Aucune tranche pour le moment.</li></ul>
+        <table class="cours">
+          <tbody>
+            <tr><th>Durée</th><td class="duree">1 heure par cours</td></tr>
+            <tr><th><label for="frequence">Fréquence</label></th><td>
+              <select name="frequence" id="frequence">{FREQUENCES.map(([v, l]) => <option value={v}>{l}</option>)}</select>
+            </td></tr>
+            <tr><th>Tranches<br>horaires</th><td>
+              <p class="expli">Définissez ci-dessous <strong>toutes</strong> les tranches horaires qui seraient possibles pour vous pour prendre ce cours, par ordre de préférences. Bien entendu, une seule sera choisie pour placer l’heure de cours, à la fréquence que vous avez définie.</p>
+              <ol class="tranches" id="creneaux"></ol>
+              <div class="ligne-saisie">
+                <div class="saisie">
+                  <span>Le</span>
+                  <select id="jour" aria-label="Jour">{JOURS.map((j, i) => <option value={i + 1}>{j}</option>)}</select>
+                  <span>de</span>
+                  <select id="debut" aria-label="Début">{HEURES.slice(0, -1).map((h) => <option value={h}>{heureFr(h)}</option>)}</select>
+                  <span>à</span>
+                  <select id="fin" aria-label="Fin">{HEURES.slice(1).map((h) => <option value={h} selected={h === '13:00'}>{heureFr(h)}</option>)}</select>
+                </div>
+                <div class="boutons">
+                  <button type="button" class="b" id="ajouter">+ Ajouter</button>
+                  <button type="button" class="b" id="comme" disabled>Comme le jour…</button>
+                  <select id="jourSource" aria-label="Copier les tranches du jour" hidden></select>
+                </div>
+              </div>
+            </td></tr>
+          </tbody>
+        </table>
       </fieldset>
 
       <fieldset>
-        <legend>Pour mieux vous connaître</legend>
-        <p class="consigne">Pour mieux vous connaître, indiquez votre niveau en théorie musicale.</p>
+        <legend>Vos compétences actuelles</legend>
+        <p class="consigne">Afin de mieux vous connaître, indiquez votre niveau en théorie musicale.</p>
         <table class="niveaux">
           <thead><tr><th></th>{NIVEAUX.map(([, l]) => <th>{l}</th>)}</tr></thead>
           <tbody>
@@ -82,10 +88,10 @@ const NIVEAUX = [['excellentes', 'Excellentes'], ['bonnes', 'Bonnes'], ['moyenne
         <label>Ne pas remplir ce champ <input type="text" name="site_web" tabindex="-1" autocomplete="off"></label>
       </div>
 
-      <p class="avertissement">Après l’envoi, vous recevrez un mail avec un lien de confirmation de votre adresse : <strong>votre demande me sera transmise seulement après ce clic de confirmation.</strong></p>
-      <div class="ligne-envoi">
+      <p class="nb">NB : Votre demande ne sera transmise qu’après la validation qui vous sera envoyée par mail (vérifiez aussi vos spams).</p>
+      <div class="envoi">
         <p class="message" id="message"></p>
-        <button type="submit">Transmettre ma demande</button>
+        <button type="submit" class="b principal">Transmettre ma demande</button>
       </div>
     </form>
 
@@ -113,39 +119,29 @@ const NIVEAUX = [['excellentes', 'Excellentes'], ['bonnes', 'Bonnes'], ['moyenne
       if (conf === 'ok') { document.getElementById('confirmationOk').hidden = false; form.hidden = true; }
       if (conf === 'invalide') document.getElementById('confirmationInvalide').hidden = false;
 
-      function trier() { creneaux.sort(function (a, b) { return a.jour - b.jour || (a.debut < b.debut ? -1 : 1); }); }
+      var nomJour = function (j) { return JOURS[j - 1].charAt(0).toUpperCase() + JOURS[j - 1].slice(1); };
       function joursRemplis() { return creneaux.map(function (c) { return c.jour; }).filter(function (j, i, t) { return t.indexOf(j) === i; }); }
 
+      // Tranches dans l'ordre d'ajout (ordre de préférence), au-dessus de la saisie
       function rendre() {
-        trier();
-        var jours = joursRemplis();
         liste.innerHTML = '';
-        if (!jours.length) liste.innerHTML = '<li class="vide">Aucune tranche pour le moment.</li>';
-        jours.forEach(function (j) {
+        creneaux.forEach(function (c, i) {
           var li = document.createElement('li');
-          var nom = document.createElement('span');
-          nom.className = 'nom-jour';
-          nom.textContent = 'Le ' + JOURS[j - 1];
-          li.append(nom);
-          creneaux.forEach(function (c, i) {
-            if (c.jour !== j) return;
-            var t = document.createElement('span');
-            t.className = 'tranche';
-            t.textContent = hFr(c.debut) + ' — ' + hFr(c.fin) + ' ';
-            var x = document.createElement('button');
-            x.type = 'button'; x.className = 'retirer'; x.title = 'Retirer cette tranche'; x.textContent = '×';
-            x.addEventListener('click', function () { creneaux.splice(i, 1); rendre(); });
-            t.append(x);
-            li.append(t);
-          });
+          li.innerHTML = '<b>' + nomJour(c.jour) + '</b> ' + hFr(c.debut) + ' – ' + hFr(c.fin) + ' ';
+          var x = document.createElement('button');
+          x.type = 'button'; x.className = 'retirer'; x.title = 'Retirer cette tranche'; x.textContent = '×';
+          x.addEventListener('click', function () { creneaux.splice(i, 1); rendre(); });
+          li.append(x);
           liste.append(li);
         });
+        liste.hidden = !creneaux.length;
         // « Comme le jour… » : jours déjà remplis, autres que le jour choisi
-        var autres = jours.filter(function (j) { return j !== Number(jour.value); });
+        var autres = joursRemplis().filter(function (j) { return j !== Number(jour.value); });
         comme.disabled = !autres.length;
         source.innerHTML = '<option value="">choisir…</option>' + autres.map(function (j) { return '<option value="' + j + '">' + JOURS[j - 1] + '</option>'; }).join('');
         source.hidden = true;
       }
+      rendre();
 
       function ajouter(j, d, f) {
         var deja = creneaux.some(function (c) { return c.jour === j && c.debut === d && c.fin === f; });

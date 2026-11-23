@@ -54,9 +54,8 @@ const heureFr = (h) => `${Number(h.slice(0, 2))} h${h.slice(3) === '30' ? ' 30' 
 function rendreDemandes() {
   const niveaux = etat.niveaux;
   $('demandes').innerHTML = etat.demandes.map((d) => {
-    const jours = {};
-    d.creneaux.forEach((c) => { (jours[c.jour] = jours[c.jour] || []).push(`${heureFr(c.debut)} — ${heureFr(c.fin)}`); });
-    const creneaux = Object.keys(jours).map((j) => `${JOURS[j - 1]} : ${jours[j].join(', ')}`).join('<br>');
+    // Tranches par ordre de préférence
+    const creneaux = d.creneaux.map((c, i) => `${i + 1}. ${JOURS[c.jour - 1]} ${heureFr(c.debut)} – ${heureFr(c.fin)}`).join('<br>');
     const connaissances = Object.entries(etat.connaissances).map(([cle, libelle]) =>
       `${esc(libelle.replace(/^Connaissances (théoriques |des |en )?/, ''))} : <b>${esc(niveaux[d.niveaux[cle]] || '—')}</b>`).join('<br>');
     return `<tr${d.confirmee_le ? '' : ' class="attente"'}>

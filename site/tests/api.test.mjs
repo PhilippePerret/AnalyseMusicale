@@ -591,7 +591,7 @@ test('demande de cours : enregistrée, transmise à l’administrateur seulement
   assert.match(rep.headers.get('location'), /confirmation=ok/);
   mails = readFileSync(mailFile, 'utf-8').slice(avant);
   assert.match(mails, /To: philippe\.perret@analyse-musicale\.fr[\s\S]*Reply-To: paul@example\.com/);
-  assert.match(mails, /le mardi entre 8 h et 13 h/);
+  assert.match(mails, /1\. le mardi entre 8 h et 13 h/);
   assert.match(mails, /en harmonie : Aucune/);
   assert.match((await visiteur.get(`/api/demande-cours.php?jeton=${jeton}`)).headers.get('location'), /confirmation=invalide/);
 

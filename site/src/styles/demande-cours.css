@@ -1,37 +1,62 @@
-/* Formulaire « Je veux prendre des cours d'analyse musicale » (/cours/demande/) */
-.demande-cours { display: block; max-width: 46em; margin: 0 auto; }
+/* Formulaire « Je veux prendre des cours d'analyse musicale » (/cours/demande/) — maquette A2 retenue */
+.demande-cours { display: block; max-width: 38em; margin: 0 auto; }
 .demande-cours [hidden] { display: none !important; }
 .demande-cours .retour-cours { text-align: right; font-size: 0.85em; margin: 0 0 1em; }
-.demande-cours fieldset { border: none; border-top: 3px solid var(--principal); background: #f7f7f7; margin: 0; padding: 0.7em 1em 1em; display: grid; gap: 0.8em; }
-.demande-cours legend { float: left; width: 100%; padding: 0; margin: 0; color: var(--principal); font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.06em; }
 .demande-cours p { margin: 0; }
-.demande-cours .note { font-size: 0.85em; font-style: italic; }
-.demande-cours .consigne { font-size: 0.85em; text-align: left; hyphens: manual; }
-.demande-cours .saisie-creneau { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4em 0.5em; font-size: 0.9em; }
-.demande-cours .saisie-creneau select { width: auto; margin: 0; }
-.demande-cours .saisie-creneau .bouton,
-.demande-cours .saisie-creneau button { font-size: 0.85em; padding: 0.1em 0.6em; }
-.demande-cours .saisie-creneau .comme { display: inline-flex; gap: 0.4em; align-items: center; }
-.demande-cours button:disabled { opacity: 0.45; cursor: default; }
-.demande-cours ul.creneaux { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25em; font-size: 0.9em; }
-.demande-cours ul.creneaux li { display: flex; flex-wrap: wrap; gap: 0.3em 1em; align-items: center; }
-.demande-cours ul.creneaux .vide { color: var(--gris-logo); font-style: italic; }
-.demande-cours ul.creneaux .nom-jour { min-width: 7em; font-weight: 700; color: var(--principal); }
-.demande-cours ul.creneaux .tranche { display: inline-flex; align-items: center; gap: 0.2em; }
-.demande-cours ul.creneaux button.retirer { border: none; background: none; color: #a33; cursor: pointer; font: inherit; font-size: 1.1em; line-height: 1; padding: 0 0.2em; width: auto; }
-.demande-cours table.niveaux { border-collapse: collapse; font-size: 0.85em; width: 100%; }
-.demande-cours table.niveaux th { font-weight: normal; }
-.demande-cours table.niveaux thead th { color: var(--principal); padding: 0 0.4em 0.3em; text-align: center; }
-.demande-cours table.niveaux tbody th { text-align: left; padding: 0.3em 0.6em 0.3em 0; }
-.demande-cours table.niveaux tbody tr { border-top: 1px solid #e2e2e2; }
-.demande-cours table.niveaux td { text-align: center; padding: 0.3em 0.4em; }
-.demande-cours table.niveaux input[type=radio] { width: 1.2em; height: 1.2em; margin: 0; padding: 0; }
-.demande-cours .avertissement { font-size: 0.9em; padding: 0.6em 0.9em; border-left: 4px solid var(--principal); text-align: left; hyphens: manual; }
-.demande-cours .confirmation { padding: 0.7em 1em; border-left: 4px solid var(--principal); margin-bottom: 1em; }
+
+.form-demande { display: grid; gap: 1.2em; font-size: 0.8em; }
+.form-demande fieldset { margin: 0; min-width: 0; border: 1px solid #c8c8c8; border-radius: 6px; padding: 0.6em 1.2em 1em; }
+.form-demande legend { padding: 0 0.5em; color: var(--principal); font-variant: small-caps; letter-spacing: 0.05em; font-size: 1.1em; font-weight: 600; }
+.form-demande label.en-regard { display: grid; grid-template-columns: 8em auto; align-items: center; gap: 0.8em; margin: 0.35em 0; }
+.form-demande label.en-regard > span { color: #444; }
+.form-demande input[type=text], .form-demande input[type=email] {
+  font: inherit; font-size: 0.95em; padding: 0.15em 0.45em; border: 1px solid #aaa; border-radius: 3px; width: 18em; max-width: 100%; box-sizing: border-box;
+}
+.form-demande select { font: inherit; font-size: 0.95em; padding: 0.1em 0.3em; border: 1px solid #aaa; border-radius: 3px; background: var(--fond); }
+.form-demande .b { font: inherit; font-size: 0.85em; padding: 0.1em 0.7em; border: 1px solid #999; border-radius: 3px; background: var(--fond); color: var(--texte); cursor: pointer; white-space: nowrap; }
+.form-demande .b:hover:not(:disabled) { border-color: var(--survol); color: var(--survol); }
+.form-demande .b:disabled { opacity: 0.45; cursor: default; }
+.form-demande .b.principal { font-size: 1em; padding: 0.3em 1.2em; }
+
+/* Cours : table invisible, intitulés à gauche */
+.form-demande table.cours { border-collapse: collapse; width: 100%; }
+.form-demande table.cours th { width: 8em; text-align: left; font-weight: 400; color: #444; vertical-align: top; padding: 0.35em 0.8em 0.35em 0; line-height: 1.25; }
+.form-demande table.cours td { padding: 0.35em 0; vertical-align: top; }
+.form-demande table.cours td.duree { font-style: italic; color: #555; }
+.form-demande .expli { font-size: 0.85em; color: #555; margin: 0.1em 0 0.5em; text-align: left; hyphens: manual; }
+.form-demande ol.tranches { margin: 0 0 0.6em; padding-left: 1.6em; font-size: 0.95em; }
+.form-demande ol.tranches li { margin: 0.15em 0; }
+.form-demande ol.tranches b { display: inline-block; min-width: 4.5em; color: var(--principal); font-weight: 600; }
+.form-demande ol.tranches button.retirer { border: none; background: none; color: #a33; cursor: pointer; font: inherit; padding: 0 0.2em; }
+.form-demande .ligne-saisie { display: flex; align-items: flex-start; gap: 1.4em; }
+.form-demande .saisie { display: flex; flex-wrap: nowrap; white-space: nowrap; align-items: center; gap: 0.4em; border: 1px dashed #bbb; border-radius: 4px; padding: 0.35em 0.6em; }
+.form-demande .boutons { display: flex; flex-direction: column; align-items: flex-start; gap: 0.35em; }
+
+/* Compétences */
+.form-demande .consigne { font-size: 0.9em; margin: 0.2em 0 0.5em; color: #444; }
+.form-demande table.niveaux { border-collapse: collapse; font-size: 0.9em; width: 100%; }
+.form-demande table.niveaux thead th { font-weight: 600; font-size: 0.85em; color: var(--principal); padding: 0 0.3em 0.3em; text-align: center; }
+.form-demande table.niveaux tbody th { text-align: left; font-weight: 400; padding: 0.3em 0.5em 0.3em 0; }
+.form-demande table.niveaux td { text-align: center; }
+.form-demande table.niveaux tbody tr + tr { border-top: 1px solid #eee; }
+.form-demande table.niveaux input[type=radio] { width: 1.1em; height: 1.1em; margin: 0; }
+
+/* NB à droite, au-dessus du bouton */
+.form-demande .nb { width: 50%; margin-left: auto; font-size: 0.85em; color: #444; line-height: 1.35; text-align: left; hyphens: manual; }
+.form-demande .envoi { display: flex; justify-content: flex-end; align-items: center; gap: 1em; margin-top: -0.4em; }
+.form-demande .envoi .message { color: #a33; font-size: 0.85em; }
+.form-demande .piege { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+.demande-cours .confirmation { padding: 0.7em 1em; border: 1px solid #c8c8c8; border-radius: 6px; margin-bottom: 1em; }
 .demande-cours .confirmation.erreur { border-color: #a33; color: #a33; }
-.demande-cours .envoyee { padding: 0.9em 1.2em; border-top: 3px solid var(--principal); background: #f7f7f7; display: grid; gap: 0.6em; }
-.demande-cours form.contact-form .message { color: #a33; font-size: 0.85em; }
+.demande-cours .envoyee { padding: 0.8em 1.2em; border: 1px solid #c8c8c8; border-radius: 6px; display: grid; gap: 0.6em; }
+.demande-cours .envoyee .note { font-size: 0.85em; font-style: italic; }
+
 @media (max-width: 600px) {
-  .demande-cours table.niveaux thead th { font-size: 0.8em; padding: 0 0.1em 0.3em; }
-  .demande-cours table.niveaux tbody th { font-size: 0.95em; }
+  .form-demande .ligne-saisie { flex-direction: column; gap: 0.5em; }
+  .form-demande .saisie { flex-wrap: wrap; }
+  .form-demande .boutons { flex-direction: row; }
+  .form-demande table.cours th { width: 5.5em; }
+  .form-demande .nb { width: auto; }
+  .form-demande label.en-regard { grid-template-columns: 1fr; gap: 0.2em; }
 }

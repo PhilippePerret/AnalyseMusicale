@@ -246,10 +246,10 @@ function demande_publique(array $d): array {
 function demande_texte(array $d): string {
   $creneaux = json_decode($d['creneaux'], true);
   $lignes = [];
-  foreach ($creneaux as $c) $lignes[] = '  - le ' . JOURS_FR[$c['jour']] . ' entre ' . heure_fr($c['debut']) . ' et ' . heure_fr($c['fin']);
+  foreach ($creneaux as $i => $c) $lignes[] = '  ' . ($i + 1) . '. le ' . JOURS_FR[$c['jour']] . ' entre ' . heure_fr($c['debut']) . ' et ' . heure_fr($c['fin']);
   $niveaux = json_decode($d['niveaux'], true);
   $conn = [];
   foreach (CONNAISSANCES as $cle => $libelle) $conn[] = "  - $libelle : " . (NIVEAUX[$niveaux[$cle] ?? ''] ?? '—');
   return "Nom : {$d['nom']}\nAdresse : {$d['email']}\n\nCOURS (1 heure)\nFréquence : " . (FREQUENCES[$d['frequence']] ?? $d['frequence'])
-    . "\nCréneaux :\n" . implode("\n", $lignes) . "\n\nCONNAISSANCES\n" . implode("\n", $conn) . "\n";
+    . "\nTranches horaires (par ordre de préférence) :\n" . implode("\n", $lignes) . "\n\nCONNAISSANCES\n" . implode("\n", $conn) . "\n";
 }

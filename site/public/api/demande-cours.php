@@ -46,7 +46,6 @@ foreach (array_slice(is_array($e['creneaux'] ?? null) ? $e['creneaux'] : [], 0, 
   $creneaux[] = ['jour' => $jour, 'debut' => $debut, 'fin' => $fin];
 }
 if (!$creneaux) refus('creneaux');
-usort($creneaux, function ($a, $b) { return [$a['jour'], $a['debut']] <=> [$b['jour'], $b['debut']]; });
 
 $niveaux = [];
 foreach (CONNAISSANCES as $cle => $libelle) {
