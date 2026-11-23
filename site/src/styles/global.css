@@ -381,3 +381,5 @@ form.contact-form .conditions input { margin: 0; width: 1.3em; height: 1.3em; pa
 form.contact-form input.objet-admin { max-width: 32em; }
 form.contact-form .ligne-envoi p.message { color: inherit; font-size: 0.85em; }
 @media (max-width: 600px) { form.contact-form .conditions { padding-left: 0; } }
+/* Page /cours/ : lien vers le formulaire de demande de cours, sous les tarifs */
+.lien-demande-cours { margin: 1em 0; font-size: 1.1em; }

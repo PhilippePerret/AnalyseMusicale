@@ -4,7 +4,7 @@
 //       ou par l'administrateur (tout).
 // POST JSON {action, …} : actions de l'élève (placer, demander, deplacer, annuler, rappels, definir_mdp)
 //       et de l'administrateur (eleve_ajouter, eleve_retirer, groupe_enregistrer, groupe_supprimer,
-//       cours_enregistrer, cours_supprimer, demande_repondre, dispos_enregistrer, lieu_enregistrer, lieu_supprimer).
+//       cours_enregistrer, cours_supprimer, demande_repondre, demande_cours_supprimer, dispos_enregistrer, lieu_enregistrer, lieu_supprimer).
 require __DIR__ . '/_cours.php';
 
 $user = user_courant();
@@ -77,6 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $reponse['lieux'] = db()->query('SELECT id, nom, valeur FROM lieux ORDER BY lower(nom)')->fetchAll();
     $reponse['eleves'] = db()->query("SELECT s.id, u.email, u.pseudo, u.genre, s.cree_le FROM students s JOIN users u ON u.id = s.user_id
       ORDER BY lower(COALESCE(NULLIF(u.pseudo, ''), u.email))")->fetchAll();
+    $reponse['demandes'] = array_map('demande_publique', db()->query('SELECT * FROM demandes_cours ORDER BY cree_le DESC')->fetchAll());
+    $reponse['connaissances'] = CONNAISSANCES;
+    $reponse['niveaux'] = NIVEAUX;
   }
   repondre($reponse);
 }
@@ -395,6 +398,11 @@ if ($action === 'lieu_enregistrer') {
   $valeur = texte($e['valeur'] ?? '', 300);
   if ($nom === '' || $valeur === '') erreur('lieu');
   db()->prepare('INSERT INTO lieux (nom, valeur) VALUES (?, ?) ON CONFLICT(nom) DO UPDATE SET valeur = excluded.valeur')->execute([$nom, $valeur]);
+  repondre(['ok' => true]);
+}
+
+if ($action === 'demande_cours_supprimer') {
+  db()->prepare('DELETE FROM demandes_cours WHERE id = ?')->execute([entier($e['id'] ?? 0)]);
   repondre(['ok' => true]);
 }
 

@@ -1,0 +1,196 @@
+---
+// Formulaire « Je veux prendre des cours d'analyse musicale » (lien sous les tarifs de /cours/).
+// Envoi : /api/demande-cours.php (demande enregistrée, transmise après confirmation de l'adresse).
+import Base from '../../../layouts/Base.astro';
+import '../../../styles/demande-cours.css';
+
+const JOURS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+const HEURES: string[] = [];
+for (let m = 8 * 60; m <= 20 * 60; m += 30) HEURES.push(`${String(Math.floor(m / 60)).padStart(2, '0')}:${m % 60 ? '30' : '00'}`);
+const heureFr = (h: string) => `${Number(h.slice(0, 2))} h${h.endsWith('30') ? ' 30' : ''}`;
+const FREQUENCES = [['semaine', 'Un par semaine'], ['quinzaine', 'Un tous les 15 jours'], ['mois', 'Un par mois'], ['ponctuel', 'Au coup par coup']];
+const CONNAISSANCES = [
+  ['generales', 'Connaissances théoriques générales'],
+  ['gammes', 'Connaissances des gammes, accords et chiffrages'],
+  ['harmonie', 'Connaissances en harmonie'],
+  ['contrepoint', 'Connaissances en contrepoint'],
+  ['analyse', 'Connaissances en analyse musicale'],
+];
+const NIVEAUX = [['excellentes', 'Excellentes'], ['bonnes', 'Bonnes'], ['moyennes', 'Moyennes'], ['aucune', 'Aucune']];
+---
+<Base title="Demande de cours" heading="Prendre des cours d’analyse" objetContact="cours"
+  description="Demande de cours d’analyse musicale avec Philippe Perret : fréquence, créneaux, connaissances.">
+  <div class="row demande-cours">
+    <p class="retour-cours"><a href="/cours/">→ Voir la page « Cours d’analyse »</a></p>
+
+    <p class="confirmation ok" id="confirmationOk" hidden>Adresse confirmée : votre demande m’a été transmise. Merci de votre intérêt.</p>
+    <p class="confirmation erreur" id="confirmationInvalide" hidden>Lien de confirmation invalide ou déjà utilisé.</p>
+
+    <form class="contact-form" id="formDemande">
+      <fieldset>
+        <legend>Identité</legend>
+        <label class="en-regard">Votre nom complet
+          <input type="text" name="nom" required maxlength="120" autocomplete="name">
+        </label>
+        <label class="en-regard">Votre adresse e-mail
+          <input type="email" name="email" required maxlength="200" autocomplete="email">
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Cours</legend>
+        <p class="note">La durée d’un cours est de 1 heure.</p>
+        <label class="en-regard">Fréquence
+          <select name="frequence">
+            {FREQUENCES.map(([v, l]) => <option value={v}>{l}</option>)}
+          </select>
+        </label>
+        <p class="consigne">Vos créneaux pour ces cours : définissez les tranches horaires qui vous conviendraient, sous la forme « Le mardi dans la tranche 8 h — 13 h ». Vous pouvez indiquer plusieurs tranches par jour.</p>
+        <div class="saisie-creneau">
+          <span>Le</span>
+          <select id="jour">{JOURS.map((j, i) => <option value={i + 1}>{j}</option>)}</select>
+          <span>dans la tranche</span>
+          <select id="debut">{HEURES.slice(0, -1).map((h) => <option value={h}>{heureFr(h)}</option>)}</select>
+          <span>—</span>
+          <select id="fin">{HEURES.slice(1).map((h) => <option value={h} selected={h === '13:00'}>{heureFr(h)}</option>)}</select>
+          <button type="button" class="bouton" id="ajouter">+ Ajouter</button>
+          <span class="comme">
+            <button type="button" class="bouton" id="comme" disabled>Comme le jour…</button>
+            <select id="jourSource" hidden></select>
+          </span>
+        </div>
+        <ul class="creneaux" id="creneaux"><li class="vide">Aucune tranche pour le moment.</li></ul>
+      </fieldset>
+
+      <fieldset>
+        <legend>Pour mieux vous connaître</legend>
+        <p class="consigne">Pour mieux vous connaître, indiquez votre niveau en théorie musicale.</p>
+        <table class="niveaux">
+          <thead><tr><th></th>{NIVEAUX.map(([, l]) => <th>{l}</th>)}</tr></thead>
+          <tbody>
+            {CONNAISSANCES.map(([cle, libelle]) => (
+              <tr>
+                <th scope="row">{libelle}</th>
+                {NIVEAUX.map(([v, l]) => <td><input type="radio" name={`niveau-${cle}`} value={v} required aria-label={`${libelle} : ${l}`}></td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </fieldset>
+
+      <div class="piege" aria-hidden="true">
+        <label>Ne pas remplir ce champ <input type="text" name="site_web" tabindex="-1" autocomplete="off"></label>
+      </div>
+
+      <p class="avertissement">Après l’envoi, vous recevrez un mail avec un lien de confirmation de votre adresse : <strong>votre demande me sera transmise seulement après ce clic de confirmation.</strong></p>
+      <div class="ligne-envoi">
+        <p class="message" id="message"></p>
+        <button type="submit">Transmettre ma demande</button>
+      </div>
+    </form>
+
+    <div class="envoyee" id="envoyee" hidden>
+      <p><strong>Votre demande est enregistrée.</strong></p>
+      <p>Un mail de confirmation vient de vous être envoyé à l’adresse <span id="adresseEnvoi"></span>. <strong>Votre demande me sera transmise seulement après votre clic sur le lien de ce mail.</strong></p>
+      <p class="note">Pensez à regarder dans les indésirables si ce mail tarde à arriver.</p>
+    </div>
+  </div>
+
+  <script is:inline define:vars={{ JOURS }}>
+    (function () {
+      var form = document.getElementById('formDemande');
+      var jour = document.getElementById('jour');
+      var debut = document.getElementById('debut');
+      var fin = document.getElementById('fin');
+      var comme = document.getElementById('comme');
+      var source = document.getElementById('jourSource');
+      var liste = document.getElementById('creneaux');
+      var message = document.getElementById('message');
+      var creneaux = [];   // [{jour, debut, fin}]
+      var hFr = function (h) { return Number(h.slice(0, 2)) + ' h' + (h.slice(3) === '30' ? ' 30' : ''); };
+
+      var conf = new URLSearchParams(location.search).get('confirmation');
+      if (conf === 'ok') { document.getElementById('confirmationOk').hidden = false; form.hidden = true; }
+      if (conf === 'invalide') document.getElementById('confirmationInvalide').hidden = false;
+
+      function trier() { creneaux.sort(function (a, b) { return a.jour - b.jour || (a.debut < b.debut ? -1 : 1); }); }
+      function joursRemplis() { return creneaux.map(function (c) { return c.jour; }).filter(function (j, i, t) { return t.indexOf(j) === i; }); }
+
+      function rendre() {
+        trier();
+        var jours = joursRemplis();
+        liste.innerHTML = '';
+        if (!jours.length) liste.innerHTML = '<li class="vide">Aucune tranche pour le moment.</li>';
+        jours.forEach(function (j) {
+          var li = document.createElement('li');
+          var nom = document.createElement('span');
+          nom.className = 'nom-jour';
+          nom.textContent = 'Le ' + JOURS[j - 1];
+          li.append(nom);
+          creneaux.forEach(function (c, i) {
+            if (c.jour !== j) return;
+            var t = document.createElement('span');
+            t.className = 'tranche';
+            t.textContent = hFr(c.debut) + ' — ' + hFr(c.fin) + ' ';
+            var x = document.createElement('button');
+            x.type = 'button'; x.className = 'retirer'; x.title = 'Retirer cette tranche'; x.textContent = '×';
+            x.addEventListener('click', function () { creneaux.splice(i, 1); rendre(); });
+            t.append(x);
+            li.append(t);
+          });
+          liste.append(li);
+        });
+        // « Comme le jour… » : jours déjà remplis, autres que le jour choisi
+        var autres = jours.filter(function (j) { return j !== Number(jour.value); });
+        comme.disabled = !autres.length;
+        source.innerHTML = '<option value="">choisir…</option>' + autres.map(function (j) { return '<option value="' + j + '">' + JOURS[j - 1] + '</option>'; }).join('');
+        source.hidden = true;
+      }
+
+      function ajouter(j, d, f) {
+        var deja = creneaux.some(function (c) { return c.jour === j && c.debut === d && c.fin === f; });
+        if (!deja) creneaux.push({ jour: j, debut: d, fin: f });
+      }
+
+      document.getElementById('ajouter').addEventListener('click', function () {
+        message.textContent = '';
+        if (fin.value <= debut.value) { message.textContent = 'La fin de la tranche doit suivre son début.'; return; }
+        ajouter(Number(jour.value), debut.value, fin.value);
+        rendre();
+      });
+      jour.addEventListener('change', rendre);
+      comme.addEventListener('click', function () { source.hidden = !source.hidden; if (!source.hidden) source.focus(); });
+      source.addEventListener('change', function () {
+        var s = Number(source.value);
+        if (!s) return;
+        var cible = Number(jour.value);
+        creneaux.filter(function (c) { return c.jour === s; }).forEach(function (c) { ajouter(cible, c.debut, c.fin); });
+        rendre();
+      });
+
+      var ERREURS = {
+        nom: 'Votre nom est à indiquer.', email: 'Adresse e-mail invalide.', creneaux: 'Ajoutez au moins une tranche horaire (bouton « + Ajouter »).',
+        creneau: 'Tranche horaire invalide.', niveaux: 'Indiquez un niveau pour chaque connaissance.', frequence: 'Fréquence invalide.'
+      };
+
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        if (!creneaux.length) { message.textContent = ERREURS.creneaux; return; }
+        var niveaux = {};
+        form.querySelectorAll('input[type=radio]:checked').forEach(function (r) { niveaux[r.name.slice(7)] = r.value; });
+        message.textContent = 'Envoi…';
+        fetch('/api/demande-cours.php', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json', 'X-Cami': '1' },
+          body: JSON.stringify({ nom: form.nom.value, email: form.email.value, frequence: form.frequence.value, creneaux: creneaux, niveaux: niveaux, site_web: form.site_web.value })
+        }).then(function (r) { return r.json(); }).then(function (r) {
+          if (!r.ok) { message.textContent = ERREURS[r.erreur] || 'Envoi impossible pour le moment.'; return; }
+          document.getElementById('adresseEnvoi').textContent = form.email.value;
+          form.hidden = true;
+          document.getElementById('envoyee').hidden = false;
+          window.scrollTo(0, 0);
+        }).catch(function () { message.textContent = 'Envoi impossible pour le moment.'; });
+      });
+    })();
+  </script>
+</Base>

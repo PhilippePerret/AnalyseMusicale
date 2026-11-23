@@ -148,6 +148,17 @@ CREATE TABLE IF NOT EXISTS lieux (   -- lieux mémorisés (lien visio ou adresse
   nom TEXT NOT NULL UNIQUE,
   valeur TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS demandes_cours (   -- formulaire « Je veux prendre des cours » (/cours/demande/)
+  id INTEGER PRIMARY KEY,
+  nom TEXT NOT NULL,
+  email TEXT NOT NULL,
+  frequence TEXT NOT NULL,          -- clé de FREQUENCES (_cours.php)
+  creneaux TEXT NOT NULL,           -- JSON [{jour (1 lundi … 7 dimanche), debut HH:MM, fin HH:MM}]
+  niveaux TEXT NOT NULL,            -- JSON {cle de CONNAISSANCES: cle de NIVEAUX}
+  jeton TEXT,                       -- jeton du lien de confirmation de l'adresse
+  confirmee_le TEXT,                -- adresse confirmée : demande transmise à l'administrateur
+  cree_le TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS rappels_cours (   -- rappel traité : cours, destinataire, délai, horaire du cours
   cours_id INTEGER NOT NULL REFERENCES cours(id) ON DELETE CASCADE,
   user_id INTEGER NOT NULL,

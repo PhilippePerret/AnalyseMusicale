@@ -27,6 +27,9 @@ Le COURS D’ANALYSE MUSICALE de Philippe Perret, c’est…
 | Cours en binôme     | 1 heure | 25 €
 |====
 
+[.lien-demande-cours]
+link:/cours/demande/[→ Je veux prendre des cours d’analyse musicale]
+
 
 La fréquence des cours est à la convenance de chacun +
 (1 cours par semaine, 1 à 2 cours par mois, 1 cours toutes les 6 semaines, séance définissable la semaine précédente, etc.)

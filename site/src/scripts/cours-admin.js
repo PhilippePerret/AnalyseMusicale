@@ -41,6 +41,7 @@ async function charger() {
   if (!r.ok || !r.acces || !r.admin) { $('refus').hidden = false; return; }
   etat = r;
   $('contenu').hidden = false;
+  rendreDemandes();
   rendreEleves();
   rendreGroupes();
   rendreDispos();
@@ -50,6 +51,27 @@ async function charger() {
 // Bouton de suppression en deux temps (clic, puis confirmation)
 const supprimer = (quoi, id, libelle) => `<button type="button" class="lien-supprimer" data-demander="${quoi}" data-id="${id}">${libelle}…</button>
   <button type="button" class="confirmer" data-confirmer="${quoi}" data-id="${id}" hidden>Confirmer</button>`;
+
+// --- Demandes de cours (formulaire /cours/demande/) ---
+
+const heureFr = (h) => `${Number(h.slice(0, 2))} h${h.slice(3) === '30' ? ' 30' : ''}`;
+
+function rendreDemandes() {
+  const niveaux = etat.niveaux;
+  $('demandes').innerHTML = etat.demandes.map((d) => {
+    const jours = {};
+    d.creneaux.forEach((c) => { (jours[c.jour] = jours[c.jour] || []).push(`${heureFr(c.debut)} — ${heureFr(c.fin)}`); });
+    const creneaux = Object.keys(jours).map((j) => `${JOURS[j - 1]} : ${jours[j].join(', ')}`).join('<br>');
+    const connaissances = Object.entries(etat.connaissances).map(([cle, libelle]) =>
+      `${esc(libelle.replace(/^Connaissances (théoriques |des |en )?/, ''))} : <b>${esc(niveaux[d.niveaux[cle]] || '—')}</b>`).join('<br>');
+    return `<tr${d.confirmee_le ? '' : ' class="attente"'}>
+      <td>${esc(d.nom)}<br><span class="email">${esc(d.email)}</span></td>
+      <td>${date(d.cree_le)}<br>${d.confirmee_le ? 'confirmée' : '<span class="vide">adresse à confirmer</span>'}</td>
+      <td>${esc(d.frequence)}<br>${creneaux}</td>
+      <td class="connaissances">${connaissances}</td>
+      <td class="action">${supprimer('demande', d.id, 'Supprimer')}</td></tr>`;
+  }).join('') || '<tr><td colspan="5" class="vide">Aucune demande pour le moment.</td></tr>';
+}
 
 // --- Élèves ---
 
@@ -196,6 +218,7 @@ $('contenu').addEventListener('click', async (e) => {
     eleve: { action: 'eleve_retirer', id },
     groupe: { action: 'groupe_supprimer', id },
     lieu: { action: 'lieu_supprimer', id },
+    demande: { action: 'demande_cours_supprimer', id },
     retour: { action: 'dispos_enregistrer', semaine, creneaux: [], generales: true },
   };
   await api(actions[confirmer.dataset.confirmer]);

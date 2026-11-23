@@ -213,3 +213,43 @@ function envoyer_rappels_cours(): int {
   }
   return $envoyes;
 }
+
+// --- Demandes de cours (formulaire /cours/demande/) ---
+
+const FREQUENCES = [
+  'semaine'  => 'Un par semaine',
+  'quinzaine' => 'Un tous les 15 jours',
+  'mois'     => 'Un par mois',
+  'ponctuel' => 'Au coup par coup',
+];
+const CONNAISSANCES = [
+  'generales'   => 'Connaissances théoriques générales',
+  'gammes'      => 'Connaissances des gammes, accords et chiffrages',
+  'harmonie'    => 'Connaissances en harmonie',
+  'contrepoint' => 'Connaissances en contrepoint',
+  'analyse'     => 'Connaissances en analyse musicale',
+];
+const NIVEAUX = ['excellentes' => 'Excellentes', 'bonnes' => 'Bonnes', 'moyennes' => 'Moyennes', 'aucune' => 'Aucune'];
+const JOURS_FR = [1 => 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+const DEMANDE_HEURE_MIN = '08:00';
+const DEMANDE_HEURE_MAX = '20:00';
+
+function demande_publique(array $d): array {
+  return [
+    'id' => (int) $d['id'], 'nom' => $d['nom'], 'email' => $d['email'], 'frequence' => FREQUENCES[$d['frequence']] ?? $d['frequence'],
+    'creneaux' => json_decode($d['creneaux'], true), 'niveaux' => json_decode($d['niveaux'], true),
+    'confirmee_le' => $d['confirmee_le'], 'cree_le' => $d['cree_le'],
+  ];
+}
+
+// Texte de la demande (mail à l'administrateur)
+function demande_texte(array $d): string {
+  $creneaux = json_decode($d['creneaux'], true);
+  $lignes = [];
+  foreach ($creneaux as $c) $lignes[] = '  - le ' . JOURS_FR[$c['jour']] . ' entre ' . heure_fr($c['debut']) . ' et ' . heure_fr($c['fin']);
+  $niveaux = json_decode($d['niveaux'], true);
+  $conn = [];
+  foreach (CONNAISSANCES as $cle => $libelle) $conn[] = "  - $libelle : " . (NIVEAUX[$niveaux[$cle] ?? ''] ?? '—');
+  return "Nom : {$d['nom']}\nAdresse : {$d['email']}\n\nCOURS (1 heure)\nFréquence : " . (FREQUENCES[$d['frequence']] ?? $d['frequence'])
+    . "\nCréneaux :\n" . implode("\n", $lignes) . "\n\nCONNAISSANCES\n" . implode("\n", $conn) . "\n";
+}

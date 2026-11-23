@@ -561,3 +561,42 @@ test('mails-types : refusés à un visiteur, servis à l’administrateur, envoi
   assert.match(mails, /To: inconnu@example\.com/);
   assert.match(mails, /Envoyé à : inconnu@example\.com/);
 });
+
+// --- Demandes de cours (/cours/demande/) ---
+
+test('demande de cours : enregistrée, transmise à l’administrateur seulement après confirmation de l’adresse', { skip }, async () => {
+  const visiteur = client();
+  const niveaux = { generales: 'bonnes', gammes: 'moyennes', harmonie: 'aucune', contrepoint: 'aucune', analyse: 'excellentes' };
+  const creneaux = [{ jour: 2, debut: '08:00', fin: '13:00' }, { jour: 4, debut: '14:30', fin: '16:00' }];
+  const base0 = { nom: 'Paul Martin', email: 'paul@example.com', frequence: 'quinzaine', creneaux, niveaux };
+  assert.equal((await visiteur.post('demande-cours.php', { ...base0, creneaux: [] })).erreur, 'creneaux');
+  assert.equal((await visiteur.post('demande-cours.php', { ...base0, creneaux: [{ jour: 2, debut: '07:00', fin: '09:00' }] })).erreur, 'creneau');
+  assert.equal((await visiteur.post('demande-cours.php', { ...base0, niveaux: { generales: 'bonnes' } })).erreur, 'niveaux');
+  assert.equal((await visiteur.post('demande-cours.php', { ...base0, frequence: 'x' })).erreur, 'frequence');
+
+  const avant = readFileSync(mailFile, 'utf-8').length;
+  assert.equal((await visiteur.post('demande-cours.php', base0)).ok, true);
+  let mails = readFileSync(mailFile, 'utf-8').slice(avant);
+  assert.match(mails, /To: paul@example\.com/);
+  assert.match(mails, /seulement apr/);
+  assert.doesNotMatch(mails, /To: philippe\.perret@/);
+  const jeton = mails.match(/demande-cours\.php\?jeton=([0-9a-f]{32})/)[1];
+
+  const admin = await adminConnecte();
+  let d = (await (await admin.get('/api/cours.php')).json()).demandes.find((x) => x.email === 'paul@example.com');
+  assert.equal(d.confirmee_le, null);
+  assert.equal(d.creneaux.length, 2);
+
+  const rep = await visiteur.get(`/api/demande-cours.php?jeton=${jeton}`);
+  assert.match(rep.headers.get('location'), /confirmation=ok/);
+  mails = readFileSync(mailFile, 'utf-8').slice(avant);
+  assert.match(mails, /To: philippe\.perret@analyse-musicale\.fr[\s\S]*Reply-To: paul@example\.com/);
+  assert.match(mails, /le mardi entre 8 h et 13 h/);
+  assert.match(mails, /en harmonie : Aucune/);
+  assert.match((await visiteur.get(`/api/demande-cours.php?jeton=${jeton}`)).headers.get('location'), /confirmation=invalide/);
+
+  d = (await (await admin.get('/api/cours.php')).json()).demandes.find((x) => x.email === 'paul@example.com');
+  assert.ok(d.confirmee_le);
+  assert.equal((await admin.post('cours.php', { action: 'demande_cours_supprimer', id: d.id })).ok, true);
+  assert.equal((await (await admin.get('/api/cours.php')).json()).demandes.length, 0);
+});

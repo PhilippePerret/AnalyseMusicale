@@ -161,3 +161,9 @@ table.mois a.puce.demande { background: #eaf1f8; color: #2c5178; border: 1px das
   .cours-page .panneau label.en-regard, .cours-page form.edition label.large { grid-template-columns: 1fr; gap: 0.2em; }
   .cours-page .dispos .jour { grid-template-columns: 1fr; gap: 0.2em; }
 }
+
+/* Demandes de cours (/cours/admin/) */
+.cours-page table.demandes td { vertical-align: top; font-size: 0.95em; }
+.cours-page table.demandes .email { overflow-wrap: anywhere; color: #555; }
+.cours-page table.demandes td.connaissances { white-space: nowrap; }
+.cours-page table.demandes tr.attente td { color: #888; }
