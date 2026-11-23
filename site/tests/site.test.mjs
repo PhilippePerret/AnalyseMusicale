@@ -176,6 +176,14 @@ test('chaque page : lien « Administration » caché, montré à l’administrat
   }
 });
 
+test('chaque page : bouton de déconnexion caché, montré au visiteur identifié', () => {
+  for (const f of htmlFiles()) {
+    const html = readFileSync(f, 'utf-8');
+    assert.match(html, /<button type="button" id="boutonDeconnexion"[^>]* hidden>/, f);
+    assert.match(html, /action: 'deconnexion'/, f);
+  }
+});
+
 test('pages /admin/ et /cours/ : liens cachés vers le calendrier des cours et la gestion des élèves', () => {
   for (const page of ['/admin/', '/cours/']) {
     const html = readFileSync(resolveLocal(page), 'utf-8');

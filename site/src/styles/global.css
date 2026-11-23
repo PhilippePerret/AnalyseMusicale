@@ -88,7 +88,9 @@ header.site .logo .marque span {
 }
 /* Menu de l'en-tête (blocs de l'accueil) */
 header.site nav.menu { align-self: flex-start; padding-top: 0.2em; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.3em 1.6em; }
-header.site nav.menu a[hidden] { display: none; }
+header.site nav.menu a[hidden], header.site nav.menu button[hidden] { display: none; }
+header.site nav.menu button.deconnexion { border: none; background: none; padding: 0; margin: 0; color: var(--gris-logo); cursor: pointer; line-height: 0; align-self: center; }
+header.site nav.menu button.deconnexion:hover { color: var(--survol); }
 /* Liens de l'administrateur, en haut à droite de la page */
 .liens-admin.row { margin-top: 0.6em; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 0.3em 1.4em; font-size: 0.7em; }
 .liens-admin + .row { margin-top: 1em; }

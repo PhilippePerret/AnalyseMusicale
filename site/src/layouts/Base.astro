@@ -49,6 +49,9 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
     <nav class="menu">
       {Astro.url.pathname !== '/' && MENU.map(([href, texte]) => <a href={href} class={Astro.url.pathname.startsWith(href) ? 'actif' : undefined}>{texte}</a>)}
       <a href="/admin/" id="lienAdmin" class={Astro.url.pathname.startsWith('/admin/') ? 'actif' : undefined} hidden>Administration</a>
+      <button type="button" id="boutonDeconnexion" class="deconnexion" title="Se déconnecter" aria-label="Se déconnecter" hidden>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4H5v16h5"/><path d="M10 12h10"/><path d="M16 8l4 4-4 4"/></svg>
+      </button>
     </nav>
   </header>
 
@@ -86,7 +89,15 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
   <script is:inline>
     // Administrateur identifié seulement : lien « Administration » du menu, liens en haut de la page (liensAdmin)
     fetch('/api/moi.php', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (d) {
-      if (!d || !d.user || !d.user.admin) return;
+      if (!d || !d.user) return;
+      // Visiteur identifié : bouton de déconnexion (en haut à droite, toutes les pages)
+      var bouton = document.getElementById('boutonDeconnexion');
+      bouton.hidden = false;
+      bouton.addEventListener('click', function () {
+        fetch('/api/compte.php', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-Cami': '1' }, body: JSON.stringify({ action: 'deconnexion' }) })
+          .then(function () { location.reload(); });
+      });
+      if (!d.user.admin) return;
       document.getElementById('lienAdmin').hidden = false;
       var liens = document.getElementById('liensAdmin');
       if (liens) liens.hidden = false;
