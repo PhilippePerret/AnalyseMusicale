@@ -1,0 +1,41 @@
+<?php
+// Mails-types de l'administrateur (chargés depuis /contact/ quand il est identifié).
+// Variables : {nom} (champ « Nom » du formulaire), {url-cours} (page des cours).
+// Blocs conditionnels : {if condition} … {/if condition} (une case à cocher par condition).
+
+const MAILS_TYPES = [
+  'reponse-demande-cours' => [
+    'titre' => 'Réponse à une demande de cours',
+    'objet' => 'Cours d’analyse musicale — CAMI',
+    'corps' => <<<'TXT'
+Bonjour {nom},
+
+Oui, vous pouvez tout à fait suivre des cours d’analyse musicale ponctuels avec la CAMI, donc avec moi.
+
+{if proposition oeuvre}
+Et ce petit prélude de Bach est idéal pour commencer.
+{/if proposition oeuvre}
+
+Nous avons juste à définir une fréquence et un horaire.
+
+Fréquence : c’est à vous de choisir : une fois par semaine, une fois tous les 15 jours, une fois par mois, c’est à votre convenance et suivant vos disponibilités.
+Durée : 1 heure par cours.
+Horaire : plutôt le matin, entre 8 heures et 13 heures, les lundi, mardi, jeudi et vendredi, mais si aucun de ces créneaux ne vous va, nous pouvons envisager autre chose.
+Le mieux et le plus simple pour moi est de définir un jour fixe, mais nous pouvons le bouger si nécessaire, les choses ne sont pas gravées dans le marbre.
+
+J’espère que vous trouverez votre bonheur dans ces créneaux possibles.
+
+{if notions}
+Lorsque vous dites que vous avez des notions d’harmonie, qu’avez-vous suivi comme formation ? Et jusqu’à quel niveau ? (c’est juste pour moi, pour savoir ce que j’aurais éventuellement à vous expliquer ou non)
+{/if notions}
+
+Merci de votre intérêt, au plaisir de travailler avec vous,
+
+Bien à vous,
+
+Philippe Perret
+—————————————————————————
+Cours d’analyse de la CAMI : {url-cours}
+TXT,
+  ],
+];

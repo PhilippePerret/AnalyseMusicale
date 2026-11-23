@@ -374,3 +374,10 @@ pre.terminal::before { content: '% '; color: #7fd27f; user-select: none; }
   color: var(--principal);
 }
 .admonitionblock td.content { padding-left: 1em; }
+/* /contact/ administrateur : conditions du mail-type, objet large */
+form.contact-form .conditions { display: flex; flex-wrap: wrap; gap: 0.4em 1.4em; font-size: 0.85em; padding-left: 11.3em; }
+form.contact-form .conditions label { display: flex; align-items: center; gap: 0.4em; white-space: nowrap; }
+form.contact-form .conditions input { margin: 0; width: 1.3em; height: 1.3em; padding: 0; font-size: inherit; display: inline-block; }
+form.contact-form input.objet-admin { max-width: 32em; }
+form.contact-form .ligne-envoi p.message { color: inherit; font-size: 0.85em; }
+@media (max-width: 600px) { form.contact-form .conditions { padding-left: 0; } }

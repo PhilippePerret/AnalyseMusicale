@@ -4,7 +4,7 @@ import { EMAIL, OBJETS_CONTACT } from '../../lib/site';
 ---
 <Base title="Contact" heading="Contact" description="Contacter Philippe Perret, Cours d’Analyse Musicale.">
   <div class="row">
-    <div class="colonne">
+    <div class="colonne" id="contactVisiteur">
       <p>Par courriel : <a href={`mailto:${EMAIL}`}>{EMAIL}</a></p>
       <p>Ou par ce formulaire :</p>
 
@@ -33,6 +33,32 @@ import { EMAIL, OBJETS_CONTACT } from '../../lib/site';
         <button type="submit">Envoyer</button>
       </form>
     </div>
+
+    <div class="colonne" id="contactAdmin" hidden>
+      <p>Écrire à une personne (inscrite ou non). Copie envoyée à l’administrateur.</p>
+      <form class="contact-form" id="formAdmin">
+        <label class="en-regard">Mail-type
+          <select id="mailType"><option value="">— aucun —</option></select>
+        </label>
+        <div class="conditions" id="conditions" hidden></div>
+        <label class="en-regard">Destinataire
+          <input type="email" name="email" required maxlength="200">
+        </label>
+        <label class="en-regard">Nom
+          <input type="text" id="nomAdmin" maxlength="120">
+        </label>
+        <label class="en-regard">Objet
+          <input type="text" name="objet" required maxlength="200" class="objet-admin">
+        </label>
+        <label class="message-libelle">Message
+          <textarea name="message" required rows="22" maxlength="20000"></textarea>
+        </label>
+        <div class="ligne-envoi">
+          <p class="message" id="retourAdmin"></p>
+          <button type="submit">Envoyer</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script is:inline>
@@ -41,6 +67,68 @@ import { EMAIL, OBJETS_CONTACT } from '../../lib/site';
       var objet = new URLSearchParams(location.search).get('objet');
       var select = document.getElementById('objet');
       if (objet && select.querySelector('option[value="' + objet + '"]')) select.value = objet;
+    })();
+  </script>
+  <script is:inline>
+    // Administrateur identifié : le formulaire devient un moyen d'écrire à n'importe qui, avec mails-types.
+    (function () {
+      fetch('/api/mails.php', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+        if (!d || !d.ok) return;
+        document.getElementById('contactVisiteur').hidden = true;
+        document.getElementById('contactAdmin').hidden = false;
+        var form = document.getElementById('formAdmin');
+        var menu = document.getElementById('mailType');
+        var zone = document.getElementById('conditions');
+        var nom = document.getElementById('nomAdmin');
+        var retour = document.getElementById('retourAdmin');
+        var dernier = '';   // dernier texte produit par le mail-type (pour savoir si Phil l'a retouché)
+        d.types.forEach(function (t) { menu.add(new Option(t.titre, t.id)); });
+        function type() { return d.types.filter(function (t) { return t.id === menu.value; })[0]; }
+        function produire() {
+          var t = type();
+          if (!t) return;
+          var coches = {};
+          zone.querySelectorAll('input').forEach(function (c) { coches[c.value] = c.checked; });
+          var texte = t.corps.replace(/\{if ([^}]+)\}\n?([\s\S]*?)\{\/if \1\}\n?/g, function (_, cond, bloc) { return coches[cond] ? bloc : ''; });
+          var vars = Object.assign({ nom: nom.value.trim() || '{nom}' }, d.variables);
+          texte = texte.replace(/\{([a-z-]+)\}/g, function (m, v) { return v in vars ? vars[v] : m; }).replace(/\n{3,}/g, '\n\n');
+          if (form.message.value !== dernier && form.message.value.trim() !== '' && !confirm('Remplacer le message retouché ?')) return;
+          form.message.value = dernier = texte;
+        }
+        menu.addEventListener('change', function () {
+          var t = type();
+          zone.innerHTML = '';
+          zone.hidden = !t;
+          if (!t) return;
+          var vues = {};
+          t.corps.replace(/\{if ([^}]+)\}/g, function (_, cond) {
+            if (vues[cond]) return;
+            vues[cond] = true;
+            var l = document.createElement('label');
+            var c = document.createElement('input');
+            c.type = 'checkbox'; c.value = cond;
+            c.addEventListener('change', produire);
+            l.append(c, ' ' + cond);
+            zone.append(l);
+          });
+          zone.hidden = !zone.children.length;
+          form.objet.value = t.objet;
+          produire();
+        });
+        nom.addEventListener('change', produire);
+        form.addEventListener('submit', function (ev) {
+          ev.preventDefault();
+          if (/\{nom\}/.test(form.message.value)) { retour.textContent = 'Le nom reste à renseigner.'; return; }
+          retour.textContent = 'Envoi…';
+          fetch('/api/mails.php', {
+            method: 'POST', credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'X-Cami': '1' },
+            body: JSON.stringify({ email: form.email.value, objet: form.objet.value, message: form.message.value })
+          }).then(function (r) { return r.json(); }).then(function (r) {
+            retour.textContent = r.ok ? 'Message envoyé à ' + form.email.value + '.' : 'Échec de l’envoi (' + r.erreur + ').';
+          }).catch(function () { retour.textContent = 'Échec de l’envoi.'; });
+        });
+      }).catch(function () {});
     })();
   </script>
 </Base>

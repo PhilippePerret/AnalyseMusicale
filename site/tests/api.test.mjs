@@ -544,3 +544,20 @@ test('cours : élèves, disponibilités, placement, demandes, rendez-vous régul
   assert.equal(apres.cours.some((c) => c.groupe === gid), false);
   assert.equal((await cours(eleve)).acces, false);
 });
+
+// --- Mails de l'administrateur depuis /contact/ (mails-types) ---
+
+test('mails-types : refusés à un visiteur, servis à l’administrateur, envoi à une adresse inconnue', { skip }, async () => {
+  assert.equal((await client().get('/api/mails.php')).status, 403);
+  const admin = await adminConnecte();
+  const d = await (await admin.get('/api/mails.php')).json();
+  const t = d.types.find((x) => x.id === 'reponse-demande-cours');
+  assert.ok(t && t.corps.includes('{if notions}'));
+  assert.match(d.variables['url-cours'], /\/cours\/$/);
+  assert.equal((await admin.post('mails.php', { email: 'pasuneadresse', objet: 'x', message: 'y' })).erreur, 'email');
+  const r = await admin.post('mails.php', { email: 'inconnu@example.com', objet: 'Cours', message: 'Bonjour Paul,' });
+  assert.equal(r.ok, true);
+  const mails = readFileSync(mailFile, 'utf-8');
+  assert.match(mails, /To: inconnu@example\.com/);
+  assert.match(mails, /Envoyé à : inconnu@example\.com/);
+});
