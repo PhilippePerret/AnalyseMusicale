@@ -1,0 +1,163 @@
+/* Cours (issue #13) : /cours/student/ (calendrier) et /cours/admin/ (élèves, groupes, disponibilités) */
+
+.cours-page { font-size: 0.8em; }
+.cours-page h1.titre-page { margin-top: 0.2em; padding: 0; }
+.cours-page [hidden] { display: none !important; }
+.cours-page .vide { color: var(--gris-logo); font-style: italic; }
+.cours-page .acces { font-size: 1.1em; }
+.cours-page input, .cours-page select, .cours-page textarea {
+  font: inherit; line-height: 1.25; padding: 0.12em 0.4em; border: 1px solid #aaa; border-radius: 3px; background: var(--fond);
+}
+.cours-page button.bouton:disabled { opacity: 0.45; cursor: default; }
+.cours-page .erreur { color: #a33; margin: 0; }
+.cours-page .message { color: var(--courant); margin: 0.6em 0 0; }
+.cours-page .message .erreur { color: #a33; }
+.cours-page .aide { color: #777; font-size: 0.9em; margin: 0; }
+
+.cours-page .barre-compte { text-align: right; font-size: 0.85em; min-height: 1.5em; margin-bottom: 0.3em; }
+
+/* Panneaux (identification, choix du mot de passe, formulaires de /cours/admin/) */
+.cours-page .panneau { display: grid; gap: 0.6em; max-width: 34em; padding: 0.9em 1.2em; border-top: 4px solid var(--principal); background: #f7f7f7; }
+.cours-page .panneau h3 { margin: 0; color: var(--principal); font-size: 1.05em; }
+.cours-page .panneau label.en-regard { display: grid; grid-template-columns: 9em 1fr; align-items: center; gap: 0.8em; }
+.cours-page .panneau label.en-regard > input { max-width: 20em; }
+.cours-page .panneau label.en-regard > select { justify-self: start; }
+.cours-page .panneau .boutons { display: flex; justify-content: space-between; align-items: center; }
+.cours-page .panneau .message { color: #a33; margin: 0; }
+.cours-page .panneau .message.ok { color: var(--courant); }
+.cours-page .identification { margin: 1em auto; }
+
+/* Annonces : cours à placer, demandes */
+.annonces ul { margin: 0 0 0.8em; padding: 0.5em 1em 0.5em 2em; background: #eaf1f8; border-left: 4px solid var(--survol); }
+.annonces li { margin: 0.15em 0; }
+.annonces li.refus { color: #a33; }
+
+/* Barre : vues, navigation, outils */
+.cours-page .barre { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6em 1.4em; margin-bottom: 0.5em; }
+.cours-page .vues { display: inline-flex; }
+.cours-page .bascule-vue, .cours-page .nav { font: inherit; padding: 0.15em 0.8em; border: 1px solid #aaa; background: var(--fond); cursor: pointer; color: var(--texte); }
+.cours-page .bascule-vue:first-child { border-radius: 3px 0 0 3px; }
+.cours-page .bascule-vue:last-child { border-radius: 0 3px 3px 0; border-left: none; }
+.cours-page .bascule-vue.actif { background: var(--principal); border-color: var(--principal); color: #fff; }
+.cours-page .nav { border-radius: 3px; padding: 0.15em 0.6em; }
+.cours-page .nav:hover, .cours-page .bascule-vue:not(.actif):hover { border-color: var(--survol); color: var(--survol); }
+.cours-page .navigation { display: inline-flex; align-items: center; gap: 0.4em; }
+.cours-page .periode { min-width: 13em; text-align: center; font-weight: 700; color: var(--principal); }
+.cours-page .outils { margin-left: auto; display: inline-flex; align-items: center; gap: 1em; }
+.cours-page .outils label { display: inline-flex; align-items: center; gap: 0.4em; }
+
+.cours-page .cadre { border: 1px solid #ccc; padding: 0.6rem; overflow-x: auto; }
+.cours-page .legende { font-size: 0.8em; color: #777; margin: 0.3em 0 0; }
+
+/* Vue semaine : colonnes des jours, zones de disponibilité, cours */
+.semaine { min-width: 44em; --hauteur: calc((var(--h1) - var(--h0)) / 60 * var(--hh)); }
+.semaine .entetes, .semaine .corps { display: grid; grid-template-columns: 3em repeat(7, 1fr); gap: 0 3px; }
+.semaine .jour-entete { text-align: center; font-weight: 700; color: var(--principal); padding: 0.2em 0; text-transform: capitalize; }
+.semaine .jour-entete.aujourdhui { color: #fff; background: var(--courant); border-radius: 3px; }
+.semaine .heures { position: relative; height: var(--hauteur); }
+.semaine .heure { height: var(--hh); font-size: 0.8em; color: #888; text-align: right; padding-right: 0.4em; transform: translateY(-0.6em); }
+.semaine .heure:first-child { transform: none; }
+.semaine .col-jour {
+  position: relative; height: var(--hauteur); cursor: pointer;
+  background-image: linear-gradient(#d4d4d4 1px, transparent 1px), repeating-linear-gradient(-45deg, #ececec 0 6px, #e3e3e3 6px 12px);
+  background-size: 100% var(--hh), auto;
+}
+.semaine .col-jour.passe { opacity: 0.6; }
+.semaine .dispo, .semaine .bloc { position: absolute; left: 0; right: 0; top: calc((var(--debut) - var(--h0)) / 60 * var(--hh)); height: calc(var(--duree) / 60 * var(--hh)); }
+.semaine .dispo { background: #fff; background-image: linear-gradient(#ececec 1px, transparent 1px); background-size: 100% var(--hh); background-position: 0 calc((var(--h0) - var(--debut)) / 60 * var(--hh)); }
+.semaine .col-jour:hover .dispo { background-color: #f4f8fc; }
+.semaine .bloc { left: 2px; right: 2px; overflow: hidden; font-size: 0.75em; line-height: 1.2; padding: 0.15em 0.35em; border-radius: 3px; background: var(--principal); color: #fff; border: 1px solid var(--principal); }
+.semaine .bloc .h { font-weight: 700; }
+.semaine .bloc .o { display: block; opacity: 0.85; }
+.semaine .bloc:hover, .semaine .bloc.choisi { background: var(--survol); border-color: var(--survol); }
+.semaine .bloc.choisi { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--survol); }
+.semaine .bloc.demande { background: #eaf1f8; color: #2c5178; border: 1px dashed var(--survol); }
+.semaine .bloc.demande:hover, .semaine .bloc.demande.choisi { background: var(--survol); color: #fff; }
+.semaine .bloc.occupe { background: #bbb; border-color: #bbb; color: #fff; cursor: default; text-align: center; }
+
+/* Vue mois */
+table.mois { width: 100%; min-width: 40em; border-collapse: collapse; table-layout: fixed; }
+table.mois th { color: var(--principal); font-weight: 700; padding: 0.2em; text-transform: capitalize; }
+table.mois td { border: 1px solid #ddd; height: 5.2em; vertical-align: top; padding: 0.2em 0.3em; cursor: pointer; background: #f3f3f3; }
+table.mois td.dispo { background: #fff; }
+table.mois td.hors { opacity: 0.45; }
+table.mois td.passe { color: #999; }
+table.mois td:hover { box-shadow: inset 0 0 0 2px var(--survol); }
+table.mois td .num { display: block; font-size: 0.85em; }
+table.mois td.aujourdhui .num { display: inline-block; color: #fff; background: var(--courant); border-radius: 3px; padding: 0 0.35em; }
+table.mois .puce { display: block; font-size: 0.75em; line-height: 1.3; margin-top: 0.15em; padding: 0 0.3em; border-radius: 2px; background: var(--principal); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+table.mois a.puce, table.mois a.puce:link, table.mois a.puce:visited { color: #fff; }
+table.mois a.puce:hover { background: var(--survol); }
+table.mois a.puce.demande { background: #eaf1f8; color: #2c5178; border: 1px dashed var(--survol); }
+
+/* Fiche d'un cours, formulaires */
+.cours-page .detail { position: relative; margin-top: 1rem; padding: 0.9em 1.1em; border-left: 4px solid var(--principal); background: #f6f7f6; display: grid; gap: 0.3em; }
+.cours-page .detail:empty { display: none; }
+.cours-page .detail .date { font-weight: 700; padding-right: 4em; text-transform: uppercase; letter-spacing: 0.03em; }
+.cours-page .detail .date sup { text-transform: none; }
+.cours-page .detail .editer { position: absolute; top: 0.9em; right: 1.1em; font-size: 0.85em; }
+.cours-page .detail .statut { font-style: italic; color: var(--survol); }
+.cours-page .detail .statut.refuse { color: #a33; }
+.cours-page .detail .travail { white-space: pre-wrap; background: #fff; border: 1px solid #e2e2e2; padding: 0.4em 0.6em; }
+.cours-page .detail .travail .titre { white-space: normal; font-size: 0.85em; color: var(--principal); font-weight: 700; }
+.cours-page .detail .actions { margin-top: 0.4em; display: flex; flex-wrap: wrap; gap: 0.8em; }
+
+.cours-page form.edition { display: grid; gap: 0.6em; margin-top: 0.4em; }
+.cours-page form.edition .rang { display: flex; flex-wrap: wrap; gap: 0.5em 1.6em; align-items: center; }
+.cours-page form.edition .rang.recurrence, .cours-page form.edition .rang.rappel { gap: 0.5em; }
+.cours-page form.edition label.en-ligne { display: inline-flex; align-items: center; gap: 0.5em; white-space: nowrap; }
+.cours-page form.edition label.large { display: grid; grid-template-columns: 8.5em 1fr; }
+.cours-page form.edition .rang label.large { flex: 1 1 24em; }
+.cours-page form.edition label.haut { align-items: start; }
+.cours-page form.edition textarea { width: 100%; resize: vertical; }
+.cours-page form.edition input[type=number] { width: 4em; }
+.cours-page form.edition label.case { display: inline-flex; align-items: center; gap: 0.4em; }
+.cours-page form.edition .titre-rang { font-weight: 700; color: var(--principal); }
+.cours-page form.edition .boutons { display: flex; gap: 1.2em; align-items: center; justify-content: space-between; margin-top: 0.3em; }
+.cours-page form.edition button.annuler { font-size: 0.8em; }
+.cours-page button.retirer { border: none; background: none; font-size: 1.3em; line-height: 1; color: #a33; cursor: pointer; padding: 0 0.2em; }
+
+/* Suppression / annulation / refus : à l'écart, avec confirmation */
+.cours-page .zone-suppression { margin-top: 1.2em; padding-top: 0.6em; border-top: 1px dashed #ccc; font-size: 0.9em; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5em 0.8em; }
+.cours-page .zone-suppression .confirmer { color: #a33; }
+.cours-page .zone-suppression label { display: inline-flex; align-items: center; gap: 0.4em; }
+.cours-page .zone-suppression button { font: inherit; padding: 0.2em 0.8em; cursor: pointer; border-radius: 3px; border: 1px solid #a33; background: #a33; color: #fff; }
+.cours-page .zone-suppression button.supprimer { background: var(--fond); color: #a33; }
+.cours-page .zone-suppression button.supprimer:hover { background: #a33; color: #fff; }
+.cours-page .zone-suppression button.non { background: var(--fond); color: var(--texte); border-color: #aaa; }
+
+/* /cours/admin/ */
+.cours-page h2.rubrique { color: var(--principal); font-size: 1.15em; text-transform: uppercase; letter-spacing: 0.06em; margin: 1.8em 0 0.5em; border-bottom: 1px solid #ddd; }
+.cours-page h2.rubrique:first-of-type { margin-top: 0.5em; }
+.cours-page table.liste { width: 100%; border-collapse: collapse; }
+.cours-page table.liste th { text-align: left; color: var(--principal); border-bottom: 2px solid var(--principal); padding: 0.3em 0.5em; }
+.cours-page table.liste td { border-bottom: 1px solid #e2e2e2; padding: 0.35em 0.5em; vertical-align: middle; }
+.cours-page table.liste td.email { overflow-wrap: anywhere; }
+.cours-page table.liste td.action { text-align: right; white-space: nowrap; }
+.cours-page table.liste input.lieu { width: 100%; }
+.cours-page .lien-supprimer { border: none; background: none; padding: 0; font: inherit; font-size: 0.9em; color: #a33; cursor: pointer; }
+.cours-page .lien-supprimer:hover { text-decoration: underline; }
+.cours-page button.confirmer { color: #fff; background: #a33; border: 1px solid #a33; border-radius: 3px; font: inherit; font-size: 0.9em; padding: 0.1em 0.6em; cursor: pointer; }
+.cours-page form.ligne { display: flex; flex-wrap: wrap; gap: 0.5em 1.2em; align-items: center; margin-top: 0.6em; padding: 0.6em 0.9em; background: #f7f7f7; border-top: 3px solid var(--principal); }
+.cours-page form.ligne label { display: inline-flex; align-items: center; gap: 0.4em; }
+.cours-page form.ligne .bouton { margin-left: auto; }
+.cours-page form.ligne .message { flex-basis: 100%; margin: 0; }
+.cours-page .eleves-groupe { display: flex; flex-wrap: wrap; gap: 0.2em 1em; }
+
+/* Disponibilités : une ligne par jour, créneaux en regard */
+.cours-page .dispos { display: grid; gap: 0.35em; }
+.cours-page .dispos .jour { display: grid; grid-template-columns: 7em 1fr; align-items: center; gap: 0.6em; }
+.cours-page .dispos .nom-jour { font-weight: 700; color: var(--principal); text-transform: capitalize; }
+.cours-page .dispos .creneaux { display: flex; flex-wrap: wrap; gap: 0.3em 1em; align-items: center; }
+.cours-page .dispos .creneau { display: inline-flex; align-items: center; gap: 0.3em; }
+.cours-page .dispos .ajouter { font-size: 0.9em; }
+.cours-page .entete-dispos { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5em 1.2em; margin-bottom: 0.5em; }
+.cours-page .entete-dispos label { display: inline-flex; align-items: center; gap: 0.4em; }
+.cours-page .entete-dispos .mode { color: #777; font-style: italic; }
+.cours-page .pied-dispos { display: flex; justify-content: space-between; align-items: center; gap: 1em; margin-top: 0.6em; }
+
+@media (max-width: 700px) {
+  .cours-page .outils { margin-left: 0; }
+  .cours-page .panneau label.en-regard, .cours-page form.edition label.large { grid-template-columns: 1fr; gap: 0.2em; }
+  .cours-page .dispos .jour { grid-template-columns: 1fr; gap: 0.2em; }
+}

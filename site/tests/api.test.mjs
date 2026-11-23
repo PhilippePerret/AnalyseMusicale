@@ -424,3 +424,123 @@ test('alertes des directs : 3 jours, 1 jour, 1 heure avant ; refus pour la sessi
   assert.doesNotMatch(dernier, /pour cette session/);
   assert.match(dernier, /plus jamais recevoir/);
 });
+
+// --- Cours (issue #13) ---
+
+test('cours : élèves, disponibilités, placement, demandes, rendez-vous régulier, délais, rappels', { skip }, async () => {
+  const admin = await adminConnecte();
+  const cours = async (c) => (await c.get('/api/cours.php')).json();
+  const jourDans = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toLocaleDateString('sv'); };
+  const J = jourDans(21);
+
+  assert.equal((await cours(client())).acces, false);
+
+  // Disponibilités générales : tous les jours de 9 h à 18 h
+  let r = await admin.post('cours.php', { action: 'dispos_enregistrer', semaine: '', creneaux: [1, 2, 3, 4, 5, 6, 7].map((jour) => ({ jour, debut: '09:00', fin: '18:00' })) });
+  assert.equal(r.ok, true);
+  assert.equal((await admin.post('cours.php', { action: 'dispos_enregistrer', semaine: '', creneaux: [{ jour: 1, debut: '12:00', fin: '10:00' }] })).erreur, 'creneau');
+
+  // Inscription d'un élève : mail avec lien de choix du mot de passe
+  r = await admin.post('cours.php', { action: 'eleve_ajouter', email: 'Eleve1@example.com', pseudo: 'Léa', genre: 'F' });
+  assert.equal(r.ok, true);
+  assert.equal((await admin.post('cours.php', { action: 'eleve_ajouter', email: 'eleve1@example.com' })).erreur, 'existe');
+  const jeton = [...readFileSync(mailFile, 'utf-8').matchAll(/cours\/student\/\?jeton=([0-9a-f]{32})/g)].pop()[1];
+  assert.match(readFileSync(mailFile, 'utf-8'), /inscrite comme élève/);
+  const eleve = client();
+  assert.equal((await eleve.post('cours.php', { action: 'definir_mdp', jeton, mdp: 'court' })).erreur, 'mdp');
+  assert.equal((await eleve.post('cours.php', { action: 'definir_mdp', jeton, mdp: 'motdepasse' })).ok, true);
+  assert.equal((await eleve.post('cours.php', { action: 'definir_mdp', jeton, mdp: 'motdepasse' })).erreur, 'jeton');
+  let e = await cours(eleve);
+  assert.equal(e.acces, true);
+  assert.equal(e.admin, false);
+  assert.equal(e.groupes.length, 1);
+  assert.deepEqual(e.rappels, [1440, 60]);
+  const gid = e.groupes[0].id;
+
+  // Un autre élève : ses cours apparaissent à Léa comme simples créneaux occupés
+  await admin.post('cours.php', { action: 'eleve_ajouter', email: 'eleve2@example.com', pseudo: 'Max', genre: 'H' });
+  const gMax = (await cours(admin)).groupes.find((g) => g.nom === 'Max').id;
+  assert.equal((await admin.post('cours.php', { action: 'cours_enregistrer', groupe: gMax, debut: `${J} 15:00`, duree: 60, oeuvres: 'Secret' })).ok, true);
+  e = await cours(eleve);
+  assert.equal(e.cours.length, 0);
+  assert.deepEqual(e.occupes, [{ debut: `${J} 15:00`, duree: 60 }]);
+  assert.equal(JSON.stringify(e).includes('Secret'), false);
+
+  // Cours accordé (à placer par l'élève)
+  r = await admin.post('cours.php', { action: 'cours_enregistrer', groupe: gid, a_placer: true, duree: 60 });
+  assert.equal(r.ok, true);
+  const accorde = r.id;
+  assert.equal((await eleve.post('cours.php', { action: 'placer', id: accorde, debut: `${J} 18:00` })).erreur, 'indisponible');
+  assert.equal((await eleve.post('cours.php', { action: 'placer', id: accorde, debut: `${J} 15:30` })).erreur, 'occupe');
+  assert.equal((await eleve.post('cours.php', { action: 'placer', id: accorde, debut: `${J} 10:10` })).erreur, 'debut');
+  assert.equal((await eleve.post('cours.php', { action: 'placer', id: accorde, debut: `${J} 10:00` })).ok, true);
+  e = await cours(eleve);
+  assert.equal(e.cours.find((c) => c.id === accorde).statut, 'place');
+
+  // Demande de cours : refusée avec une raison, puis retirée
+  r = await eleve.post('cours.php', { action: 'demander', groupe: gid, debut: `${J} 13:00`, duree: 90 });
+  assert.equal(r.ok, true);
+  assert.equal((await eleve.post('cours.php', { action: 'demander', groupe: gid, debut: `${J} 14:00`, duree: 30 })).erreur, 'occupe');
+  assert.equal((await eleve.post('cours.php', { action: 'demander', groupe: gMax, debut: `${J} 16:00`, duree: 30 })).erreur, 'groupe');
+  const demande = (await cours(admin)).cours.find((c) => c.statut === 'demande');
+  assert.equal((await eleve.post('cours.php', { action: 'demande_repondre', id: demande.id, accepter: true })).erreur, 'action');
+  assert.equal((await admin.post('cours.php', { action: 'demande_repondre', id: demande.id, accepter: false, raison: 'Concert ce jour-là' })).ok, true);
+  assert.match(readFileSync(mailFile, 'utf-8'), /Raison : Concert ce jour-là/);
+  e = await cours(eleve);
+  assert.equal(e.cours.find((c) => c.id === demande.id).statut, 'refuse');
+  assert.equal((await eleve.post('cours.php', { action: 'annuler', id: demande.id })).ok, true);
+
+  // Demande acceptée
+  await eleve.post('cours.php', { action: 'demander', groupe: gid, debut: `${J} 16:00`, duree: 60 });
+  const d2 = (await cours(admin)).cours.find((c) => c.statut === 'demande');
+  await admin.post('cours.php', { action: 'demande_repondre', id: d2.id, accepter: true });
+  assert.equal((await cours(eleve)).cours.find((c) => c.id === d2.id).statut, 'place');
+
+  // Rendez-vous régulier : toutes les semaines pendant 3 semaines → 4 cours ; suppression de la série
+  const R = jourDans(40);
+  r = await admin.post('cours.php', { action: 'cours_enregistrer', groupe: gid, debut: `${R} 11:00`, duree: 45, recurrence: { frequence: 1, unite: 'semaine', jusqu_au: jourDans(61) } });
+  assert.equal(r.nombre, 4);
+  const serie = (await cours(eleve)).cours.filter((c) => c.serie);
+  assert.equal(serie.length, 4);
+  assert.equal(serie[1].debut, `${jourDans(47)} 11:00`);
+  assert.equal((await admin.post('cours.php', { action: 'cours_supprimer', id: serie[1].id, serie: true, prevenir: true })).nombre, 3);
+  assert.equal((await cours(eleve)).cours.filter((c) => c.serie).length, 1);
+
+  // Moins de 2 jours avant : ni déplacement ni annulation par l'élève
+  const demain = (await admin.post('cours.php', { action: 'cours_enregistrer', groupe: gid, debut: `${jourDans(1)} 10:00`, duree: 60 })).id;
+  assert.equal((await eleve.post('cours.php', { action: 'deplacer', id: demain, debut: `${J} 11:00` })).erreur, 'delai');
+  assert.equal((await eleve.post('cours.php', { action: 'annuler', id: demain })).erreur, 'delai');
+  // Plus de 2 jours avant : déplacement possible
+  assert.equal((await eleve.post('cours.php', { action: 'deplacer', id: accorde, debut: `${J} 11:00` })).ok, true);
+
+  // Rappels : 1 jour, puis 1 heure avant (une seule fois chacun) ; délais réglés par l'élève
+  assert.equal((await eleve.post('cours.php', { action: 'rappels', delais: [60, 1440, 1440] })).ok, true);
+  assert.deepEqual((await cours(eleve)).rappels, [1440, 60]);
+  const taches = (maintenant) => spawnSync('php', ['-d', `sendmail_path=cat >> ${mailFile}`, join(DIST, 'api', '_taches.php')], {
+    env: { ...process.env, CAMI_DB: join(tmp, 'cami.sqlite'), CAMI_MAINTENANT: maintenant }, encoding: 'utf-8',
+  });
+  const veille = new Date(`${J}T11:00`); veille.setDate(veille.getDate() - 1);
+  const rappels = (avant) => readFileSync(mailFile, 'utf-8').slice(avant).split(/(?=^To: )/m)
+    .filter((m) => m.startsWith('To: eleve1@example.com') && /Petit rappel/.test(m));
+  let avant = readFileSync(mailFile, 'utf-8').length;
+  taches(`${veille.toLocaleDateString('sv')} 12:00`);   // 1 jour avant le cours de 11 h
+  let recus = rappels(avant);
+  assert.ok(recus.length >= 1);
+  assert.ok(recus.every((m) => /Bonjour Léa/.test(m)));
+  avant = readFileSync(mailFile, 'utf-8').length;
+  taches(`${veille.toLocaleDateString('sv')} 12:05`);
+  assert.equal(rappels(avant).length, 0);
+  avant = readFileSync(mailFile, 'utf-8').length;
+  taches(`${J} 10:10`);   // 1 heure avant le cours de 11 h (et 1 jour avant celui de 16 h)
+  recus = rappels(avant);
+  assert.equal(recus.filter((m) => /de 11 h à 12 h/.test(m)).length, 1);
+  assert.equal(recus.filter((m) => /de 16 h à 17 h/.test(m)).length, 1);
+
+  // Élève retiré : son groupe solo et ses cours supprimés
+  const idLea = (await cours(admin)).eleves.find((x) => x.email === 'eleve1@example.com').id;
+  assert.equal((await admin.post('cours.php', { action: 'eleve_retirer', id: idLea })).ok, true);
+  const apres = await cours(admin);
+  assert.equal(apres.groupes.some((g) => g.id === gid), false);
+  assert.equal(apres.cours.some((c) => c.groupe === gid), false);
+  assert.equal((await cours(eleve)).acces, false);
+});

@@ -103,6 +103,59 @@ CREATE TABLE IF NOT EXISTS presences (
   jour TEXT NOT NULL REFERENCES seances(jour) ON DELETE CASCADE,
   PRIMARY KEY (user_id, jour)
 );
+-- Cours (issue #13) : élèves, groupes (chaque groupe = des élèves + le professeur), cours, disponibilités du professeur
+CREATE TABLE IF NOT EXISTS students (
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+  rappels TEXT NOT NULL DEFAULT '[1440,60]',   -- délais des rappels, en minutes avant le cours (JSON)
+  cree_le TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS groupes (
+  id INTEGER PRIMARY KEY,
+  nom TEXT NOT NULL DEFAULT '',     -- vide : groupe solo (affiché au nom de l'élève)
+  solo INTEGER NOT NULL DEFAULT 0,  -- groupe créé d'office avec l'élève
+  lieu TEXT NOT NULL DEFAULT '',    -- lieu habituel (lien visio ou adresse)
+  cree_le TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS groupe_eleves (
+  groupe_id INTEGER NOT NULL REFERENCES groupes(id) ON DELETE CASCADE,
+  student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+  PRIMARY KEY (groupe_id, student_id)
+);
+CREATE TABLE IF NOT EXISTS cours (
+  id INTEGER PRIMARY KEY,
+  groupe_id INTEGER NOT NULL REFERENCES groupes(id) ON DELETE CASCADE,
+  debut TEXT,                       -- AAAA-MM-JJ HH:MM ; NULL : cours accordé, créneau à placer par l'élève
+  duree INTEGER NOT NULL,           -- minutes
+  statut TEXT NOT NULL,             -- a_placer | place | demande | refuse
+  lieu TEXT NOT NULL DEFAULT '',
+  oeuvres TEXT NOT NULL DEFAULT '',
+  travail TEXT NOT NULL DEFAULT '',
+  raison TEXT NOT NULL DEFAULT '',  -- raison du refus d'une demande
+  serie TEXT,                       -- rendez-vous régulier : identifiant commun aux cours de la série
+  cree_le TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS dispos (   -- disponibilités du professeur
+  id INTEGER PRIMARY KEY,
+  semaine TEXT NOT NULL DEFAULT '', -- '' : générales ; AAAA-MM-JJ (lundi) : propres à cette semaine
+  jour INTEGER NOT NULL,            -- 1 lundi … 7 dimanche
+  debut TEXT NOT NULL,              -- HH:MM
+  fin TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS semaines_reglees (semaine TEXT PRIMARY KEY);   -- semaines aux disponibilités propres
+CREATE TABLE IF NOT EXISTS lieux (   -- lieux mémorisés (lien visio ou adresse)
+  id INTEGER PRIMARY KEY,
+  nom TEXT NOT NULL UNIQUE,
+  valeur TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS rappels_cours (   -- rappel traité : cours, destinataire, délai, horaire du cours
+  cours_id INTEGER NOT NULL REFERENCES cours(id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL,
+  delai INTEGER NOT NULL,
+  debut TEXT NOT NULL,
+  envoye INTEGER NOT NULL DEFAULT 0,   -- 0 : sauté (déjà passé à la programmation, ou délai plus proche dû)
+  PRIMARY KEY (cours_id, user_id, delai, debut)
+);
 SQL;
 
 function dossier_donnees(): string {

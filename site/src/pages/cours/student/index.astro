@@ -1,0 +1,58 @@
+---
+// Calendrier des cours (issue #13) : élève connecté (ses cours, placer, demander, déplacer, annuler, rappels)
+// ou administrateur (tous les groupes, création et édition des cours, réponse aux demandes).
+// Données et actions : /api/cours.php, par src/scripts/cours.js.
+import Base from '../../../layouts/Base.astro';
+import '../../../styles/cours.css';
+---
+<Base title="Calendrier des cours" indexer={false} objetContact="cours">
+  <div class="row cours-page">
+    <h1 class="titre-page">Calendrier des cours</h1>
+
+    <div id="chargement" class="vide">Chargement…</div>
+
+    <!-- Visiteur non identifié -->
+    <form class="panneau identification" id="formConnexion" hidden>
+      <h3>S’identifier</h3>
+      <label class="en-regard">Adresse e-mail <input type="email" name="email" required maxlength="200" autocomplete="email"></label>
+      <label class="en-regard">Mot de passe <input type="password" name="mdp" required autocomplete="current-password"></label>
+      <p class="message" hidden></p>
+      <div class="boutons"><span></span><button class="bouton">Se connecter</button></div>
+    </form>
+
+    <!-- Lien du mail d'inscription comme élève : choix du mot de passe -->
+    <form class="panneau identification" id="formMdp" hidden>
+      <h3>Choisir votre mot de passe</h3>
+      <label class="en-regard">Mot de passe <input type="password" name="mdp" required minlength="8" autocomplete="new-password"></label>
+      <label class="en-regard">Confirmation <input type="password" name="mdp2" required minlength="8" autocomplete="new-password"></label>
+      <p class="message" hidden></p>
+      <div class="boutons"><span></span><button class="bouton">Enregistrer</button></div>
+    </form>
+
+    <p class="acces" id="refus" hidden>Cette page est réservée aux élèves des <a href="/cours/">cours d’analyse</a>.</p>
+
+    <div id="contenu" hidden>
+      <div class="barre-compte" id="barreCompte"></div>
+      <div class="annonces" id="annonces"></div>
+
+      <div class="barre">
+        <span class="vues">
+          <button type="button" class="bascule-vue" data-vue="mois">Mois</button><button type="button" class="bascule-vue" data-vue="semaine">Semaine</button>
+        </span>
+        <span class="navigation">
+          <button type="button" class="nav" data-pas="-1" aria-label="Précédent" title="Précédent">‹</button>
+          <span class="periode" id="periode"></span>
+          <button type="button" class="nav" data-pas="1" aria-label="Suivant" title="Suivant">›</button>
+          <button type="button" class="nav aujourdhui" data-pas="0">Aujourd’hui</button>
+        </span>
+        <span class="outils" id="outils"></span>
+      </div>
+
+      <div class="cadre" id="cal"></div>
+      <p class="legende" id="legende"></p>
+      <div class="detail" id="detail"></div>
+    </div>
+  </div>
+
+  <script src="../../../scripts/cours.js"></script>
+</Base>

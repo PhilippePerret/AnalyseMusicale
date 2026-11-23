@@ -1,0 +1,205 @@
+// Gestion des cours (page /cours/admin/, issue #13) : élèves, groupes, disponibilités, lieux mémorisés.
+// Données et actions : /api/cours.php (administrateur).
+
+const JOURS = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const deux = (n) => String(n).padStart(2, '0');
+const cle = (d) => `${d.getFullYear()}-${deux(d.getMonth() + 1)}-${deux(d.getDate())}`;
+const date = (s) => s ? `${s.slice(8, 10)}/${s.slice(5, 7)}/${s.slice(2, 4)}` : '';
+const lundiDe = (k) => { const d = new Date(`${k}T12:00`); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return cle(d); };
+
+let etat = null;
+let semaine = '';   // '' : disponibilités générales ; AAAA-MM-JJ (lundi) : celles de cette semaine
+
+const ERREURS = {
+  email: 'Adresse e-mail invalide.',
+  existe: 'Cette personne est déjà élève.',
+  nom: 'Le nom du groupe est obligatoire.',
+  eleves: 'Choisir au moins un élève.',
+  creneau: 'Créneau invalide : l’heure de fin doit suivre l’heure de début.',
+  semaine: 'Semaine invalide.',
+  lieu: 'Nom et lien (ou adresse) obligatoires.',
+};
+
+async function api(donnees) {
+  const options = donnees === undefined ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Cami': '1' }, body: JSON.stringify(donnees) };
+  const rep = await fetch('/api/cours.php', { credentials: 'same-origin', ...options });
+  try { return await rep.json(); } catch { return { ok: false, erreur: 'serveur' }; }
+}
+
+function message(form, texte, ok = false) {
+  const m = form.querySelector('.message');
+  m.textContent = texte;
+  m.classList.toggle('ok', ok);
+  m.hidden = !texte;
+}
+
+async function charger() {
+  const r = await api();
+  $('chargement').hidden = true;
+  if (!r.ok || !r.acces || !r.admin) { $('refus').hidden = false; return; }
+  etat = r;
+  $('contenu').hidden = false;
+  rendreEleves();
+  rendreGroupes();
+  rendreDispos();
+  rendreLieux();
+}
+
+// Bouton de suppression en deux temps (clic, puis confirmation)
+const supprimer = (quoi, id, libelle) => `<button type="button" class="lien-supprimer" data-demander="${quoi}" data-id="${id}">${libelle}…</button>
+  <button type="button" class="confirmer" data-confirmer="${quoi}" data-id="${id}" hidden>Confirmer</button>`;
+
+// --- Élèves ---
+
+function rendreEleves() {
+  $('eleves').innerHTML = etat.eleves.map((e) => `<tr>
+    <td>${esc(e.pseudo || '—')}</td><td class="email">${esc(e.email)}</td><td>${date(e.cree_le)}</td>
+    <td class="action">${supprimer('eleve', e.id, 'Retirer des élèves')}</td></tr>`).join('')
+    || '<tr><td colspan="4" class="vide">Aucun élève pour le moment.</td></tr>';
+  $('elevesGroupe').innerHTML = etat.eleves.map((e) => `<label><input type="checkbox" name="eleves" value="${e.id}"> ${esc(e.pseudo || e.email)}</label>`).join('');
+}
+
+$('formEleve').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  const r = await api({ action: 'eleve_ajouter', ...f });
+  if (!r.ok) return message(e.target, ERREURS[r.erreur] || 'Inscription impossible.');
+  e.target.reset();
+  await charger();
+  message(e.target, `${f.email} est inscrit comme élève : un mail de bienvenue lui est envoyé.`, true);
+});
+
+// --- Groupes ---
+
+function rendreGroupes() {
+  $('groupes').innerHTML = etat.groupes.map((g) => `<tr>
+    <td>${g.solo ? '<span class="vide">solo</span> ' : ''}${esc(g.nom)}</td>
+    <td>${g.eleves.map((e) => esc(e.nom)).join(', ')}</td>
+    <td>${esc(g.lieu)}</td>
+    <td class="action"><a href="#" data-modifier="${g.id}">Modifier</a>${g.solo ? '' : ' · ' + supprimer('groupe', g.id, 'Supprimer')}</td></tr>`).join('')
+    || '<tr><td colspan="4" class="vide">Chaque élève inscrit a son groupe solo.</td></tr>';
+}
+
+function editerGroupe(g) {
+  const f = $('formGroupe');
+  f.reset();
+  f.elements.id.value = g ? g.id : 0;
+  f.elements.nom.value = g && !g.solo ? g.nom : '';
+  f.elements.lieu.value = g ? g.lieu : '';
+  f.elements.nom.disabled = !!g?.solo;
+  const ids = g ? g.eleves.map((e) => e.id) : [];
+  f.querySelectorAll('[name=eleves]').forEach((c) => { c.checked = ids.includes(Number(c.value)); c.disabled = !!g?.solo; });
+  $('boutonGroupe').textContent = g ? 'Enregistrer le groupe' : 'Créer le groupe';
+  $('annulerGroupe').hidden = !g;
+  message(f, '');
+  if (g) f.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+$('groupes').addEventListener('click', (e) => {
+  const a = e.target.closest('[data-modifier]');
+  if (!a) return;
+  e.preventDefault();
+  editerGroupe(etat.groupes.find((g) => g.id === Number(a.dataset.modifier)));
+});
+$('annulerGroupe').addEventListener('click', () => editerGroupe(null));
+
+$('formGroupe').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const eleves = [...f.querySelectorAll('[name=eleves]:checked')].map((c) => Number(c.value));
+  const r = await api({ action: 'groupe_enregistrer', id: Number(f.elements.id.value), nom: f.elements.nom.value, lieu: f.elements.lieu.value, eleves });
+  if (!r.ok) return message(f, ERREURS[r.erreur] || 'Enregistrement impossible.');
+  await charger();
+  editerGroupe(null);
+  message(f, 'Groupe enregistré.', true);
+});
+
+// --- Disponibilités ---
+
+const HEURES = Array.from({ length: (24 - 7) * 4 + 1 }, (_, i) => `${deux(7 + Math.floor(i / 4))}:${deux((i % 4) * 15)}`);
+const menuHeure = (nom, val) => `<select name="${nom}">${HEURES.map((h) => `<option${h === val ? ' selected' : ''}>${h}</option>`).join('')}</select>`;
+const creneau = (c) => `<span class="creneau">de ${menuHeure('debut', c.debut)} à ${menuHeure('fin', c.fin)}<button type="button" class="retirer" data-retirer title="Retirer ce créneau">×</button></span>`;
+
+function rendreDispos() {
+  const propres = semaine ? etat.dispos.semaines[semaine] : undefined;
+  const liste = semaine ? (propres ?? etat.dispos.generales) : etat.dispos.generales;
+  $('etatSemaine').textContent = !semaine ? '' : propres
+    ? 'Cette semaine a ses propres disponibilités.'
+    : 'Cette semaine reprend les disponibilités générales (les modifier ici les rend propres à cette semaine).';
+  $('dispos').innerHTML = JOURS.map((j, i) => `<div class="jour" data-jour="${i + 1}"><span class="nom-jour">${j}</span>
+    <span class="creneaux">${liste.filter((c) => c.jour === i + 1).map(creneau).join('')}<a href="#" class="ajouter" data-ajouter>+ créneau</a></span></div>`).join('');
+  $('zoneRetour').innerHTML = semaine && propres
+    ? `<button type="button" class="lien-supprimer" data-demander="retour" data-id="0">Revenir aux disponibilités générales…</button>
+       <button type="button" class="confirmer" data-confirmer="retour" data-id="0" hidden>Confirmer</button>` : '';
+  message($('formDispos'), '');
+}
+
+$('modeDispos').addEventListener('change', (e) => {
+  $('choixSemaine').hidden = !e.target.value;
+  if (!e.target.value) { semaine = ''; rendreDispos(); return; }
+  if (!$('dateSemaine').value) $('dateSemaine').value = cle(new Date());
+  semaine = lundiDe($('dateSemaine').value);
+  rendreDispos();
+});
+$('dateSemaine').addEventListener('change', (e) => { if (e.target.value) { semaine = lundiDe(e.target.value); rendreDispos(); } });
+
+$('dispos').addEventListener('click', (e) => {
+  if (e.target.closest('[data-ajouter]')) {
+    e.preventDefault();
+    e.target.closest('[data-ajouter]').insertAdjacentHTML('beforebegin', creneau({ debut: '14:00', fin: '18:00' }));
+  }
+  if (e.target.closest('[data-retirer]')) e.target.closest('.creneau').remove();
+});
+
+$('formDispos').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const creneaux = [...$('dispos').querySelectorAll('.jour')].flatMap((j) => [...j.querySelectorAll('.creneau')].map((c) => ({
+    jour: Number(j.dataset.jour), debut: c.querySelector('[name=debut]').value, fin: c.querySelector('[name=fin]').value,
+  })));
+  const r = await api({ action: 'dispos_enregistrer', semaine, creneaux });
+  if (!r.ok) return message(e.target, ERREURS[r.erreur] || 'Enregistrement impossible.');
+  await charger();
+  message(e.target, 'Disponibilités enregistrées.', true);
+});
+
+// --- Lieux mémorisés ---
+
+function rendreLieux() {
+  $('lieux').innerHTML = etat.lieux.map((l) => `<tr><td>${esc(l.nom)}</td><td class="email">${esc(l.valeur)}</td>
+    <td class="action">${supprimer('lieu', l.id, 'Supprimer')}</td></tr>`).join('')
+    || '<tr><td colspan="3" class="vide">Aucun lieu mémorisé.</td></tr>';
+}
+
+$('formLieu').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const r = await api({ action: 'lieu_enregistrer', ...Object.fromEntries(new FormData(e.target)) });
+  if (!r.ok) return message(e.target, ERREURS[r.erreur] || 'Enregistrement impossible.');
+  e.target.reset();
+  await charger();
+});
+
+// --- Suppressions en deux temps ---
+
+$('contenu').addEventListener('click', async (e) => {
+  const demander = e.target.closest('[data-demander]');
+  if (demander) {
+    demander.hidden = true;
+    demander.nextElementSibling.hidden = false;
+    return;
+  }
+  const confirmer = e.target.closest('[data-confirmer]');
+  if (!confirmer) return;
+  const id = Number(confirmer.dataset.id);
+  const actions = {
+    eleve: { action: 'eleve_retirer', id },
+    groupe: { action: 'groupe_supprimer', id },
+    lieu: { action: 'lieu_supprimer', id },
+    retour: { action: 'dispos_enregistrer', semaine, creneaux: [], generales: true },
+  };
+  await api(actions[confirmer.dataset.confirmer]);
+  await charger();
+});
+
+charger();
