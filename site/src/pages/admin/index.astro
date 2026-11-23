@@ -4,6 +4,7 @@
 import Base from '../../layouts/Base.astro';
 import '../../styles/admin.css';
 import { getCollection } from 'astro:content';
+import { LIENS_COURS_ADMIN } from '../../lib/site';
 
 // Pages publiques du site (menu « Copier l’adresse d’une page… » de la boîte Inviter) :
 // libellé = titre de la page, valeur = adresse absolue
@@ -26,7 +27,7 @@ const pagesSite = [...pagesAstro, ...pagesContenu]
   .map((p) => ({ url: SITE + p.chemin, titre: p.titre ?? p.chemin }))
   .sort((x, y) => x.titre.localeCompare(y.titre, 'fr'));
 ---
-<Base title="Adresses" indexer={false}>
+<Base title="Adresses" indexer={false} liensAdmin={[...LIENS_COURS_ADMIN]}>
   <div class="row admin">
     <h1 class="titre-page">Adresses</h1>
 

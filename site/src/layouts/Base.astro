@@ -13,9 +13,10 @@ interface Props {
   objetContact?: ObjetContact;
   piedDePage?: boolean;   // false : pas de liens en bas de page (accueil)
   indexer?: boolean;      // false : page exclue des moteurs de recherche
+  liensAdmin?: (readonly [string, string])[];   // liens en haut à droite de la page, montrés à l'administrateur seul
 }
 
-const { title, heading, bande, description, objetContact = 'renseignements', piedDePage = true, indexer = true } = Astro.props;
+const { title, heading, bande, description, objetContact = 'renseignements', piedDePage = true, indexer = true, liensAdmin } = Astro.props;
 // Menu de l'en-tête : les blocs de la page d'accueil
 const MENU = [
   ['/jeudis-analyse/', 'Jeudis de l’analyse'],
@@ -52,6 +53,11 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
   </header>
 
   <main>
+    {liensAdmin && (
+      <nav class="row liens-admin" id="liensAdmin" hidden>
+        {liensAdmin.map(([href, texte]) => <a href={href}>{texte}</a>)}
+      </nav>
+    )}
     {heading && <h1 class="row titre-page" set:html={marqueCami(heading.replace(/&/g, '&amp;').replace(/</g, '&lt;'))} />}
     {bande && <div class="row bande-grise" set:html={bande} />}
     <slot />
@@ -78,9 +84,12 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
   </div>
 
   <script is:inline>
-    // Lien « Administration » dans le menu : administrateur identifié seulement
+    // Administrateur identifié seulement : lien « Administration » du menu, liens en haut de la page (liensAdmin)
     fetch('/api/moi.php', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (d) {
-      if (d && d.user && d.user.admin) document.getElementById('lienAdmin').hidden = false;
+      if (!d || !d.user || !d.user.admin) return;
+      document.getElementById('lienAdmin').hidden = false;
+      var liens = document.getElementById('liensAdmin');
+      if (liens) liens.hidden = false;
     }).catch(function () {});
   </script>
 

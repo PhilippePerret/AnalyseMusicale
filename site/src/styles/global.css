@@ -89,6 +89,10 @@ header.site .logo .marque span {
 /* Menu de l'en-tête (blocs de l'accueil) */
 header.site nav.menu { align-self: flex-start; padding-top: 0.2em; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.3em 1.6em; }
 header.site nav.menu a[hidden] { display: none; }
+/* Liens de l'administrateur, en haut à droite de la page */
+.liens-admin.row { margin-top: 0.6em; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 0.3em 1.4em; font-size: 0.7em; }
+.liens-admin + .row { margin-top: 1em; }
+.liens-admin[hidden] { display: none; }
 header.site nav.menu a { font-size: 0.6em; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; }
 header.site nav.menu a.actif { color: var(--principal); }
 

@@ -36,3 +36,9 @@ export const TABLE_ANALYSE = {
   // Commande Terminal sortant l'application de la quarantaine (macOS, application non signée)
   deblocageMac: 'xattr -dr com.apple.quarantine /Applications/Table-d-analyse.app',
 };
+
+// Liens de l'administrateur vers les cours (pages /admin/ et /cours/, en haut à droite)
+export const LIENS_COURS_ADMIN = [
+  ['/cours/student/', 'Calendrier des cours'],
+  ['/cours/admin/', 'Élèves et disponibilités'],
+] as const;

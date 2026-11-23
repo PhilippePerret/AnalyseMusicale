@@ -175,3 +175,13 @@ test('chaque page : lien « Administration » caché, montré à l’administrat
     assert.match(html, /fetch\('\/api\/moi\.php'/, f);
   }
 });
+
+test('pages /admin/ et /cours/ : liens cachés vers le calendrier des cours et la gestion des élèves', () => {
+  for (const page of ['/admin/', '/cours/']) {
+    const html = readFileSync(resolveLocal(page), 'utf-8');
+    const bloc = html.match(/<nav class="row liens-admin" id="liensAdmin" hidden>([\s\S]*?)<\/nav>/)?.[1] ?? '';
+    assert.match(bloc, /href="\/cours\/student\/"/, page);
+    assert.match(bloc, /href="\/cours\/admin\/"/, page);
+  }
+  assert.doesNotMatch(readFileSync(resolveLocal('/jeudis-analyse/'), 'utf-8'), /id="liensAdmin"/);
+});
