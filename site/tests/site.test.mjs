@@ -23,7 +23,7 @@ function resolveLocal(href) {
   return join(DIST, path);
 }
 
-const PAGES = ['/', '/jeudis-analyse/', '/jeudis-analyse/detail/', '/cours/', '/pedagogue/', '/contact/', '/contact/merci/', '/contact/erreur/', '/table-analyse/', '/mentions-legales/', '/cgu/', '/confidentialite/'];
+const PAGES = ['/', '/jeudis-analyse/', '/jeudis-analyse/detail/', '/cours/', '/pedagogue/', '/contact/', '/contact/merci/', '/contact/erreur/', '/table-analyse/', '/mentions-legales/', '/cgu/', '/confidentialite/', '/cours/student/', '/cours/admin/'];
 
 test('toutes les pages attendues sont construites', () => {
   for (const page of PAGES) assert.ok(existsSync(resolveLocal(page)), `page manquante : ${page}`);
@@ -166,4 +166,12 @@ test('chaque page : bandeau des cookies', () => {
 test('acceptation des CGU demandée à l’inscription, pas au téléchargement', () => {
   assert.match(readFileSync(resolveLocal('/jeudis-analyse/'), 'utf-8'), /<input type="checkbox" name="cgu" required>/);
   assert.doesNotMatch(readFileSync(resolveLocal('/table-analyse/'), 'utf-8'), /name="cgu"/);
+});
+
+test('chaque page : lien « Administration » caché, montré à l’administrateur identifié (/api/moi.php)', () => {
+  for (const f of htmlFiles()) {
+    const html = readFileSync(f, 'utf-8');
+    assert.match(html, /<a href="\/admin\/" id="lienAdmin"[^>]* hidden>Administration<\/a>/, f);
+    assert.match(html, /fetch\('\/api\/moi\.php'/, f);
+  }
 });

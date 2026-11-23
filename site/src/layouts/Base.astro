@@ -45,11 +45,10 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
       </span>
       <span class="accueil">ACCUEIL</span>
     </a>
-    {Astro.url.pathname !== '/' && (
-      <nav class="menu">
-        {MENU.map(([href, texte]) => <a href={href} class={Astro.url.pathname.startsWith(href) ? 'actif' : undefined}>{texte}</a>)}
-      </nav>
-    )}
+    <nav class="menu">
+      {Astro.url.pathname !== '/' && MENU.map(([href, texte]) => <a href={href} class={Astro.url.pathname.startsWith(href) ? 'actif' : undefined}>{texte}</a>)}
+      <a href="/admin/" id="lienAdmin" class={Astro.url.pathname.startsWith('/admin/') ? 'actif' : undefined} hidden>Administration</a>
+    </nav>
   </header>
 
   <main>
@@ -77,6 +76,13 @@ const fullTitle = title === 'Cours d’Analyse Musicale' ? title : `${title} —
       <button type="button" class="bouton" data-choix="accepte">Accepter</button>
     </div>
   </div>
+
+  <script is:inline>
+    // Lien « Administration » dans le menu : administrateur identifié seulement
+    fetch('/api/moi.php', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d && d.user && d.user.admin) document.getElementById('lienAdmin').hidden = false;
+    }).catch(function () {});
+  </script>
 
   <script is:inline>
     // Consentement aux cookies : choix gardé 6 mois dans le cookie « cami-cookies » (accepte | refuse).
