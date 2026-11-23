@@ -1,12 +1,12 @@
 ---
-// Gestion des cours (issue #13, administrateur) : élèves, groupes, disponibilités, lieux mémorisés.
+// Gestion des cours (issue #13, administrateur) : demandes de cours, élèves, groupes, lieux mémorisés (disponibilités : mode « Dispos » du calendrier).
 // Données et actions : /api/cours.php, par src/scripts/cours-admin.js.
 import Base from '../../../layouts/Base.astro';
 import '../../../styles/cours.css';
 ---
-<Base title="Élèves et disponibilités" indexer={false} objetContact="cours">
+<Base title="Gestion des élèves" indexer={false} objetContact="cours">
   <div class="row cours-page cours-admin">
-    <h1 class="titre-page">Élèves et disponibilités</h1>
+    <h1 class="titre-page">Gestion des élèves</h1>
 
     <div id="chargement" class="vide">Chargement…</div>
     <p class="acces" id="refus" hidden>Page réservée à l’administrateur : <a href="/cours/student/">s’identifier</a>.</p>
@@ -48,23 +48,6 @@ import '../../../styles/cours.css';
         <button type="button" class="bouton annuler" id="annulerGroupe" hidden>Annuler</button>
         <button class="bouton" id="boutonGroupe">Créer le groupe</button>
         <p class="message" hidden></p>
-      </form>
-
-      <h2 class="rubrique">Disponibilités</h2>
-      <div class="entete-dispos">
-        <label>Afficher
-          <select id="modeDispos"><option value="">générales</option><option value="semaine">d’une semaine</option></select>
-        </label>
-        <label id="choixSemaine" hidden>semaine du <input type="date" id="dateSemaine"></label>
-        <span class="mode" id="etatSemaine"></span>
-      </div>
-      <form id="formDispos">
-        <div class="dispos" id="dispos"></div>
-        <p class="message" hidden></p>
-        <div class="pied-dispos">
-          <span class="zone-retour" id="zoneRetour"></span>
-          <button class="bouton">Enregistrer les disponibilités</button>
-        </div>
       </form>
 
       <h2 class="rubrique">Lieux mémorisés</h2>

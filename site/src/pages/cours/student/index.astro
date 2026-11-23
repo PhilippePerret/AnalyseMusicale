@@ -37,7 +37,7 @@ import '../../../styles/cours.css';
 
       <div class="barre">
         <span class="vues">
-          <button type="button" class="bascule-vue" data-vue="mois">Mois</button><button type="button" class="bascule-vue" data-vue="semaine">Semaine</button>
+          <button type="button" class="bascule-vue" data-vue="mois">Mois</button><button type="button" class="bascule-vue" data-vue="semaine">Semaine</button><button type="button" class="bascule-vue" data-vue="dispos" id="vueDispos" title="Régler mes disponibilités, semaine par semaine" hidden>Dispos</button>
         </span>
         <span class="navigation">
           <button type="button" class="nav" data-pas="-1" aria-label="Précédent" title="Précédent">‹</button>
@@ -49,6 +49,7 @@ import '../../../styles/cours.css';
       </div>
 
       <div class="cadre" id="cal"></div>
+      <div class="pied-dispos" id="piedDispos" hidden></div>
       <p class="legende" id="legende"></p>
       <div class="detail" id="detail"></div>
     </div>

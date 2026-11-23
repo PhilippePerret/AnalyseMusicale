@@ -1,4 +1,4 @@
-// Gestion des cours (page /cours/admin/, issue #13) : élèves, groupes, disponibilités, lieux mémorisés.
+// Gestion des cours (page /cours/admin/, issue #13) : demandes de cours, élèves, groupes, lieux mémorisés.
 // Données et actions : /api/cours.php (administrateur).
 
 const JOURS = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
@@ -7,18 +7,14 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
 const deux = (n) => String(n).padStart(2, '0');
 const cle = (d) => `${d.getFullYear()}-${deux(d.getMonth() + 1)}-${deux(d.getDate())}`;
 const date = (s) => s ? `${s.slice(8, 10)}/${s.slice(5, 7)}/${s.slice(2, 4)}` : '';
-const lundiDe = (k) => { const d = new Date(`${k}T12:00`); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return cle(d); };
 
 let etat = null;
-let semaine = '';   // '' : disponibilités générales ; AAAA-MM-JJ (lundi) : celles de cette semaine
 
 const ERREURS = {
   email: 'Adresse e-mail invalide.',
   existe: 'Cette personne est déjà élève.',
   nom: 'Le nom du groupe est obligatoire.',
   eleves: 'Choisir au moins un élève.',
-  creneau: 'Créneau invalide : l’heure de fin doit suivre l’heure de début.',
-  semaine: 'Semaine invalide.',
   lieu: 'Nom et lien (ou adresse) obligatoires.',
 };
 
@@ -44,7 +40,6 @@ async function charger() {
   rendreDemandes();
   rendreEleves();
   rendreGroupes();
-  rendreDispos();
   rendreLieux();
 }
 
@@ -138,54 +133,6 @@ $('formGroupe').addEventListener('submit', async (e) => {
   message(f, 'Groupe enregistré.', true);
 });
 
-// --- Disponibilités ---
-
-const HEURES = Array.from({ length: (24 - 7) * 4 + 1 }, (_, i) => `${deux(7 + Math.floor(i / 4))}:${deux((i % 4) * 15)}`);
-const menuHeure = (nom, val) => `<select name="${nom}">${HEURES.map((h) => `<option${h === val ? ' selected' : ''}>${h}</option>`).join('')}</select>`;
-const creneau = (c) => `<span class="creneau">de ${menuHeure('debut', c.debut)} à ${menuHeure('fin', c.fin)}<button type="button" class="retirer" data-retirer title="Retirer ce créneau">×</button></span>`;
-
-function rendreDispos() {
-  const propres = semaine ? etat.dispos.semaines[semaine] : undefined;
-  const liste = semaine ? (propres ?? etat.dispos.generales) : etat.dispos.generales;
-  $('etatSemaine').textContent = !semaine ? '' : propres
-    ? 'Cette semaine a ses propres disponibilités.'
-    : 'Cette semaine reprend les disponibilités générales (les modifier ici les rend propres à cette semaine).';
-  $('dispos').innerHTML = JOURS.map((j, i) => `<div class="jour" data-jour="${i + 1}"><span class="nom-jour">${j}</span>
-    <span class="creneaux">${liste.filter((c) => c.jour === i + 1).map(creneau).join('')}<a href="#" class="ajouter" data-ajouter>+ créneau</a></span></div>`).join('');
-  $('zoneRetour').innerHTML = semaine && propres
-    ? `<button type="button" class="lien-supprimer" data-demander="retour" data-id="0">Revenir aux disponibilités générales…</button>
-       <button type="button" class="confirmer" data-confirmer="retour" data-id="0" hidden>Confirmer</button>` : '';
-  message($('formDispos'), '');
-}
-
-$('modeDispos').addEventListener('change', (e) => {
-  $('choixSemaine').hidden = !e.target.value;
-  if (!e.target.value) { semaine = ''; rendreDispos(); return; }
-  if (!$('dateSemaine').value) $('dateSemaine').value = cle(new Date());
-  semaine = lundiDe($('dateSemaine').value);
-  rendreDispos();
-});
-$('dateSemaine').addEventListener('change', (e) => { if (e.target.value) { semaine = lundiDe(e.target.value); rendreDispos(); } });
-
-$('dispos').addEventListener('click', (e) => {
-  if (e.target.closest('[data-ajouter]')) {
-    e.preventDefault();
-    e.target.closest('[data-ajouter]').insertAdjacentHTML('beforebegin', creneau({ debut: '14:00', fin: '18:00' }));
-  }
-  if (e.target.closest('[data-retirer]')) e.target.closest('.creneau').remove();
-});
-
-$('formDispos').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const creneaux = [...$('dispos').querySelectorAll('.jour')].flatMap((j) => [...j.querySelectorAll('.creneau')].map((c) => ({
-    jour: Number(j.dataset.jour), debut: c.querySelector('[name=debut]').value, fin: c.querySelector('[name=fin]').value,
-  })));
-  const r = await api({ action: 'dispos_enregistrer', semaine, creneaux });
-  if (!r.ok) return message(e.target, ERREURS[r.erreur] || 'Enregistrement impossible.');
-  await charger();
-  message(e.target, 'Disponibilités enregistrées.', true);
-});
-
 // --- Lieux mémorisés ---
 
 function rendreLieux() {
@@ -219,7 +166,6 @@ $('contenu').addEventListener('click', async (e) => {
     groupe: { action: 'groupe_supprimer', id },
     lieu: { action: 'lieu_supprimer', id },
     demande: { action: 'demande_cours_supprimer', id },
-    retour: { action: 'dispos_enregistrer', semaine, creneaux: [], generales: true },
   };
   await api(actions[confirmer.dataset.confirmer]);
   await charger();

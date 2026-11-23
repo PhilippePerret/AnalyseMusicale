@@ -150,16 +150,24 @@ function rendreOutils() {
     const options = etat.groupes.map((g) => `<option value="${g.id}"${String(g.id) === filtreGroupe ? ' selected' : ''}>${esc(g.nom)}</option>`).join('');
     $('outils').innerHTML = `<label>Groupe <select id="filtreGroupe"><option value="">tous</option>${options}</select></label>
       <button type="button" class="bouton" data-outil="nouveau">Nouveau cours…</button>
-      <a href="/cours/admin/">Élèves et disponibilités</a>`;
+      <a href="/cours/admin/">Gestion des élèves</a>`;
   } else {
     $('outils').innerHTML = '<button type="button" class="bouton" data-outil="profil">Mon profil…</button>';
   }
+  $('vueDispos').hidden = !admin();
   document.querySelectorAll('.bascule-vue').forEach((b) => b.classList.toggle('actif', b.dataset.vue === vue));
 }
 
 // --- Calendrier ---
 
 function rendreCalendrier() {
+  $('piedDispos').hidden = vue !== 'dispos';
+  $('cal').classList.toggle('mode-dispos', vue === 'dispos');
+  if (vue === 'dispos') {
+    rendreModeDispos();
+    $('legende').innerHTML = 'Mode « Dispos » : cliquer ou glisser sur une colonne pour ajouter des disponibilités ; cliquer sur une disponibilité pour en retirer la demi-heure ; tirer ses bords pour l’ajuster. Enregistrement immédiat.';
+    return;
+  }
   if (vue === 'semaine') rendreSemaine(); else rendreMois();
   $('legende').innerHTML = admin()
     ? 'Cliquer sur un créneau pour créer un cours, sur un cours pour le voir ou le modifier. Zones blanches : disponibilités.'
@@ -222,6 +230,172 @@ function rendreMois() {
   }
   $('cal').innerHTML = h + '</tbody></table>';
 }
+
+// --- Mode « Dispos » (administrateur) : disponibilités de la semaine affichée, réglées dans le calendrier ---
+// Repris de SmallCal : une semaine réglée remplace les disponibilités générales ; une semaine pas encore
+// réglée part d'une copie des disponibilités générales. Clic : ajoute ou retire une demi-heure ;
+// glisser : peint une plage ; tirer un bord : ajuste la plage.
+
+const DISPO_PAS = 30;
+const DISPO_H0 = 7 * 60, DISPO_H1 = 22 * 60;
+let fileDispos = Promise.resolve();   // enregistrements à la suite (ordre des modifications conservé)
+
+const semaineAffichee = () => cle(lundiDe(ref));
+const semaineReglee = (sem) => Object.prototype.hasOwnProperty.call(etat.dispos.semaines, sem);
+
+// Demi-heures disponibles de la semaine, par jour : { jour: Set(minute de début) }
+function cellulesDispos(sem) {
+  const source = semaineReglee(sem) ? etat.dispos.semaines[sem] : etat.dispos.generales;
+  const cells = {};
+  for (let j = 1; j <= 7; j++) cells[j] = new Set();
+  for (const c of source) for (let t = minutes(c.debut); t < minutes(c.fin); t += DISPO_PAS) cells[c.jour].add(t);
+  return cells;
+}
+
+// Demi-heures consécutives regroupées en plages [[début, fin], …]
+function plages(set) {
+  const out = [];
+  for (const t of [...set].sort((a, b) => a - b)) {
+    const der = out[out.length - 1];
+    if (der && der[1] === t) der[1] = t + DISPO_PAS; else out.push([t, t + DISPO_PAS]);
+  }
+  return out;
+}
+const regler = (set, a, b, on) => { for (let t = a; t < b; t += DISPO_PAS) on ? set.add(t) : set.delete(t); };
+const versCreneaux = (cells) => Object.keys(cells).flatMap((j) => plages(cells[j]).map(([a, b]) => ({ jour: Number(j), debut: hhmm(a), fin: b === 1440 ? '24:00' : hhmm(b) })));
+
+function enregistrerDispos(sem, cells) {
+  const creneaux = versCreneaux(cells);
+  fileDispos = fileDispos.then(async () => {
+    const r = await api({ action: 'dispos_enregistrer', semaine: sem, creneaux });
+    if (!r.ok) { $('piedDispos').insertAdjacentHTML('beforeend', '<span class="erreur">Enregistrement impossible.</span>'); return; }
+    etat.dispos.semaines[sem] = creneaux;
+    if (vue === 'dispos' && semaineAffichee() === sem) rendrePiedDispos(sem);
+  });
+  return fileDispos;
+}
+
+function rendrePiedDispos(sem) {
+  const reglee = semaineReglee(sem);
+  $('piedDispos').innerHTML = `<button type="button" class="bouton" data-dispos="generales">Définir comme disponibilités générales</button>
+    <span class="etat-dispos">${reglee ? 'Semaine réglée' : 'Copie des disponibilités générales'}</span>
+    ${reglee ? `<span class="zone-retour"><button type="button" class="lien-supprimer" data-dispos="retour">Revenir aux disponibilités générales…</button>
+      <button type="button" class="confirmer" data-dispos="retour-ok" hidden>Confirmer</button></span>` : ''}`;
+}
+
+function rendreModeDispos() {
+  const lundi = lundiDe(ref);
+  const sem = cle(lundi);
+  const jours = Array.from({ length: 7 }, (_, i) => ajouterJours(lundi, i));
+  const dim = jours[6];
+  $('periode').textContent = lundi.getMonth() === dim.getMonth()
+    ? `${lundi.getDate()} – ${dim.getDate()} ${MOIS[dim.getMonth()]} ${dim.getFullYear()}`
+    : `${lundi.getDate()} ${MOIS[lundi.getMonth()]} – ${dim.getDate()} ${MOIS[dim.getMonth()]} ${dim.getFullYear()}`;
+  const cells = cellulesDispos(sem);
+  let h0 = DISPO_H0, h1 = DISPO_H1;
+  for (let j = 1; j <= 7; j++) for (const [a, b] of plages(cells[j])) { h0 = Math.min(h0, Math.floor(a / 60) * 60); h1 = Math.max(h1, Math.ceil(b / 60) * 60); }
+  const auj = etat.maintenant.slice(0, 10);
+  const entetes = jours.map((d) => `<div class="jour-entete${cle(d) === auj ? ' aujourdhui' : ''}">${JOURS[jourIso(d) - 1].slice(0, 3)}. ${premier(d.getDate())}</div>`).join('');
+  const heures = Array.from({ length: (h1 - h0) / 60 }, (_, i) => `<div class="heure">${(h0 / 60) + i} h</div>`).join('');
+  const colonnes = jours.map((d) => `<div class="col-jour col-dispos" data-jour="${jourIso(d)}"><div class="couche"></div><div class="fantome" hidden></div></div>`).join('');
+  $('cal').innerHTML = `<div class="semaine" style="--h0:${h0};--h1:${h1};--hh:${HAUTEUR_HEURE}rem">
+    <div class="entetes"><div></div>${entetes}</div>
+    <div class="corps"><div class="heures">${heures}</div>${colonnes}</div></div>`;
+  rendrePiedDispos(sem);
+
+  const rangs = (h1 - h0) / DISPO_PAS;
+  $('cal').querySelectorAll('.col-dispos').forEach((col) => {
+    const j = Number(col.dataset.jour);
+    const couche = col.querySelector('.couche');
+    const fantome = col.querySelector('.fantome');
+    const dessiner = () => {
+      couche.innerHTML = plages(cells[j]).map(([a, b]) => `<div class="plage" data-a="${a}" data-b="${b}" style="--debut:${a};--duree:${b - a}">
+        <span class="bord haut"></span><span class="lbl">${heure(hhmm(a))} – ${heure(b === 1440 ? '24:00' : hhmm(b))}</span><span class="bord bas"></span></div>`).join('');
+    };
+    dessiner();
+    const sous = (ev) => {
+      const r = col.getBoundingClientRect();
+      const k = Math.floor((ev.clientY - r.top) / (r.height / rangs));
+      return h0 + Math.max(0, Math.min(rangs - 1, k)) * DISPO_PAS;
+    };
+    const montrerFantome = (ev) => {
+      if (glisse || ev.pointerType === 'touch') { fantome.hidden = true; return; }
+      const t = sous(ev);
+      fantome.textContent = `${heure(hhmm(t))} – ${heure(hhmm(t + DISPO_PAS))}`;
+      fantome.style.setProperty('--debut', t);
+      fantome.hidden = false;
+    };
+    let glisse = null;
+    col.addEventListener('pointerleave', () => { fantome.hidden = true; });
+    col.addEventListener('pointerdown', (ev) => {
+      if (ev.button !== 0) return;
+      ev.preventDefault();
+      const t = sous(ev);
+      const avant = new Set(cells[j]);
+      const bord = ev.target.closest('.bord');
+      if (bord) {
+        const p = bord.closest('.plage');
+        glisse = { sorte: bord.classList.contains('haut') ? 'haut' : 'bas', a: +p.dataset.a, b: +p.dataset.b, t, avant };
+      } else if (avant.has(t)) {
+        const [a, b] = plages(avant).find(([x, y]) => x <= t && t < y);
+        glisse = { sorte: 'saisie', a, b, t, avant };
+      } else {
+        glisse = { sorte: 'peindre', t, avant };
+      }
+      glisse.bouge = false;
+      fantome.hidden = true;
+      try { col.setPointerCapture(ev.pointerId); } catch { /* pointeur déjà relâché */ }
+    });
+    col.addEventListener('pointermove', (ev) => {
+      montrerFantome(ev);
+      if (!glisse) return;
+      const t = sous(ev);
+      if (!glisse.bouge && t === glisse.t) return;
+      glisse.bouge = true;
+      if (glisse.sorte === 'saisie') glisse.sorte = t > glisse.t ? 'bas' : 'haut';
+      const set = new Set(glisse.avant);
+      if (glisse.sorte === 'peindre') regler(set, Math.min(t, glisse.t), Math.max(t, glisse.t) + DISPO_PAS, true);
+      else if (glisse.sorte === 'haut') { regler(set, glisse.a, glisse.b, false); regler(set, Math.min(t, glisse.b - DISPO_PAS), glisse.b, true); }
+      else { regler(set, glisse.a, glisse.b, false); regler(set, glisse.a, Math.max(t + DISPO_PAS, glisse.a + DISPO_PAS), true); }
+      cells[j] = set;
+      dessiner();
+    });
+    const finir = (annule) => {
+      const g = glisse;
+      glisse = null;
+      if (!g) return;
+      if (annule) { cells[j] = g.avant; dessiner(); return; }
+      if (!g.bouge) { cells[j].has(g.t) ? cells[j].delete(g.t) : cells[j].add(g.t); dessiner(); }
+      enregistrerDispos(sem, cells);
+    };
+    col.addEventListener('pointerup', (ev) => { finir(false); montrerFantome(ev); });
+    col.addEventListener('pointercancel', () => finir(true));
+  });
+}
+
+$('piedDispos').addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-dispos]');
+  if (!b) return;
+  const sem = semaineAffichee();
+  await fileDispos;
+  if (b.dataset.dispos === 'retour') { b.hidden = true; b.nextElementSibling.hidden = false; return; }
+  if (b.dataset.dispos === 'retour-ok') {
+    await api({ action: 'dispos_enregistrer', semaine: sem, creneaux: [], generales: true });
+    delete etat.dispos.semaines[sem];
+    rendreCalendrier();
+    return;
+  }
+  if (b.dataset.dispos === 'generales') {
+    if (!confirm('Remplacer les disponibilités générales par celles de cette semaine ?')) return;
+    const creneaux = versCreneaux(cellulesDispos(sem));
+    const r = await api({ action: 'dispos_enregistrer', semaine: '', creneaux });
+    if (!r.ok) return;
+    etat.dispos.generales = creneaux;
+    await api({ action: 'dispos_enregistrer', semaine: sem, creneaux: [], generales: true });
+    delete etat.dispos.semaines[sem];
+    rendreCalendrier();
+  }
+});
 
 // --- Menus des formulaires ---
 
@@ -289,7 +463,7 @@ function formCours(c, preset = {}) {
   const nouveau = !c;
   const v = c || { groupe: Number(filtreGroupe) || etat.groupes[0]?.id, duree: 60, lieu: '', oeuvres: '', travail: '', statut: 'place', debut: preset.debut || null };
   if (nouveau && v.groupe) v.lieu = groupe(v.groupe)?.lieu || '';
-  if (!etat.groupes.length) return fiche('<p class="erreur">Aucun élève : inscrire d’abord un élève dans <a href="/cours/admin/">Élèves et disponibilités</a>.</p>');
+  if (!etat.groupes.length) return fiche('<p class="erreur">Aucun élève : inscrire d’abord un élève dans <a href="/cours/admin/">Gestion des élèves</a>.</p>');
   const aPlacer = v.statut === 'a_placer';
   const jour = v.debut ? v.debut.slice(0, 10) : (preset.jour || cle(ref));
   const h = v.debut ? v.debut.slice(11) : '14:00';
@@ -427,6 +601,7 @@ function minuteCliquee(colonne, e) {
 }
 
 $('cal').addEventListener('click', (e) => {
+  if (vue === 'dispos') return;   // mode « Dispos » : gestes propres (pointerdown…)
   const b = e.target.closest('[data-cours]');
   if (b) { e.preventDefault(); afficherCours(Number(b.dataset.cours)); return; }
   if (e.target.closest('.occupe')) return;
@@ -461,7 +636,7 @@ document.querySelector('.barre').addEventListener('click', (e) => {
   if (b.dataset.pas !== undefined) {
     const pas = Number(b.dataset.pas);
     if (pas === 0) ref = maintenant();
-    else if (vue === 'semaine') ref = ajouterJours(ref, 7 * pas);
+    else if (vue === 'semaine' || vue === 'dispos') ref = ajouterJours(ref, 7 * pas);
     else ref = new Date(ref.getFullYear(), ref.getMonth() + pas, 1, 12);
     rendreCalendrier();
   }

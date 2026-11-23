@@ -167,3 +167,26 @@ table.mois a.puce.demande { background: #eaf1f8; color: #2c5178; border: 1px das
 .cours-page table.demandes .email { overflow-wrap: anywhere; color: #555; }
 .cours-page table.demandes td.connaissances { white-space: nowrap; }
 .cours-page table.demandes tr.attente td { color: #888; }
+
+/* Mode « Dispos » du calendrier (administrateur) : disponibilités de la semaine, repris de SmallCal */
+.semaine .col-dispos { cursor: crosshair; touch-action: none; user-select: none; -webkit-user-select: none; }
+.semaine .col-dispos .couche { position: absolute; inset: 0; pointer-events: none; }
+.semaine .col-dispos .plage, .semaine .col-dispos .fantome {
+  position: absolute; left: 0; right: 0; top: calc((var(--debut) - var(--h0)) / 60 * var(--hh));
+}
+.semaine .col-dispos .plage {
+  height: calc(var(--duree) / 60 * var(--hh)); background: #fff; border: 1px solid var(--principal); border-radius: 3px;
+  display: flex; align-items: flex-start; justify-content: center; box-sizing: border-box;
+}
+.semaine .col-dispos .plage .lbl { font-size: 0.72em; font-weight: 700; color: var(--principal); padding-top: 0.1em; pointer-events: none; }
+.semaine .col-dispos .plage .bord { position: absolute; left: 0; right: 0; height: 7px; cursor: ns-resize; pointer-events: auto; }
+.semaine .col-dispos .plage .bord.haut { top: -1px; }
+.semaine .col-dispos .plage .bord.bas { bottom: -1px; }
+.semaine .col-dispos .plage .bord:hover { background: color-mix(in srgb, var(--survol) 45%, transparent); }
+.semaine .col-dispos .fantome {
+  height: calc(30 / 60 * var(--hh)); pointer-events: none; font-size: 0.7em; color: var(--survol); text-align: center;
+  border: 1px dashed var(--survol); background: color-mix(in srgb, var(--survol) 10%, transparent); box-sizing: border-box;
+}
+.cours-page .pied-dispos { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6em 1.2em; margin-top: 0.5em; font-size: 0.9em; }
+.cours-page .pied-dispos .etat-dispos { margin-left: auto; color: #777; }
+.cours-page .pied-dispos .zone-retour { display: inline-flex; gap: 0.5em; align-items: center; }

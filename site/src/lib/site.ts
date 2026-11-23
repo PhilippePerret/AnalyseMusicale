@@ -40,5 +40,5 @@ export const TABLE_ANALYSE = {
 // Liens de l'administrateur vers les cours (pages /admin/ et /cours/, en haut à droite)
 export const LIENS_COURS_ADMIN = [
   ['/cours/student/', 'Calendrier des cours'],
-  ['/cours/admin/', 'Élèves et disponibilités'],
+  ['/cours/admin/', 'Gestion des élèves'],
 ] as const;
