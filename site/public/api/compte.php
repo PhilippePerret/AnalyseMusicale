@@ -57,7 +57,7 @@ if ($action === 'inscription') {
   $corps = g("Bonjour" . ($pseudo !== '' ? " $pseudo" : '') . ",\n\n"
     . "Pour confirmer votre inscription aux Jeudis de l’analyse, cliquez sur ce lien :\n\n$lien\n\n"
     . "Si vous n’êtes pas à l’origine de cette demande, ignorez simplement ce message.\n\n"
-    . "Philippe Perret\nCours d’Analyse Musicale — " . SITE . "\n", $genre);
+    . "Philippe Perret\nClasse d’Analyse Musicale — " . SITE . "\n", $genre);
   envoyer_mail($email, 'CAMI • Confirmez votre inscription', $corps);
   repondre(['ok' => true, 'attente' => true]);
 }

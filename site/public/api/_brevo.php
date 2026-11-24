@@ -62,7 +62,7 @@ function brevo_supprimer(string $email): bool {
 // Mail transactionnel par Brevo (texte brut) ; sans clé ou en cas d'échec : envoi direct par le serveur.
 function brevo_mail(string $a, string $sujet, string $corps, string $repondre_a = ''): bool {
   $donnees = [
-    'sender' => ['name' => 'CAMI — Cours d’Analyse Musicale', 'email' => EXPEDITEUR],
+    'sender' => ['name' => 'CAMI — Classe d’Analyse Musicale', 'email' => EXPEDITEUR],
     'to' => [['email' => $a]],
     'subject' => $sujet,
     'textContent' => $corps,

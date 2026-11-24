@@ -47,7 +47,7 @@ $corps = "Bonjour,\n\n"
   . "Voici le lien pour télécharger la Table d’analyse ($systeme) :\n\n"
   . SITE . '/api/telecharger.php?jeton=' . $jeton . "\n\n"
   . (preg_match('/\.dmg$/', $fichier) ? texte_deblocage_mac() : '')
-  . "Bonnes analyses !\n\nPhilippe Perret\nCours d’Analyse Musicale — " . SITE . "\n";
+  . "Bonnes analyses !\n\nPhilippe Perret\nClasse d’Analyse Musicale — " . SITE . "\n";
 if (!envoyer_mail($email, 'Votre lien de téléchargement de la Table d’analyse', $corps)) reponse(false, 'envoi');
 
 $date = date('Y-m-d H:i:s');

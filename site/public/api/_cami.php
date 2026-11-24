@@ -346,7 +346,7 @@ function g(string $texte, string $genre): string {
 // $piece : pièce jointe facultative ['nom' => …, 'type' => …, 'contenu' => …]
 function envoyer_mail(string $a, string $sujet, string $corps, ?array $piece = null, string $repondre_a = ''): bool {
   $entetes = [
-    'From: ' . mb_encode_mimeheader('CAMI — Cours d’Analyse Musicale', 'UTF-8') . ' <' . EXPEDITEUR . '>',
+    'From: ' . mb_encode_mimeheader('CAMI — Classe d’Analyse Musicale', 'UTF-8') . ' <' . EXPEDITEUR . '>',
     'MIME-Version: 1.0',
   ];
   if ($repondre_a !== '') $entetes[] = 'Reply-To: ' . $repondre_a;

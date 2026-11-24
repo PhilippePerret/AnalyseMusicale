@@ -1,9 +1,9 @@
 export const EMAIL = 'philippe.perret@analyse-musicale.fr';
 
-// « Cours d’Analyse Musicale » dans un texte HTML : initiales C, A, M, i aux couleurs du logo (issue #11)
+// « Classe d’Analyse Musicale » dans un texte HTML : initiales C, A, M, i aux couleurs du logo (issue #11)
 export function marqueCami(html: string): string {
-  return html.replace(/Cours d([’'])Analyse Mus[iI]cale/g, (_, apos) =>
-    `<span class="cami"><span class="c">C</span>ours d${apos}<span class="a">A</span>nalyse <span class="m">M</span>us<span class="i">i</span>cale</span>`);
+  return html.replace(/Classe d([’'])Analyse Mus[iI]cale/g, (_, apos) =>
+    `<span class="cami"><span class="c">C</span>lasse d${apos}<span class="a">A</span>nalyse <span class="m">M</span>us<span class="i">i</span>cale</span>`);
 }
 
 // Objets proposés dans le formulaire de contact (clé = paramètre ?objet=)

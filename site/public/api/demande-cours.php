@@ -64,5 +64,5 @@ brevo_mail($email, 'CAMI • Confirmez votre demande de cours', "Bonjour $nom,\n
   . "Pour confirmer votre adresse, cliquez sur ce lien :\n\n$lien\n\n"
   . "Votre demande me sera transmise seulement après ce clic de confirmation.\n\n"
   . "Si vous n’êtes pas à l’origine de cette demande, ignorez simplement ce message.\n\n"
-  . "Philippe Perret\nCours d’Analyse Musicale — " . SITE . "\n");
+  . "Philippe Perret\nClasse d’Analyse Musicale — " . SITE . "\n");
 repondre(['ok' => true]);

@@ -1,6 +1,6 @@
 = Les ressources
 :description: Ressources pour l’analyse musicale : livres et outils recommandés.
-:bande: Espace virtuel du Cours d’Analyse MusIcale (CAMI) de Philippe PERRET.
+:bande: Espace virtuel de la Classe d’Analyse MusIcale (CAMI) de Philippe PERRET.
 
 Vous trouverez ici une liste de ressources qui peut vous être utiles si vous voulez progresser ou mieux connaitre l’analyse musicale.
 

@@ -1,4 +1,4 @@
-/* Cours d'Analyse Musicale (CAMI) — styles communs */
+/* Classe d'Analyse Musicale (CAMI) — styles communs */
 
 :root {
   --principal: #3e4a54;   /* ardoise : titres, liens, bordures */
@@ -32,7 +32,7 @@ body {
   line-height: 1.5;
 }
 
-/* « Cours d’Analyse Musicale » : initiales aux couleurs du logo (marqueCami) */
+/* « Classe d’Analyse Musicale » : initiales aux couleurs du logo (marqueCami) */
 .cami .c, .cami .a, .cami .m, .cami .i { font-weight: 600; }
 .cami .c { color: #1f5fe0; }
 .cami .a { color: #e8264f; }

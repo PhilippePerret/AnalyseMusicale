@@ -1,7 +1,7 @@
 = Les Jeudis de l’Analyse (musicale) =
 :description: Les Jeudis de l’analyse : rendez-vous hebdomadaires en visioconférence pour découvrir et approfondir la pratique de l’analyse musicale.
 :objet-contact: jeudis
-:bande: Espace virtuel du Cours d’Analyse Musicale (CAMI) de Philippe PERRET.
+:bande: Espace virtuel de la Classe d’Analyse Musicale (CAMI) de Philippe PERRET.
 
 [.contact-bloc]
 Contact et renseignements +

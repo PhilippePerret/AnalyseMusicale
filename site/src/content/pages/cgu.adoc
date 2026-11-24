@@ -1,5 +1,5 @@
 = Conditions générales d’utilisation
-:description: Conditions générales d’utilisation du site du Cours d’Analyse Musicale (CAMI), des Jeudis de l’analyse et de la Table d’analyse.
+:description: Conditions générales d’utilisation du site de la Classe d’Analyse Musicale (CAMI), des Jeudis de l’analyse et de la Table d’analyse.
 
 [.small]#Version du 20 novembre 2026.#
 

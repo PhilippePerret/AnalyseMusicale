@@ -6,7 +6,7 @@
 const MAILS_TYPES = [
   'reponse-demande-cours' => [
     'titre' => 'Réponse à une demande de cours',
-    'objet' => 'Cours d’analyse musicale — CAMI',
+    'objet' => 'Classe d’analyse musicale — CAMI',
     'corps' => <<<'TXT'
 Bonjour {nom},
 

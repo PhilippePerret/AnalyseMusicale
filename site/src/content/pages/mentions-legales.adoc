@@ -1,9 +1,9 @@
 = Mentions légales
-:description: Mentions légales du site du Cours d’Analyse Musicale (CAMI) : éditeur, hébergeur, propriété intellectuelle.
+:description: Mentions légales du site de la Classe d’Analyse Musicale (CAMI) : éditeur, hébergeur, propriété intellectuelle.
 
 == Éditeur
 
-Le site *analyse-musicale.fr* (Cours d’Analyse Musicale, « CAMI ») est édité à titre non professionnel par *Philippe Perret*.
+Le site *analyse-musicale.fr* (Classe d’Analyse Musicale, « CAMI ») est édité à titre non professionnel par *Philippe Perret*.
 
 Directeur de la publication : Philippe Perret.
 

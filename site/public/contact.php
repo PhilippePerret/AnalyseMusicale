@@ -1,5 +1,5 @@
 <?php
-// Formulaire de contact du Cours d'Analyse Musicale (CAMI).
+// Formulaire de contact de la Classe d'Analyse Musicale (CAMI).
 // Reçoit le POST de /contact/, envoie le message par mail() puis redirige.
 
 const DESTINATAIRE = 'philippe.perret@analyse-musicale.fr';

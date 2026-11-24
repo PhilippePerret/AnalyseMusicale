@@ -1,5 +1,5 @@
 = Confidentialité et cookies
-:description: Données personnelles collectées par le site du Cours d’Analyse Musicale (CAMI), finalités, durées de conservation, droits et cookies.
+:description: Données personnelles collectées par le site de la Classe d’Analyse Musicale (CAMI), finalités, durées de conservation, droits et cookies.
 
 [.small]#Version du 20 novembre 2026.#
 

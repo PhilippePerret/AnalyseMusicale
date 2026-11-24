@@ -162,7 +162,7 @@ function armer_rappels(int $cid): void {
 // --- Mails ---
 
 function signature_cours(): string {
-  return "\nPhilippe Perret\nCours d’Analyse Musicale — " . SITE . "\nVos cours : " . SITE . "/cours/student/\n";
+  return "\nPhilippe Perret\nClasse d’Analyse Musicale — " . SITE . "\nVos cours : " . SITE . "/cours/student/\n";
 }
 
 function bonjour(array $e): string { return 'Bonjour' . ($e['pseudo'] ? ' ' . $e['pseudo'] : '') . ",\n\n"; }
