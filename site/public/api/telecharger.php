@@ -1,6 +1,6 @@
 <?php
 // Lien de téléchargement de la Table d'analyse → redirection vers le fichier (Release GitHub).
-// GET ?jeton=… : lien envoyé par mail ; le premier clic confirme l'adresse (telecharge_le).
+// GET ?jeton=… : lien envoyé par mail ; le premier clic confirme l'adresse (telecharge_le), chaque clic est signalé.
 // GET ?fichier=…&systeme=… : visiteur identifié (liens directs de /table-analyse/), téléchargement enregistré.
 require __DIR__ . '/_brevo.php';
 
@@ -25,8 +25,9 @@ if ($jeton !== '') {
   if (!$t) aller('/table-analyse/');
   if (!$t['telecharge_le']) {
     db()->prepare('UPDATE telechargements SET telecharge_le = ? WHERE id = ?')->execute([$maintenant, $t['id']]);
-    signaler(array_merge($t, ['telecharge_le' => $maintenant]));
   }
+  // Chaque téléchargement est signalé, même par un lien déjà utilisé
+  signaler(array_merge($t, ['telecharge_le' => $maintenant]));
   aller($t['fichier']);
 }
 
