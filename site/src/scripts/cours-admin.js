@@ -147,34 +147,37 @@ function editerEleve(el) {
     f.elements.email.value = el.email;
     f.elements.pseudo.value = el.pseudo;
     f.elements.genre.value = el.genre || 'N';
+    f.elements.actif.value = el.actif ? '1' : '0';
   }
   $('titreFormEleve').textContent = el ? 'Modifier l’élève' : 'Nouvel élève';
   $('caseBienvenue').hidden = !!el;
   $('annulerEleve').hidden = !el;
-  $('boutonEleve').textContent = el ? 'Enregistrer' : 'Inscrire comme élève';
+  $('boutonEleve').textContent = el ? 'Enregistrer' : 'Inscrire';
   message(f, '');
   if (el) f.elements.email.focus();
 }
 $('annulerEleve').addEventListener('click', () => editerEleve(null));
+// Menu actif/inactif : « inactif » décoche « Mail de bienvenue », « actif » la recoche
+$('formEleve').elements.actif.addEventListener('change', (e) => { $('formEleve').elements.bienvenue.checked = e.target.value === '1'; });
 
 $('formEleve').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = Object.fromEntries(new FormData(e.target));
   const id = Number(f.id);
   if (id) {
-    const r = await api({ action: 'eleve_modifier', id, email: f.email, pseudo: f.pseudo, genre: f.genre });
+    const r = await api({ action: 'eleve_modifier', id, email: f.email, pseudo: f.pseudo, genre: f.genre, actif: f.actif === '1' });
     if (!r.ok) return message(e.target, ERREURS[r.erreur] || 'Enregistrement impossible.');
     editerEleve(null);
     await charger();
     return message(e.target, 'Élève modifié.', true);
   }
   f.bienvenue = e.target.elements.bienvenue.checked;
-  const r = await api({ action: 'eleve_ajouter', ...f });
+  const r = await api({ action: 'eleve_ajouter', ...f, actif: f.actif === '1' });
   if (!r.ok) return message(e.target, ERREURS[r.erreur] || 'Inscription impossible.');
   editerEleve(null);
   // L'élève inscrit apparaît tout de suite dans la liste
   $('filtreEleves').value = '';
-  document.querySelector('#ongletsEleves input[value=actif]').checked = true;
+  document.querySelector(`#ongletsEleves input[value=${f.actif === '1' ? 'actif' : 'inactif'}]`).checked = true;
   nouvelEleve = r.id;
   await charger();
   setTimeout(() => { nouvelEleve = 0; $('eleves').querySelector('.nouveau')?.classList.remove('nouveau'); }, 2500);

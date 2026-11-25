@@ -44,15 +44,16 @@ import '../../../styles/cours.css';
         <h3 class="sous-rubrique" id="titreFormEleve">Nouvel élève</h3>
         <form class="ligne simple" id="formEleve">
           <input type="hidden" name="id" value="0">
-          <label>Adresse e-mail <input type="email" name="email" required maxlength="200" size="20"></label>
-          <label>Pseudo <input type="text" name="pseudo" maxlength="60" size="12"></label>
-          <label>Lui parler en tant que
+          <input type="email" name="email" required maxlength="200" size="20" placeholder="Adresse e-mail" aria-label="Adresse e-mail">
+          <input type="text" name="pseudo" maxlength="60" size="12" placeholder="Pseudo" aria-label="Pseudo">
+          <label class="en-tant-que">en tant que
             <select name="genre"><option value="F">une femme</option><option value="H">un homme</option><option value="N" selected>non précisé</option></select>
           </label>
+          <select name="actif" class="statut-eleve" aria-label="Statut"><option value="1">actif</option><option value="0">inactif</option></select>
           <span class="envoi">
-            <label class="case" id="caseBienvenue"><input type="checkbox" name="bienvenue" checked> Envoyer le mail de bienvenue</label>
+            <label class="case" id="caseBienvenue"><input type="checkbox" name="bienvenue" checked> Mail de bienvenue</label>
             <button type="button" class="bouton annuler" id="annulerEleve" hidden>Annuler</button>
-            <button class="bouton" id="boutonEleve">Inscrire comme élève</button>
+            <button class="bouton" id="boutonEleve">Inscrire</button>
           </span>
           <p class="message" hidden></p>
         </form>

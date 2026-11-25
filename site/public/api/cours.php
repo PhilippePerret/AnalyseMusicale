@@ -207,7 +207,8 @@ if ($action === 'eleve_ajouter') {
     $u = array_merge($u, ['pseudo' => $u['pseudo'] ?: $pseudo]);
   }
   if (student_de_user($u)) erreur('existe', 409);
-  db()->prepare('INSERT INTO students (user_id, rappels, cree_le) VALUES (?, ?, ?)')->execute([$u['id'], json_encode(RAPPELS_DEFAUT), date('Y-m-d H:i:s')]);
+  $actif = !array_key_exists('actif', $e) || !empty($e['actif']);   // menu actif/inactif du formulaire
+  db()->prepare('INSERT INTO students (user_id, rappels, actif, cree_le) VALUES (?, ?, ?, ?)')->execute([$u['id'], json_encode(RAPPELS_DEFAUT), $actif ? 1 : 0, date('Y-m-d H:i:s')]);
   $sid = (int) db()->lastInsertId();
   db()->prepare('INSERT INTO groupes (nom, solo, cree_le) VALUES (\'\', 1, ?)')->execute([date('Y-m-d H:i:s')]);
   db()->prepare('INSERT INTO groupe_eleves (groupe_id, student_id) VALUES (?, ?)')->execute([(int) db()->lastInsertId(), $sid]);
@@ -220,7 +221,7 @@ if ($action === 'eleve_ajouter') {
       . "Votre identifiant est votre adresse e-mail : $email\n"
     : "Identifiez-vous avec votre adresse e-mail ($email) et votre mot de passe habituel du site.\n";
   // Case « Envoyer le mail de bienvenue » (cochée par défaut, issue #19)
-  if (!array_key_exists('bienvenue', $e) || !empty($e['bienvenue'])) {
+  if ($actif && (!array_key_exists('bienvenue', $e) || !empty($e['bienvenue']))) {   // élève inactif : aucun mail
     brevo_mail($email, 'CAMI • Bienvenue dans les cours d’analyse', g($texte . signature_cours(), $u['genre']), NOTIFICATIONS);
   }
   repondre(['ok' => true, 'id' => $sid]);
@@ -239,6 +240,7 @@ if ($action === 'eleve_modifier') {   // adresse, pseudo, genre de l'élève (is
   if ($st->fetch()) erreur('email_pris', 409);
   $genre = in_array($e['genre'] ?? '', ['F', 'H', 'N'], true) ? $e['genre'] : 'N';
   db()->prepare('UPDATE users SET email = ?, pseudo = ?, genre = ? WHERE id = ?')->execute([$email, texte($e['pseudo'] ?? '', 60), $genre, $uid]);
+  if (array_key_exists('actif', $e)) db()->prepare('UPDATE students SET actif = ? WHERE id = ?')->execute([empty($e['actif']) ? 0 : 1, $sid]);
   repondre(['ok' => true]);
 }
 

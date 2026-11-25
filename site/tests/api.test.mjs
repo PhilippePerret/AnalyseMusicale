@@ -449,6 +449,12 @@ test('cours : élèves, disponibilités, placement, demandes, rendez-vous régul
   assert.equal(r.ok, true);
   assert.equal(readFileSync(mailFile, 'utf-8').includes('sansmail@example.com'), false);
   assert.equal((await admin.post('cours.php', { action: 'eleve_retirer', id: r.id })).ok, true);
+  // Menu « inactif » : élève inactif, aucun mail même case cochée
+  r = await admin.post('cours.php', { action: 'eleve_ajouter', email: 'inactif@example.com', actif: false, bienvenue: true });
+  assert.equal(r.ok, true);
+  assert.equal(readFileSync(mailFile, 'utf-8').includes('inactif@example.com'), false);
+  assert.equal((await cours(admin)).eleves.find((x) => x.id === r.id).actif, false);
+  assert.equal((await admin.post('cours.php', { action: 'eleve_retirer', id: r.id })).ok, true);
   const jeton = [...readFileSync(mailFile, 'utf-8').matchAll(/cours\/student\/\?jeton=([0-9a-f]{32})/g)].pop()[1];
   assert.match(readFileSync(mailFile, 'utf-8'), /inscrite comme élève/);
   const eleve = client();
@@ -562,6 +568,7 @@ test('cours : élèves, disponibilités, placement, demandes, rendez-vous régul
   const max = (await cours(admin)).eleves.find((x) => x.id === idMax);
   assert.equal(max.pseudo, 'Maxime');
   assert.equal(max.genre, 'N');
+  assert.equal((await admin.post('cours.php', { action: 'eleve_modifier', id: idMax, email: 'eleve2@example.com', pseudo: 'Maxime', genre: 'N', actif: true })).ok, true);
   assert.equal((await admin.post('cours.php', { action: 'eleves_actif', ids: [idLea], actif: false })).ok, true);
   assert.equal((await cours(admin)).eleves.find((x) => x.id === idLea).actif, false);
   assert.equal((await cours(eleve)).acces, false);
