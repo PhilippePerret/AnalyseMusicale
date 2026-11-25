@@ -89,7 +89,7 @@ test('le contenu AsciiDoc est converti (sous-dossier compris)', () => {
 
 test('accueil : contenu AsciiDoc, blocs, sans pied de page', () => {
   const html = readFileSync(resolveLocal('/'), 'utf-8');
-  assert.match(html, /<h1 class="row titre-page"><span class="cami"><span class="c">C<\/span>ours d’<span class="a">A<\/span>nalyse <span class="m">M<\/span>us<span class="i">i<\/span>cale<\/span><\/h1>/);
+  assert.match(html, /<h1 class="row titre-page"><span class="cami"><span class="c">C<\/span>lasse d’<span class="a">A<\/span>nalyse <span class="m">M<\/span>us<span class="i">i<\/span>cale<\/span><\/h1>/);
   assert.match(html, /class="ulist blocs"/);
   assert.match(html, /href="\/jeudis-analyse\/"/);
   assert.doesNotMatch(html, /<footer/);
