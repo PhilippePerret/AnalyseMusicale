@@ -489,6 +489,19 @@ test('cours : élèves, disponibilités, placement, demandes, rendez-vous régul
   assert.equal(readFileSync(mailFile, 'utf-8').slice(avantMail).includes('Nouveau cours'), false);
   assert.equal((await admin.post('cours.php', { action: 'cours_supprimer', id: r.id })).ok, true);
 
+  // Programme : enregistré tout de suite ; Travail effectué : ignoré tant que le cours n'a pas eu lieu
+  r = await admin.post('cours.php', { action: 'cours_enregistrer', groupe: gid, debut: `${J} 09:00`, duree: 30, informer: false, programme: 'Prog', travail: 'Trop tôt' });
+  let c = (await cours(eleve)).cours.find((x) => x.id === r.id);
+  assert.equal(c.programme, 'Prog');
+  assert.equal(c.travail, '');
+  assert.equal((await admin.post('cours.php', { action: 'cours_enregistrer', id: r.id, groupe: gid, debut: `${J} 09:00`, duree: 30, programme: 'Prog 2', travail: 'Toujours trop tôt' })).ok, true);
+  c = (await cours(eleve)).cours.find((x) => x.id === r.id);
+  assert.equal(c.programme, 'Prog 2');
+  assert.equal(c.travail, '');
+  assert.equal((await admin.post('cours.php', { action: 'cours_enregistrer', id: r.id, groupe: gid, debut: `${jourDans(-3)} 09:00`, duree: 30, programme: 'Prog 2', travail: 'Fait' })).ok, true);
+  assert.equal((await cours(eleve)).cours.find((x) => x.id === r.id).travail, 'Fait');
+  assert.equal((await admin.post('cours.php', { action: 'cours_supprimer', id: r.id })).ok, true);
+
   // Cours accordé (à placer par l'élève)
   r = await admin.post('cours.php', { action: 'cours_enregistrer', groupe: gid, a_placer: true, duree: 60 });
   assert.equal(r.ok, true);

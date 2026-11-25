@@ -444,6 +444,7 @@ function afficherCours(id) {
     c.debut ? `<div>Durée : ${duree(c.duree)}</div>` : '',
     c.lieu ? `<div>Lieu : ${lien(c.lieu)}</div>` : '',
     c.oeuvres ? `<div>Œuvre(s) : <strong>${esc(c.oeuvres)}</strong></div>` : '',
+    c.programme ? `<div class="travail"><div class="titre">Programme</div>${esc(c.programme)}</div>` : '',
     c.travail ? `<div class="travail"><div class="titre">Travail effectué</div>${esc(c.travail)}</div>` : '',
   ].join('');
   let actions = '';
@@ -468,9 +469,14 @@ function afficherCours(id) {
 
 // --- Administrateur : création / édition d'un cours ---
 
+// Cours ayant eu lieu (placé, fin passée) : seul cas où le « Travail effectué » est modifiable
+function coursPasse(c) {
+  return c.statut === 'place' && !!c.debut && new Date(c.debut.replace(' ', 'T')).getTime() + c.duree * 60000 <= maintenant().getTime();
+}
+
 function formCours(c, preset = {}) {
   const nouveau = !c;
-  const v = c || { groupe: Number(filtreGroupe) || etat.groupes[0]?.id, duree: 60, lieu: '', oeuvres: '', travail: '', statut: 'place', debut: preset.debut || null };
+  const v = c || { groupe: Number(filtreGroupe) || etat.groupes[0]?.id, duree: 60, lieu: '', oeuvres: '', programme: '', travail: '', statut: 'place', debut: preset.debut || null };
   if (nouveau && v.groupe) v.lieu = groupe(v.groupe)?.lieu || '';
   if (!etat.groupes.length) return fiche('<p class="erreur">Aucun élève : inscrire d’abord un élève dans <a href="/cours/admin/">Gestion des élèves</a>.</p>');
   const aPlacer = v.statut === 'a_placer';
@@ -496,7 +502,8 @@ function formCours(c, preset = {}) {
       </div>` : ''}
       <div class="rang"><label class="en-ligne large">Lieu <input name="lieu" value="${esc(v.lieu)}" maxlength="300" placeholder="lien visio ou adresse"></label>${lieux}</div>
       <label class="en-ligne large">Œuvre(s) <input name="oeuvres" value="${esc(v.oeuvres)}" maxlength="500"></label>
-      <label class="en-ligne large haut">Travail effectué <textarea name="travail" rows="4" maxlength="5000">${esc(v.travail)}</textarea></label>
+      <label class="en-ligne large haut">Programme <textarea name="programme" rows="4" maxlength="5000">${esc(v.programme)}</textarea></label>
+      <label class="en-ligne large haut">Travail effectué <textarea name="travail" rows="4" maxlength="5000"${coursPasse(v) ? '' : ' disabled title="Disponible une fois le cours passé"'}>${esc(v.travail)}</textarea></label>
       <div class="boutons">
         <button type="button" class="bouton annuler" data-action="annuler">Annuler</button>
         <span class="envoi">${nouveau ? '<label class="case"><input type="checkbox" name="informer" checked> Informer l’élève de ce cours</label>' : ''}
@@ -510,7 +517,7 @@ async function enregistrerCours(form) {
   const f = Object.fromEntries(new FormData(form));
   const donnees = {
     action: 'cours_enregistrer', id: choisi || 0, groupe: Number(f.groupe), duree: Number(f.duree),
-    a_placer: !!f.a_placer, debut: `${f.jour} ${f.heure}`, lieu: f.lieu, oeuvres: f.oeuvres, travail: f.travail,
+    a_placer: !!f.a_placer, debut: `${f.jour} ${f.heure}`, lieu: f.lieu, oeuvres: f.oeuvres, programme: f.programme, travail: f.travail,
   };
   if (form.elements.informer) donnees.informer = form.elements.informer.checked;
   if (f.regulier) donnees.recurrence = { frequence: Number(f.frequence), unite: f.unite, jusqu_au: f.jusqu_au };

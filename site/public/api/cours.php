@@ -31,7 +31,7 @@ function groupe_public(array $g, bool $admin): array {
 function cours_public(array $c): array {
   return [
     'id' => (int) $c['id'], 'groupe' => (int) $c['groupe_id'], 'debut' => $c['debut'], 'duree' => (int) $c['duree'],
-    'statut' => $c['statut'], 'lieu' => $c['lieu'], 'oeuvres' => $c['oeuvres'], 'travail' => $c['travail'],
+    'statut' => $c['statut'], 'lieu' => $c['lieu'], 'oeuvres' => $c['oeuvres'], 'programme' => $c['programme'], 'travail' => $c['travail'],
     'raison' => $c['raison'], 'serie' => $c['serie'],
   ];
 }
@@ -316,6 +316,7 @@ if ($action === 'cours_enregistrer') {
   if (!$a_placer && !debut_valide($debut)) erreur('debut');
   $lieu = texte($e['lieu'] ?? '', 300);
   $oeuvres = texte($e['oeuvres'] ?? '', 500);
+  $programme = mb_substr(trim((string) ($e['programme'] ?? '')), 0, 5000);
   $travail = mb_substr(trim((string) ($e['travail'] ?? '')), 0, 5000);
   $statut = $a_placer ? 'a_placer' : 'place';
 
@@ -335,8 +336,9 @@ if ($action === 'cours_enregistrer') {
 
   if ($ancien) {
     $statut = $a_placer ? 'a_placer' : ($ancien['statut'] === 'a_placer' || $ancien['statut'] === 'place' ? 'place' : $ancien['statut']);
-    db()->prepare('UPDATE cours SET groupe_id = ?, debut = ?, duree = ?, statut = ?, lieu = ?, oeuvres = ?, travail = ? WHERE id = ?')
-      ->execute([$gid, $debut, $duree, $statut, $lieu, $oeuvres, $travail, $id]);
+    if (!cours_passe($debut, (int) $duree, $statut)) $travail = $ancien['travail'];   // « Travail effectué » bloqué tant que le cours n'a pas eu lieu
+    db()->prepare('UPDATE cours SET groupe_id = ?, debut = ?, duree = ?, statut = ?, lieu = ?, oeuvres = ?, programme = ?, travail = ? WHERE id = ?')
+      ->execute([$gid, $debut, $duree, $statut, $lieu, $oeuvres, $programme, $travail, $id]);
     armer_rappels($id);
     $change = $ancien['debut'] !== $debut || (int) $ancien['duree'] !== $duree || $ancien['lieu'] !== $lieu || (int) $ancien['groupe_id'] !== $gid;
     if ($change && $statut === 'place' && strtotime($debut) > maintenant_cours()) {
@@ -346,10 +348,10 @@ if ($action === 'cours_enregistrer') {
     repondre(['ok' => true, 'id' => $id]);
   }
 
-  $ins = db()->prepare('INSERT INTO cours (groupe_id, debut, duree, statut, lieu, oeuvres, travail, serie, cree_le) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+  $ins = db()->prepare('INSERT INTO cours (groupe_id, debut, duree, statut, lieu, oeuvres, programme, travail, serie, cree_le) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
   $ids = [];
   foreach ($debuts as $d) {
-    $ins->execute([$gid, $d, $duree, $statut, $lieu, $oeuvres, $travail, $serie, date('Y-m-d H:i:s')]);
+    $ins->execute([$gid, $d, $duree, $statut, $lieu, $oeuvres, $programme, cours_passe($d, (int) $duree, $statut) ? $travail : '', $serie, date('Y-m-d H:i:s')]);
     $ids[] = (int) db()->lastInsertId();
     armer_rappels(end($ids));
   }

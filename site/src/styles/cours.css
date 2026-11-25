@@ -239,3 +239,4 @@ table.mois a.puce.demande { background: #eaf1f8; color: #2c5178; border: 1px das
 .cours-page .pied-dispos { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6em 1.2em; margin-top: 0.5em; font-size: 0.9em; }
 .cours-page .pied-dispos .etat-dispos { margin-left: auto; color: #777; }
 .cours-page .pied-dispos .zone-retour { display: inline-flex; gap: 0.5em; align-items: center; }
+.cours-page form.edition textarea:disabled { background: #f2f2f2; color: #999; cursor: not-allowed; }

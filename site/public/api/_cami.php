@@ -130,6 +130,7 @@ CREATE TABLE IF NOT EXISTS cours (
   statut TEXT NOT NULL,             -- a_placer | place | demande | refuse
   lieu TEXT NOT NULL DEFAULT '',
   oeuvres TEXT NOT NULL DEFAULT '',
+  programme TEXT NOT NULL DEFAULT '',
   travail TEXT NOT NULL DEFAULT '',
   raison TEXT NOT NULL DEFAULT '',  -- raison du refus d'une demande
   serie TEXT,                       -- rendez-vous régulier : identifiant commun aux cours de la série
@@ -193,6 +194,7 @@ function migrer(PDO $pdo): void {
   $ajouts = [
     'seances' => ['partition' => "TEXT NOT NULL DEFAULT ''"],
     'users' => ['source' => "TEXT NOT NULL DEFAULT 'site'", 'cgu_le' => 'TEXT', 'vu_le' => 'TEXT'],
+    'cours' => ['programme' => "TEXT NOT NULL DEFAULT ''"],
     'students' => ['actif' => 'INTEGER NOT NULL DEFAULT 1'],   // 0 : élève inactif, sans accès à /cours/student/ (issue #20)
     'telechargements' => [
       'version' => "TEXT NOT NULL DEFAULT ''",

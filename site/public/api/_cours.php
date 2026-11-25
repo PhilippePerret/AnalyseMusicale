@@ -13,6 +13,11 @@ const RAPPELS_DEFAUT = [1440, 60];    // 1 jour et 1 heure avant
 
 function maintenant_cours(): int { return maintenant_alertes(); }
 
+// Cours ayant eu lieu (placé, fin passée) : seul cas où le « Travail effectué » est modifiable
+function cours_passe(?string $debut, int $duree, string $statut): bool {
+  return $statut === 'place' && $debut && strtotime($debut) + $duree * 60 <= maintenant_cours();
+}
+
 // --- Élèves et groupes ---
 
 function student_de_user(?array $user): ?array {
