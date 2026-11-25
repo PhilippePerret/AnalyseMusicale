@@ -33,7 +33,7 @@ import '../../../styles/cours.css';
           <label class="case"><input type="checkbox" id="toutCocher"> tout cocher</label>
           <span class="compte" id="nbCoches"></span>
           <select id="actionEleves">
-            <option value="">Action…</option><option value="modifier">Modifier</option><option value="contacter">Contacter</option>
+            <option value="">Action…</option><option value="groupe">Faire un groupe d’élèves</option><option value="modifier">Modifier</option><option value="contacter">Contacter</option>
             <option value="inactif">Rendre inactif</option><option value="actif">Rendre actif</option><option value="supprimer">Supprimer…</option>
           </select>
           <button type="button" class="bouton" id="appliquerEleves">Appliquer</button>
@@ -64,15 +64,22 @@ import '../../../styles/cours.css';
         <thead><tr><th>Groupe</th><th>Élèves</th><th>Lieu habituel</th><th></th></tr></thead>
         <tbody id="groupes"></tbody>
       </table>
-      <form class="ligne" id="formGroupe">
-        <input type="hidden" name="id" value="0">
-        <label>Nom <input type="text" name="nom" maxlength="80" size="16"></label>
-        <span class="eleves-groupe" id="elevesGroupe"></span>
-        <label>Lieu habituel <input type="text" name="lieu" maxlength="300" size="22" placeholder="lien visio ou adresse"></label>
-        <button type="button" class="bouton annuler" id="annulerGroupe" hidden>Annuler</button>
-        <button class="bouton" id="boutonGroupe">Créer le groupe</button>
-        <p class="message" hidden></p>
-      </form>
+      <p class="message" id="messageGroupes" hidden></p>
+
+      <!-- Fenêtre « Faire un groupe d'élèves » (action de la liste) et « Modifier » d'un groupe (issue #22) -->
+      <dialog class="panneau groupe" id="dialogGroupe">
+        <form id="formGroupe">
+          <h3 id="titreGroupe">Faire un groupe d’élèves</h3>
+          <label class="en-regard" id="ligneNomGroupe">Nom du groupe <input type="text" name="nom" maxlength="80"></label>
+          <div class="en-regard"><span>Élèves</span><span class="membres" id="membresGroupe"></span></div>
+          <label class="en-regard" id="ligneLieuGroupe">Lieu habituel <input type="text" name="lieu" maxlength="300" placeholder="lien visio ou adresse"></label>
+          <p class="message" hidden></p>
+          <div class="boutons">
+            <button type="button" class="bouton annuler">Annuler</button>
+            <button class="bouton" id="boutonGroupe">Créer le groupe</button>
+          </div>
+        </form>
+      </dialog>
 
       <h2 class="rubrique">Lieux mémorisés</h2>
       <table class="liste">

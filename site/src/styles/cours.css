@@ -157,12 +157,13 @@ table.mois a.puce.demande { background: #eaf1f8; color: #2c5178; border: 1px das
 .cours-page .onglets label:has(input:checked) { background: var(--principal); color: #fff; }
 .cours-page .onglets label:hover:not(:has(input:checked)) { color: var(--survol); }
 .cours-page ul.eleves { list-style: none; padding: 0; margin: 0; border-top: 2px solid var(--principal); border-bottom: 2px solid var(--principal); }
-.cours-page ul.eleves li { display: grid; grid-template-columns: 1.8em 7em 15em 4.5em 5em; justify-content: start; align-items: center; gap: 0.5em 1em; padding: 0.3em; border-bottom: 1px solid #e2e2e2; }
+.cours-page ul.eleves li { display: grid; grid-template-columns: 1.8em 7em 21em 4.5em 5em; justify-content: start; align-items: center; gap: 0.5em 1em; padding: 0.3em; border-bottom: 1px solid #e2e2e2; }
+.cours-page ul.eleves li { cursor: pointer; user-select: none; -webkit-user-select: none; }
 .cours-page ul.eleves li:hover { background: #f7f9fb; }
 .cours-page ul.eleves li.inactif { color: #999; }
 .cours-page ul.eleves li.nouveau { background: #fff3c4; }
 .cours-page ul.eleves li.vide { display: block; }
-.cours-page ul.eleves .email { overflow-wrap: anywhere; }
+.cours-page ul.eleves .email { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }   /* jamais sur deux lignes */
 .cours-page ul.eleves .genre { color: #666; font-size: 0.92em; }
 .cours-page ul.eleves mark { background: #fff0a8; color: inherit; }
 .cours-page .statut { display: inline-block; text-align: center; width: 4.8em; padding: 0.2em 0 0.12em; line-height: 1.2; border: 1px solid currentColor; border-radius: 1em; font-size: 0.88em; }
@@ -175,7 +176,19 @@ table.mois a.puce.demande { background: #eaf1f8; color: #2c5178; border: 1px das
 .cours-page form.ligne.simple .statut-eleve { margin-left: auto; }
 .cours-page form.ligne.simple .envoi .bouton { margin-left: 0; }
 .cours-page .barre-eleves input.filtre { width: 22em; }
-.cours-page .eleves-groupe { display: flex; flex-wrap: wrap; gap: 0.2em 1em; }
+.cours-page #actionEleves { width: 8.2em; }   /* largeur fixe, quel que soit l'item choisi */
+/* Fenêtre « Faire un groupe d'élèves » / « Modifier le groupe » (issue #22), sur le modèle de la fenêtre « Inviter » de /admin/ */
+.cours-page dialog.groupe { width: min(30em, calc(100vw - 2em)); border: none; margin: auto; padding: 0.9em 1.2em; border-top: 4px solid var(--principal); background: #f7f7f7; box-shadow: 0 6px 30px rgba(0,0,0,0.25); }
+.cours-page dialog.groupe:not([open]) { display: none; }
+.cours-page dialog.groupe::backdrop { background: rgba(0,0,0,0.35); }
+.cours-page dialog.groupe form { display: grid; gap: 0.7em; }
+.cours-page dialog.groupe h3 { margin: 0; color: var(--principal); font-size: 1.05em; }
+.cours-page dialog.groupe .en-regard { display: grid; grid-template-columns: 8em 1fr; align-items: center; gap: 0.8em; }
+.cours-page dialog.groupe .membres { color: #555; }
+.cours-page dialog.groupe button.retirer { border: none; background: none; color: #a33; cursor: pointer; padding: 0 0.15em; font: inherit; }
+.cours-page dialog.groupe .boutons { display: flex; justify-content: space-between; align-items: center; }
+.cours-page dialog.groupe .boutons .annuler { font-size: 0.8em; }
+.cours-page dialog.groupe .message { margin: 0; }
 
 /* Disponibilités : une ligne par jour, créneaux en regard */
 .cours-page .dispos { display: grid; gap: 0.35em; }

@@ -111,7 +111,6 @@ function rendreEleves() {
     <span class="statut ${e.actif ? 'actif' : 'inactif'}">${e.actif ? 'actif' : 'inactif'}</span></li>`).join('')
     || `<li class="vide">${etat.eleves.length ? 'Aucun élève ne correspond.' : 'Aucun élève pour le moment.'}</li>`;
   majCoches();
-  $('elevesGroupe').innerHTML = etat.eleves.map((e) => `<label><input type="checkbox" name="eleves" value="${e.id}"> ${esc(e.pseudo || e.email)}</label>`).join('');
 }
 
 function majCoches() {
@@ -129,6 +128,15 @@ $('eleves').addEventListener('change', (e) => {
   const id = Number(e.target.value);
   if (e.target.checked) coches.add(id); else coches.delete(id);
   majCoches();
+});
+// Clic n'importe où sur la ligne d'un élève : coche / décoche
+$('eleves').addEventListener('click', (e) => {
+  const li = e.target.closest('li');
+  if (!li || e.target.classList.contains('coche')) return;
+  const c = li.querySelector('.coche');
+  if (!c) return;
+  c.checked = !c.checked;
+  c.dispatchEvent(new Event('change', { bubbles: true }));
 });
 $('toutCocher').addEventListener('change', (e) => {
   $('eleves').querySelectorAll('.coche').forEach((c) => {
@@ -197,6 +205,9 @@ $('appliquerEleves').addEventListener('click', async () => {
   message(barreActions, '');
   if (!action) return message(barreActions, 'Choisir une action.');
   if (!choisis.length) return message(barreActions, 'Cocher au moins un élève.');
+  if (action === 'groupe') {
+    return ouvrirGroupe({ id: 0, solo: false, nom: '', lieu: '', eleves: choisis.map((x) => ({ id: x.id, nom: x.pseudo || x.email })) });
+  }
   if (action === 'modifier' || action === 'contacter') {
     if (choisis.length > 1) return message(barreActions, 'Cocher un seul élève pour cette action.');
     const el = choisis[0];
@@ -234,38 +245,56 @@ function rendreGroupes() {
     || '<tr><td colspan="4" class="vide">Chaque élève inscrit a son groupe solo.</td></tr>';
 }
 
-function editerGroupe(g) {
+// Fenêtre de groupe : création (élèves cochés de la liste) ou modification (« Modifier »)
+const dialogGroupe = $('dialogGroupe');
+let groupeEdite = null;   // { id, solo, eleves: [{id, nom}] }
+dialogGroupe.addEventListener('cancel', (e) => e.preventDefault());
+dialogGroupe.querySelector('.annuler').addEventListener('click', () => dialogGroupe.close());
+
+function rendreMembres() {
+  const g = groupeEdite;
+  $('membresGroupe').innerHTML = g.eleves.map((e) => `${esc(e.nom)}${g.id && !g.solo ? ` <button type="button" class="retirer" data-retirer="${e.id}" title="Retirer du groupe">×</button>` : ''}`).join(', ');
+}
+function ouvrirGroupe(g) {
+  groupeEdite = g;
   const f = $('formGroupe');
   f.reset();
-  f.elements.id.value = g ? g.id : 0;
-  f.elements.nom.value = g && !g.solo ? g.nom : '';
-  f.elements.lieu.value = g ? g.lieu : '';
-  f.elements.nom.disabled = !!g?.solo;
-  const ids = g ? g.eleves.map((e) => e.id) : [];
-  f.querySelectorAll('[name=eleves]').forEach((c) => { c.checked = ids.includes(Number(c.value)); c.disabled = !!g?.solo; });
-  $('boutonGroupe').textContent = g ? 'Enregistrer le groupe' : 'Créer le groupe';
-  $('annulerGroupe').hidden = !g;
+  f.elements.nom.value = g.id && !g.solo ? g.nom : '';
+  f.elements.lieu.value = g.lieu || '';
+  $('titreGroupe').textContent = g.id ? (g.solo ? `Groupe solo de ${g.nom}` : 'Modifier le groupe') : 'Faire un groupe d’élèves';
+  $('ligneNomGroupe').hidden = !!g.solo;
+  $('ligneLieuGroupe').hidden = !g.id;   // création : lieu ajouté ensuite en modifiant le groupe
+  $('boutonGroupe').textContent = g.id ? 'Enregistrer' : 'Créer le groupe';
+  rendreMembres();
   message(f, '');
-  if (g) f.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  dialogGroupe.showModal();
+  (g.solo ? f.elements.lieu : f.elements.nom).focus();
 }
+$('membresGroupe').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-retirer]');
+  if (!b) return;
+  groupeEdite.eleves = groupeEdite.eleves.filter((x) => x.id !== Number(b.dataset.retirer));
+  rendreMembres();
+});
 
 $('groupes').addEventListener('click', (e) => {
   const a = e.target.closest('[data-modifier]');
   if (!a) return;
   e.preventDefault();
-  editerGroupe(etat.groupes.find((g) => g.id === Number(a.dataset.modifier)));
+  const g = etat.groupes.find((x) => x.id === Number(a.dataset.modifier));
+  ouvrirGroupe({ id: g.id, solo: g.solo, nom: g.nom, lieu: g.lieu, eleves: g.eleves.map((x) => ({ id: x.id, nom: x.nom })) });
 });
-$('annulerGroupe').addEventListener('click', () => editerGroupe(null));
 
 $('formGroupe').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = e.target;
-  const eleves = [...f.querySelectorAll('[name=eleves]:checked')].map((c) => Number(c.value));
-  const r = await api({ action: 'groupe_enregistrer', id: Number(f.elements.id.value), nom: f.elements.nom.value, lieu: f.elements.lieu.value, eleves });
+  const g = groupeEdite;
+  const r = await api({ action: 'groupe_enregistrer', id: g.id, nom: f.elements.nom.value, lieu: g.id ? f.elements.lieu.value : '', eleves: g.eleves.map((x) => x.id) });
   if (!r.ok) return message(f, ERREURS[r.erreur] || 'Enregistrement impossible.');
+  dialogGroupe.close();
+  if (!g.id) coches.clear();
   await charger();
-  editerGroupe(null);
-  message(f, 'Groupe enregistré.', true);
+  const m = $('messageGroupes'); m.textContent = g.id ? 'Groupe enregistré.' : 'Groupe créé.'; m.classList.add('ok'); m.hidden = false;
 });
 
 // --- Lieux mémorisés ---
