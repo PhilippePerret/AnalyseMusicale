@@ -6,6 +6,8 @@
 // Lien du mail d'inscription comme élève : ?jeton=… → choix du mot de passe.
 
 const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+// Mois abrégés de la période affichée (issue #23)
+const MOIS_COURTS = ['jan.','fév.','mars','avr.','mai','juin','juil.','aout','sept.','oct.','nov.','déc.'];
 const JOURS = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
 const HAUTEUR_HEURE = 2.1;   // rem par heure (vue semaine) — rem : même échelle pour libellés et cours
 
@@ -194,8 +196,8 @@ function rendreSemaine() {
   const jours = Array.from({ length: 7 }, (_, i) => ajouterJours(lundi, i));
   const dim = jours[6];
   $('periode').textContent = lundi.getMonth() === dim.getMonth()
-    ? `${lundi.getDate()} – ${dim.getDate()} ${MOIS[dim.getMonth()]} ${dim.getFullYear()}`
-    : `${lundi.getDate()} ${MOIS[lundi.getMonth()]} – ${dim.getDate()} ${MOIS[dim.getMonth()]} ${dim.getFullYear()}`;
+    ? `${lundi.getDate()} – ${dim.getDate()} ${MOIS_COURTS[dim.getMonth()]} ${dim.getFullYear()}`
+    : `${lundi.getDate()} ${MOIS_COURTS[lundi.getMonth()]} – ${dim.getDate()} ${MOIS_COURTS[dim.getMonth()]} ${dim.getFullYear()}`;
   // Plage horaire : 8 h – 21 h, élargie aux disponibilités et aux cours de la semaine
   let h0 = 8 * 60, h1 = 21 * 60;
   for (const d of jours) {
@@ -221,7 +223,7 @@ function rendreSemaine() {
 
 function rendreMois() {
   const a = ref.getFullYear(), m = ref.getMonth();
-  $('periode').textContent = `${MOIS[m]} ${a}`;
+  $('periode').textContent = `${MOIS_COURTS[m]} ${a}`;
   const debut = lundiDe(new Date(a, m, 1, 12));
   const auj = etat.maintenant.slice(0, 10);
   let h = `<table class="mois"><thead><tr>${JOURS.map((j) => `<th>${j.slice(0, 3)}.</th>`).join('')}</tr></thead><tbody>`;
@@ -296,8 +298,8 @@ function rendreModeDispos() {
   const jours = Array.from({ length: 7 }, (_, i) => ajouterJours(lundi, i));
   const dim = jours[6];
   $('periode').textContent = lundi.getMonth() === dim.getMonth()
-    ? `${lundi.getDate()} – ${dim.getDate()} ${MOIS[dim.getMonth()]} ${dim.getFullYear()}`
-    : `${lundi.getDate()} ${MOIS[lundi.getMonth()]} – ${dim.getDate()} ${MOIS[dim.getMonth()]} ${dim.getFullYear()}`;
+    ? `${lundi.getDate()} – ${dim.getDate()} ${MOIS_COURTS[dim.getMonth()]} ${dim.getFullYear()}`
+    : `${lundi.getDate()} ${MOIS_COURTS[lundi.getMonth()]} – ${dim.getDate()} ${MOIS_COURTS[dim.getMonth()]} ${dim.getFullYear()}`;
   const cells = cellulesDispos(sem);
   let h0 = DISPO_H0, h1 = DISPO_H1;
   for (let j = 1; j <= 7; j++) for (const [a, b] of plages(cells[j])) { h0 = Math.min(h0, Math.floor(a / 60) * 60); h1 = Math.max(h1, Math.ceil(b / 60) * 60); }

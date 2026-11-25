@@ -42,7 +42,8 @@
 .cours-page .nav { border-radius: 3px; padding: 0.15em 0.6em; }
 .cours-page .nav:hover, .cours-page .bascule-vue:not(.actif):hover { border-color: var(--survol); color: var(--survol); }
 .cours-page .navigation { display: inline-flex; align-items: center; gap: 0.4em; }
-.cours-page .periode { min-width: 13em; text-align: center; font-weight: 700; color: var(--principal); }
+.cours-page .periode { display: inline-block; width: 11.5em; white-space: nowrap; text-align: center;   /* largeur fixe : « › » et « Aujourd’hui » immobiles (issue #23) */
+  font-weight: 700; color: var(--principal); }
 .cours-page .outils { margin-left: auto; display: inline-flex; align-items: center; gap: 1em; }
 .cours-page .outils label { display: inline-flex; align-items: center; gap: 0.4em; }
 
