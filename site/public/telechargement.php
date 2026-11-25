@@ -42,11 +42,23 @@ function texte_deblocage_mac(): string {
     . "merci de nous en informer en répondant à ce message.\n\n";
 }
 
+// Marche à suivre quand l'antivirus bloque l'application non signée (mail Windows seulement)
+function texte_deblocage_windows(): string {
+  return "Table d’analyse n'étant pas « signée » (signature payante), Windows ou votre antivirus peuvent la bloquer "
+    . "ou la placer en quarantaine (confinement). Dans ce cas :\n"
+    . "- si Windows affiche « Windows a protégé votre ordinateur », cliquez sur « Informations complémentaires » puis sur « Exécuter quand même »,\n"
+    . "- si votre antivirus a confiné l'application, ouvrez-le, rendez-vous dans sa zone de quarantaine (ou de confinement), "
+    . "demandez-lui d'en sortir Table d’analyse (« Restaurer », « Autoriser ») et ajoutez-la à ses exceptions.\n\n"
+    . "L'application devrait alors s'ouvrir sans problème. Si cependant vous en rencontrez, "
+    . "merci de nous en informer en répondant à ce message.\n\n";
+}
+
 // Lien de téléchargement envoyé au demandeur
 $corps = "Bonjour,\n\n"
   . "Voici le lien pour télécharger la Table d’analyse ($systeme) :\n\n"
   . SITE . '/api/telecharger.php?jeton=' . $jeton . "\n\n"
   . (preg_match('/\.dmg$/', $fichier) ? texte_deblocage_mac() : '')
+  . (preg_match('/\.exe$/', $fichier) ? texte_deblocage_windows() : '')
   . "Bonnes analyses !\n\nPhilippe Perret\nClasse d’Analyse Musicale — " . SITE . "\n";
 if (!envoyer_mail($email, 'Votre lien de téléchargement de la Table d’analyse', $corps)) reponse(false, 'envoi');
 
