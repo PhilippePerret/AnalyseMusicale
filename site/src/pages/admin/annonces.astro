@@ -1,0 +1,61 @@
+---
+// Annonce Facebook aux groupes : texte, groupes, programmation et répétition.
+// Données et actions : /api/annonces-fb.php, par src/scripts/annonces-fb.js.
+// Publication : scripts/informer-groupes-fb.command (Mac de l'administrateur).
+import Base from '../../layouts/Base.astro';
+import '../../styles/admin.css';
+import { LIENS_ADMIN } from '../../lib/site';
+---
+<Base title="Annonce Facebook" indexer={false} liensAdmin={LIENS_ADMIN.filter(([href]) => href !== '/admin/annonces/')}>
+  <div class="row admin annonces-fb">
+    <h1 class="titre-page">Annonce Facebook</h1>
+
+    <p class="acces" id="acces" hidden>Page réservée à l’administrateur : <a href="/jeudis-analyse/?compte=connexion&retour=/admin/annonces/">s’identifier</a>.</p>
+
+    <div id="contenu" hidden>
+      <form class="panneau" id="formAnnonce">
+        <label class="en-regard haut">Annonce <textarea name="texte" required rows="8" maxlength="10000"></textarea></label>
+        <p class="texte-seul">Publication en texte seul : aucune image, aucun aperçu de lien.</p>
+      </form>
+
+      <h2 class="rubrique-admin">Groupes</h2>
+      <div class="panneau">
+        <table class="groupes">
+          <thead><tr><th class="case"><input type="checkbox" id="tousGroupes" title="Tout sélectionner"></th><th>Groupe</th><th>État</th><th></th></tr></thead>
+          <tbody id="groupes"></tbody>
+        </table>
+        <form class="ajout-groupe" id="formGroupe">
+          <label>Nom <input type="text" name="nom" required maxlength="120"></label>
+          <label class="url">URL <input type="text" name="url" required placeholder="https://www.facebook.com/groups/…"></label>
+          <button class="bouton">Ajouter le groupe</button>
+        </form>
+        <p class="message" hidden></p>
+      </div>
+
+      <h2 class="rubrique-admin">Envoi</h2>
+      <div class="panneau" id="panneauEnvoi">
+        <div class="ligne"><label><input type="radio" name="mode" value="clic" form="formAnnonce" checked> au prochain clic sur « Informer les groupes FB »</label></div>
+        <div class="ligne">
+          <label><input type="radio" name="mode" value="date" form="formAnnonce"> programmé le</label>
+          <input type="date" name="date" form="formAnnonce" aria-label="Date d’envoi">
+          <label>à <input type="time" name="heure" step="300" form="formAnnonce"></label>
+        </div>
+        <div class="ligne">
+          <label><input type="checkbox" name="repeter" form="formAnnonce"> Répéter tous les</label>
+          <input type="number" class="nb" name="repeter_n" min="1" max="365" value="1" form="formAnnonce" aria-label="Intervalle">
+          <select name="repeter_unite" form="formAnnonce" aria-label="Unité">
+            <option value="jours">jours</option>
+            <option value="semaines" selected>semaines</option>
+            <option value="mois">mois</option>
+          </select>
+          <label><input type="number" class="nb" name="repeter_fois" min="2" max="100" value="2" form="formAnnonce"> fois</label>
+        </div>
+        <p class="etat-annonce" id="etatAnnonce"></p>
+        <p class="message" hidden></p>
+        <div class="boutons"><span></span><button class="bouton" form="formAnnonce">Enregistrer</button></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../scripts/annonces-fb.js"></script>
+</Base>

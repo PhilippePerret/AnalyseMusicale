@@ -109,3 +109,32 @@ h2.rubrique-admin { color: var(--principal); font-size: 1.2em; text-transform: u
   .admin .panneau .une-ligne { padding-left: 0; }
   table.adresses td.origine { white-space: normal; }
 }
+
+/* Page /admin/annonces/ : annonce Facebook */
+.annonces-fb .panneau p.texte-seul { margin: 0; padding-left: 10.3em; color: #777; font-size: 0.9em; font-style: italic; }
+.annonces-fb table.groupes { width: 100%; border-collapse: collapse; }
+.annonces-fb table.groupes th { text-align: left; font-weight: 700; color: var(--principal); border-bottom: 2px solid var(--principal); padding: 0.2em 0.5em; }
+.annonces-fb table.groupes td { border-bottom: 1px solid #e2e2e2; padding: 0.3em 0.5em; vertical-align: middle; background: #fff; }
+.annonces-fb table.groupes .case { width: 1.8em; }
+.annonces-fb table.groupes a.url { font-size: 0.8em; color: #777; overflow-wrap: anywhere; }
+.annonces-fb table.groupes td.etat { white-space: nowrap; }
+.annonces-fb table.groupes td.suppr { text-align: right; width: 1%; white-space: nowrap; }
+.annonces-fb table.groupes td.vide { color: #999; font-style: italic; }
+.annonces-fb .lien-supprimer { border: none; background: none; padding: 0; font: inherit; font-size: 0.85em; color: #a33; cursor: pointer; }
+.annonces-fb .lien-supprimer:hover { text-decoration: underline; }
+.annonces-fb button.confirmer { color: #fff; background: #a33; border-color: #a33; }
+.annonces-fb .pastille { display: inline-block; font-size: 0.85em; padding: 0 0.5em; border-radius: 3px; border: 1px solid; }
+.annonces-fb .pastille.ok { color: var(--principal); border-color: var(--principal); }
+.annonces-fb .pastille.attente { color: #999; border-color: #ccc; }
+.annonces-fb .pastille.ko { color: #a33; border-color: #a33; }
+.annonces-fb .ajout-groupe { display: flex; flex-wrap: wrap; gap: 0.6em 1em; align-items: center; }
+.annonces-fb .ajout-groupe label { display: flex; align-items: center; gap: 0.5em; }
+.annonces-fb .ajout-groupe input[name=nom] { width: 12em; }
+.annonces-fb .ajout-groupe label.url { flex: 1; }
+.annonces-fb .ajout-groupe label.url input { flex: 1; min-width: 12em; }
+.annonces-fb .ligne { display: flex; flex-wrap: wrap; gap: 0.5em; align-items: center; }
+.annonces-fb .ligne label { display: flex; align-items: center; gap: 0.4em; white-space: nowrap; }
+.annonces-fb input.nb { width: 3.5em; }
+.annonces-fb .etat-annonce { color: #777; font-style: italic; margin: 0; }
+.annonces-fb .etat-annonce:empty { display: none; }
+@media (max-width: 600px) { .annonces-fb .panneau p.texte-seul { padding-left: 0; } }

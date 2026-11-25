@@ -4,12 +4,12 @@
 import Base from '../../layouts/Base.astro';
 import '../../styles/admin.css';
 import { getCollection } from 'astro:content';
-import { LIENS_COURS_ADMIN } from '../../lib/site';
+import { LIENS_ADMIN } from '../../lib/site';
 
 // Pages publiques du site (menu « Copier l’adresse d’une page… » de la boîte Inviter) :
 // libellé = titre de la page, valeur = adresse absolue
 const SITE = Astro.site!.href.replace(/\/$/, '');
-const EXCLUES = /^\/(admin|404|contact\/(merci|erreur)|cours\/(admin|student))\/$/;
+const EXCLUES = /^\/(admin(\/annonces)?|404|contact\/(merci|erreur)|cours\/(admin|student))\/$/;
 const pagesAdoc = await getCollection('pages');
 const titreAdoc = (id: string) => pagesAdoc.find((p) => p.id === id)?.data.title;
 const pagesAstro = Object.entries(import.meta.glob('../**/*.astro', { query: '?raw', import: 'default', eager: true }) as Record<string, string>)
@@ -27,7 +27,7 @@ const pagesSite = [...pagesAstro, ...pagesContenu]
   .map((p) => ({ url: SITE + p.chemin, titre: p.titre ?? p.chemin }))
   .sort((x, y) => x.titre.localeCompare(y.titre, 'fr'));
 ---
-<Base title="Adresses" indexer={false} liensAdmin={[...LIENS_COURS_ADMIN]}>
+<Base title="Adresses" indexer={false} liensAdmin={LIENS_ADMIN.filter(([href]) => href !== '/admin/')}>
   <div class="row admin">
     <h1 class="titre-page">Adresses</h1>
 

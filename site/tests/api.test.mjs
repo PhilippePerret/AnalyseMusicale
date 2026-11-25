@@ -600,3 +600,102 @@ test('demande de cours : enregistrée, transmise à l’administrateur seulement
   assert.equal((await admin.post('cours.php', { action: 'demande_cours_supprimer', id: d.id })).ok, true);
   assert.equal((await (await admin.get('/api/cours.php')).json()).demandes.length, 0);
 });
+
+test('annonce Facebook : groupes, programmation, avis, clé du Mac, publications, répétition', { skip }, async () => {
+  const cle = 'c'.repeat(40);
+  writeFileSync(join(tmp, 'annonces-fb.key'), cle);
+  const mac = async (donnees) => {
+    const rep = await fetch(`${base}/api/annonces-fb.php`, donnees
+      ? { method: 'POST', headers: { 'X-Cami-Cle': cle, 'Content-Type': 'application/json' }, body: JSON.stringify(donnees) }
+      : { headers: { 'X-Cami-Cle': cle } });
+    return rep.json();
+  };
+  const taches = (maintenant) => spawnSync('php', ['-d', `sendmail_path=cat >> ${mailFile}`, join(DIST, 'api', '_taches.php')], {
+    env: { ...process.env, CAMI_DB: join(tmp, 'cami.sqlite'), CAMI_MAINTENANT: maintenant }, encoding: 'utf-8',
+  });
+
+  // Accès : administrateur ou clé du Mac
+  assert.equal((await client().get('/api/annonces-fb.php')).status, 403);
+  assert.equal((await fetch(`${base}/api/annonces-fb.php`, { headers: { 'X-Cami-Cle': 'x'.repeat(40) } })).status, 403);
+  const admin = await adminConnecte();
+
+  // Groupes : nom et URL requis, URL normalisée, pas de doublon
+  assert.equal((await admin.post('annonces-fb.php', { action: 'ajouter', nom: '', url: 'https://www.facebook.com/groups/abc' })).erreur, 'nom');
+  assert.equal((await admin.post('annonces-fb.php', { action: 'ajouter', nom: 'X', url: 'https://example.com/groups/abc' })).erreur, 'url');
+  let r = await admin.post('annonces-fb.php', { action: 'ajouter', nom: 'Musiciens', url: 'facebook.com/groups/musiciens?ref=share' });
+  assert.equal(r.groupes[0].url, 'https://www.facebook.com/groups/musiciens/');
+  assert.equal(r.groupes[0].etat, 'a_verifier');
+  assert.equal((await admin.post('annonces-fb.php', { action: 'ajouter', nom: 'Bis', url: 'https://m.facebook.com/groups/musiciens/' })).erreur, 'existe');
+  r = await admin.post('annonces-fb.php', { action: 'ajouter', nom: 'Harmonie', url: 'https://www.facebook.com/groups/harmonie' });
+  const [harmonie, musiciens] = r.groupes;
+
+  // Rien de dû : le Mac n'a que des vérifications
+  let t = await mac();
+  assert.equal(t.publier.length, 0);
+  assert.equal(t.verifier.length, 2);
+  assert.equal((await mac({ groupe: harmonie.id, verification: 'existant' })).ok, true);
+  assert.equal((await mac({ groupe: musiciens.id, verification: 'existant' })).ok, true);
+
+  // Programmation : texte requis, date future, répétition valide
+  const annonce = { action: 'enregistrer', texte: 'Jeudi : Bach.\nhttps://www.analyse-musicale.fr/', mode: 'date', programmee_le: '2099-01-05 10:00', repeter: true, repeter_n: 1, repeter_unite: 'semaines', repeter_fois: 2 };
+  assert.equal((await admin.post('annonces-fb.php', { ...annonce, texte: ' ' })).erreur, 'texte');
+  assert.equal((await admin.post('annonces-fb.php', { ...annonce, programmee_le: '2000-01-01 10:00' })).erreur, 'passe');
+  assert.equal((await admin.post('annonces-fb.php', { ...annonce, repeter_fois: 1 })).erreur, 'repetition');
+  r = await admin.post('annonces-fb.php', annonce);
+  assert.equal(r.annonce.echeance, '2099-01-05 10:00');
+  assert.equal((await mac()).a_faire, 0);
+
+  // Échéance arrivée : un seul mail d'avis
+  let avant = readFileSync(mailFile, 'utf-8').length;
+  taches('2099-01-05 09:55');
+  assert.doesNotMatch(readFileSync(mailFile, 'utf-8').slice(avant), /Annonce Facebook/);
+  taches('2099-01-05 10:00');
+  taches('2099-01-05 10:05');
+  const avis = readFileSync(mailFile, 'utf-8').slice(avant).match(/To: philippe\.perret@analyse-musicale\.fr[^]*?SuperBoard/g);
+  assert.equal(avis.length, 1);
+  assert.match(avis[0], /Vous devez envoyer le message aux groupes Facebook\. Bouton "Informer les groupes FB" sur SuperBoard/);
+});
+
+test('annonce Facebook : au prochain clic, publications, échec retenté, répétition', { skip }, async () => {
+  const cle = 'c'.repeat(40);
+  const mac = async (donnees) => (await fetch(`${base}/api/annonces-fb.php`, donnees
+    ? { method: 'POST', headers: { 'X-Cami-Cle': cle, 'Content-Type': 'application/json' }, body: JSON.stringify(donnees) }
+    : { headers: { 'X-Cami-Cle': cle } })).json();
+  const admin = await adminConnecte();
+  let r = await (await admin.get('/api/annonces-fb.php')).json();
+  const [harmonie, musiciens] = r.groupes;
+
+  r = await admin.post('annonces-fb.php', { action: 'enregistrer', texte: 'Annonce', mode: 'clic', repeter: true, repeter_n: 2, repeter_unite: 'jours', repeter_fois: 2 });
+  const echeance = r.annonce.echeance;
+  assert.ok(echeance);
+  let t = await mac();
+  assert.equal(t.texte, 'Annonce');
+  assert.deepEqual(t.publier.map((g) => g.id).sort(), [harmonie.id, musiciens.id].sort());
+
+  // Échec : retenté au clic suivant, signalé sur la page
+  await mac({ groupe: harmonie.id, publication: 'ok' });
+  await mac({ groupe: musiciens.id, publication: 'echec', detail: 'bouton Publier absent' });
+  t = await mac();
+  assert.deepEqual(t.publier.map((g) => g.id), [musiciens.id]);
+  r = await (await admin.get('/api/annonces-fb.php')).json();
+  assert.equal(r.echecs[0].detail, 'bouton Publier absent');
+
+  // Tout publié : échéance suivante (2 jours plus tard), envoi 2 sur 2
+  await mac({ groupe: musiciens.id, publication: 'ok' });
+  r = await (await admin.get('/api/annonces-fb.php')).json();
+  const suivante = new Date(`${echeance.replace(' ', 'T')}:00`);
+  suivante.setDate(suivante.getDate() + 2);
+  assert.equal(r.annonce.echeance.slice(0, 10), suivante.toLocaleDateString('sv'));
+  assert.equal(Number(r.annonce.numero), 2);
+  assert.equal(Number(r.annonce.dernier_envoi_groupes), 2);
+  assert.equal((await mac()).a_faire, 0);
+
+  // Texte seul modifié : cycle conservé ; groupe décoché : hors envoi ; suppression
+  r = await admin.post('annonces-fb.php', { action: 'enregistrer', texte: 'Annonce corrigée', mode: 'clic', repeter: true, repeter_n: 2, repeter_unite: 'jours', repeter_fois: 2 });
+  assert.equal(Number(r.annonce.numero), 2);
+  r = await admin.post('annonces-fb.php', { action: 'cocher', id: harmonie.id, coche: false });
+  assert.equal(Number(r.groupes.find((g) => g.id === harmonie.id).coche), 0);
+  r = await admin.post('annonces-fb.php', { action: 'supprimer', id: harmonie.id });
+  assert.equal(r.groupes.length, 1);
+  assert.equal((await mac({ groupe: harmonie.id, verification: 'existant' })).ok, false);
+});

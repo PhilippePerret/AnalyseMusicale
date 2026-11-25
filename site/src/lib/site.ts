@@ -42,3 +42,10 @@ export const LIENS_COURS_ADMIN = [
   ['/cours/student/', 'Calendrier des cours'],
   ['/cours/admin/', 'Gestion des élèves'],
 ] as const;
+
+// Liens des pages d'administration (en haut à droite)
+export const LIENS_ADMIN: [string, string][] = [
+  ['/admin/', 'Adresses'],
+  ['/admin/annonces/', 'Annonce Facebook'],
+  ...LIENS_COURS_ADMIN,
+];

@@ -7,12 +7,14 @@ require_once __DIR__ . '/_cami.php';
 require_once __DIR__ . '/_invitations.php';
 require_once __DIR__ . '/_alertes.php';
 require_once __DIR__ . '/_cours.php';
+require_once __DIR__ . '/_annonces_fb.php';
 
 // nom => fonction renvoyant le nombre d'éléments traités
 const TACHES = [
   'invitations programmées' => 'envoyer_invitations_dues',
   'alertes des directs' => 'envoyer_alertes_directs',
   'rappels des cours' => 'envoyer_rappels_cours',
+  'avis d’annonce Facebook' => 'aviser_annonce_fb',
 ];
 
 foreach (TACHES as $nom => $tache) {
