@@ -750,3 +750,14 @@ test('annonce Facebook : au prochain clic, publications, échec retenté, répé
   assert.equal(r.groupes.length, 1);
   assert.equal((await mac({ groupe: harmonie.id, verification: 'existant' })).ok, false);
 });
+
+test('migration : le texte de l’ancien champ « Travail effectué » des cours devient leur « Programme »', { skip }, () => {
+  const fichier = join(mkdtempSync(join(tmpdir(), 'cami-migr-')), 'cami.sqlite');
+  const php = (code) => spawnSync('php', ['-r', code], { env: { ...process.env, CAMI_DB: fichier }, encoding: 'utf-8' });
+  // Base à l'ancienne : table cours sans colonne programme, user_version 0
+  let r = php(`$p = new PDO('sqlite:${fichier}'); $p->exec("CREATE TABLE cours (id INTEGER PRIMARY KEY, groupe_id INTEGER NOT NULL, debut TEXT, duree INTEGER NOT NULL, statut TEXT NOT NULL, lieu TEXT NOT NULL DEFAULT '', oeuvres TEXT NOT NULL DEFAULT '', travail TEXT NOT NULL DEFAULT '', raison TEXT NOT NULL DEFAULT '', serie TEXT, cree_le TEXT NOT NULL)"); $p->exec("INSERT INTO cours (groupe_id, debut, duree, statut, travail, cree_le) VALUES (1, '2026-12-01 10:00', 60, 'place', 'Mon programme', '2026-11-25')");`);
+  assert.equal(r.status, 0, r.stderr);
+  r = php(`require '${join(DIST, 'api', '_cami.php')}'; echo json_encode(db()->query('SELECT programme, travail FROM cours')->fetch(PDO::FETCH_ASSOC));`);
+  assert.equal(r.status, 0, r.stderr);
+  assert.deepEqual(JSON.parse(r.stdout.trim().split('\n').pop()), { programme: 'Mon programme', travail: '' });
+});

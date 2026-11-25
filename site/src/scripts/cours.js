@@ -444,8 +444,8 @@ function afficherCours(id) {
     c.debut ? `<div>Durée : ${duree(c.duree)}</div>` : '',
     c.lieu ? `<div>Lieu : ${lien(c.lieu)}</div>` : '',
     c.oeuvres ? `<div>Œuvre(s) : <strong>${esc(c.oeuvres)}</strong></div>` : '',
-    c.programme ? `<div class="travail"><div class="titre">Programme</div>${esc(c.programme)}</div>` : '',
-    c.travail ? `<div class="travail"><div class="titre">Travail effectué</div>${esc(c.travail)}</div>` : '',
+    `<div class="travail"><div class="titre">Programme</div>${c.programme ? esc(c.programme) : '<span class="vide">—</span>'}</div>`,
+    `<div class="travail"><div class="titre">Travail effectué</div>${c.travail ? esc(c.travail) : `<span class="vide">${coursPasse(c) ? '—' : 'après le cours'}</span>`}</div>`,
   ].join('');
   let actions = '';
   if (admin() && c.statut === 'demande') {

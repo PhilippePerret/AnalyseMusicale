@@ -210,6 +210,11 @@ function migrer(PDO $pdo): void {
       if (!in_array($colonne, $colonnes, true)) $pdo->exec("ALTER TABLE $table ADD COLUMN $colonne $definition");
     }
   }
+  // Version 1 : le texte saisi dans l'ancien champ « Travail effectué » des cours devient leur « Programme »
+  if ((int) $pdo->query('PRAGMA user_version')->fetchColumn() < 1) {
+    $pdo->exec("UPDATE cours SET programme = travail, travail = '' WHERE programme = '' AND travail != ''");
+    $pdo->exec('PRAGMA user_version = 1');
+  }
 }
 
 // --- Session (fichiers dans le dossier des données, 90 jours) ---
