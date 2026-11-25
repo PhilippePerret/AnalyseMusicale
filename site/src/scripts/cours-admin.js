@@ -265,11 +265,17 @@ function ouvrirGroupe(g) {
   $('ligneNomGroupe').hidden = !!g.solo;
   $('ligneLieuGroupe').hidden = !g.id;   // création : lieu ajouté ensuite en modifiant le groupe
   $('boutonGroupe').textContent = g.id ? 'Enregistrer' : 'Créer le groupe';
+  // Lieux mémorisés, toujours proposés à droite du lieu habituel
+  $('lieuxGroupe').innerHTML = '<option value="">lieux mémorisés…</option>' + etat.lieux.map((l) => `<option value="${esc(l.valeur)}">${esc(l.nom)}</option>`).join('');
   rendreMembres();
   message(f, '');
   dialogGroupe.showModal();
   (g.solo ? f.elements.lieu : f.elements.nom).focus();
 }
+$('lieuxGroupe').addEventListener('change', (e) => {
+  if (e.target.value) $('formGroupe').elements.lieu.value = e.target.value;
+  e.target.value = '';
+});
 $('membresGroupe').addEventListener('click', (e) => {
   const b = e.target.closest('[data-retirer]');
   if (!b) return;

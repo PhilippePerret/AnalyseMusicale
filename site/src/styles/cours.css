@@ -178,13 +178,15 @@ table.mois a.puce.demande { background: #eaf1f8; color: #2c5178; border: 1px das
 .cours-page .barre-eleves input.filtre { width: 22em; }
 .cours-page #actionEleves { width: 8.2em; }   /* largeur fixe, quel que soit l'item choisi */
 /* Fenêtre « Faire un groupe d'élèves » / « Modifier le groupe » (issue #22), sur le modèle de la fenêtre « Inviter » de /admin/ */
-.cours-page dialog.groupe { width: min(30em, calc(100vw - 2em)); border: none; margin: auto; padding: 0.9em 1.2em; border-top: 4px solid var(--principal); background: #f7f7f7; box-shadow: 0 6px 30px rgba(0,0,0,0.25); }
+.cours-page dialog.groupe { width: 44em; max-width: calc(100vw - 2em); border: none; margin: auto; padding: 0.9em 1.2em; border-top: 4px solid var(--principal); background: #f7f7f7; box-shadow: 0 6px 30px rgba(0,0,0,0.25); }
 .cours-page dialog.groupe:not([open]) { display: none; }
 .cours-page dialog.groupe::backdrop { background: rgba(0,0,0,0.35); }
 .cours-page dialog.groupe form { display: grid; gap: 0.7em; }
 .cours-page dialog.groupe h3 { margin: 0; color: var(--principal); font-size: 1.05em; }
 .cours-page dialog.groupe .en-regard { display: grid; grid-template-columns: 8em 1fr; align-items: center; gap: 0.8em; }
 .cours-page dialog.groupe .membres { color: #555; }
+.cours-page dialog.groupe .champ-lieu { display: flex; gap: 0.6em; align-items: center; }
+.cours-page dialog.groupe .champ-lieu input { flex: 1; min-width: 0; }
 .cours-page dialog.groupe button.retirer { border: none; background: none; color: #a33; cursor: pointer; padding: 0 0.15em; font: inherit; }
 .cours-page dialog.groupe .boutons { display: flex; justify-content: space-between; align-items: center; }
 .cours-page dialog.groupe .boutons .annuler { font-size: 0.8em; }

@@ -72,7 +72,9 @@ import '../../../styles/cours.css';
           <h3 id="titreGroupe">Faire un groupe d’élèves</h3>
           <label class="en-regard" id="ligneNomGroupe">Nom du groupe <input type="text" name="nom" maxlength="80"></label>
           <div class="en-regard"><span>Élèves</span><span class="membres" id="membresGroupe"></span></div>
-          <label class="en-regard" id="ligneLieuGroupe">Lieu habituel <input type="text" name="lieu" maxlength="300" placeholder="lien visio ou adresse"></label>
+          <div class="en-regard" id="ligneLieuGroupe"><label for="lieuGroupe">Lieu habituel</label>
+            <span class="champ-lieu"><input type="text" name="lieu" id="lieuGroupe" maxlength="300" placeholder="lien visio ou adresse">
+              <select class="lieux" id="lieuxGroupe" aria-label="Lieux mémorisés"><option value="">lieux mémorisés…</option></select></span></div>
           <p class="message" hidden></p>
           <div class="boutons">
             <button type="button" class="bouton annuler">Annuler</button>
