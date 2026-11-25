@@ -351,14 +351,17 @@ if ($action === 'cours_enregistrer') {
     $ids[] = (int) db()->lastInsertId();
     armer_rappels(end($ids));
   }
-  if ($a_placer) {
+  // Case « Informer l'élève de ce cours » (cochée par défaut) : mail avec lien vers le cours
+  $informer = !array_key_exists('informer', $e) || !empty($e['informer']);
+  $lien = "\nPour en prendre connaissance :\n" . SITE . '/cours/student/?cours=' . $ids[0] . "\n";
+  if ($informer && $a_placer) {
     mail_groupe($gid, 'CAMI • Un cours vous est accordé', "Un cours d’analyse de " . heure_fr(hhmm($duree)) . " vous est accordé.\n\n"
-      . "Vous pouvez dès maintenant le placer sur un créneau libre de votre calendrier de cours :\n" . SITE . "/cours/student/\n");
-  } elseif (count($debuts) > 1) {
+      . "Vous pouvez dès maintenant le placer sur un créneau libre de votre calendrier de cours :\n" . SITE . '/cours/student/?cours=' . $ids[0] . "\n");
+  } elseif ($informer && count($debuts) > 1) {
     mail_groupe($gid, 'CAMI • Vos prochains cours', "Vos prochains cours d’analyse sont fixés :\n\n"
-      . implode("\n", array_map(function ($d) use ($duree) { return '- ' . quand_fr($d, $duree); }, $debuts)) . "\n" . lieu_fr($lieu));
-  } else {
-    mail_groupe($gid, 'CAMI • Nouveau cours', 'Votre prochain cours d’analyse est fixé le ' . quand_fr($debut, $duree) . ".\n" . lieu_fr($lieu));
+      . implode("\n", array_map(function ($d) use ($duree) { return '- ' . quand_fr($d, $duree); }, $debuts)) . "\n" . lieu_fr($lieu) . $lien);
+  } elseif ($informer) {
+    mail_groupe($gid, 'CAMI • Nouveau cours', 'Votre prochain cours d’analyse est fixé le ' . quand_fr($debut, $duree) . ".\n" . lieu_fr($lieu) . $lien);
   }
   repondre(['ok' => true, 'id' => $ids[0], 'nombre' => count($ids)]);
 }

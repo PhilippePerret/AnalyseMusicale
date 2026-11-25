@@ -14,6 +14,7 @@ let vue = 'semaine';
 let ref = new Date();        // jour de référence de la période affichée
 let filtreGroupe = '';       // administrateur : groupe affiché ('' : tous)
 let choisi = null;           // id du cours affiché dans la fiche
+let coursDemande = Number(new URLSearchParams(location.search).get('cours')) || 0;
 let message = '';
 
 const $ = (id) => document.getElementById(id);
@@ -104,6 +105,12 @@ async function charger() {
     return;
   }
   etat = r;
+  // Lien du mail « Informer l'élève » : /cours/student/?cours=ID ouvre la fiche du cours (une fois)
+  if (coursDemande) {
+    const c = etat.cours.find((x) => x.id === coursDemande);
+    if (c) { choisi = c.id; if (c.debut) ref = dateDe(c.debut.slice(0, 10)); }
+    coursDemande = 0;
+  }
   $('contenu').hidden = false;
   rendreTout();
 }
@@ -490,7 +497,8 @@ function formCours(c, preset = {}) {
       <label class="en-ligne large haut">Travail effectué <textarea name="travail" rows="4" maxlength="5000">${esc(v.travail)}</textarea></label>
       <div class="boutons">
         <button type="button" class="bouton annuler" data-action="annuler">Annuler</button>
-        <button class="bouton">Enregistrer</button>
+        <span class="envoi">${nouveau ? '<label class="case"><input type="checkbox" name="informer" checked> Informer l’élève de ce cours</label>' : ''}
+          <button class="bouton">Enregistrer</button></span>
       </div>
     </form>
     ${nouveau ? '' : '<div class="zone-suppression" id="zoneSuppr"><button type="button" class="supprimer" data-action="demander-suppression">Supprimer ce cours…</button></div>'}`);
@@ -502,6 +510,7 @@ async function enregistrerCours(form) {
     action: 'cours_enregistrer', id: choisi || 0, groupe: Number(f.groupe), duree: Number(f.duree),
     a_placer: !!f.a_placer, debut: `${f.jour} ${f.heure}`, lieu: f.lieu, oeuvres: f.oeuvres, travail: f.travail,
   };
+  if (form.elements.informer) donnees.informer = form.elements.informer.checked;
   if (f.regulier) donnees.recurrence = { frequence: Number(f.frequence), unite: f.unite, jusqu_au: f.jusqu_au };
   const r = await api(donnees);
   if (!r.ok) return erreurForm(form, r.erreur);

@@ -471,6 +471,18 @@ test('cours : élèves, disponibilités, placement, demandes, rendez-vous régul
   assert.deepEqual(e.occupes, [{ debut: `${J} 15:00`, duree: 60 }]);
   assert.equal(JSON.stringify(e).includes('Secret'), false);
 
+  // Case « Informer l'élève de ce cours » : cochée → mail avec lien vers le cours ; décochée → aucun mail
+  let avantMail = readFileSync(mailFile, 'utf-8').length;
+  r = await admin.post('cours.php', { action: 'cours_enregistrer', groupe: gid, debut: `${J} 09:00`, duree: 30, informer: true });
+  assert.equal(r.ok, true);
+  assert.match(readFileSync(mailFile, 'utf-8').slice(avantMail), new RegExp(`cours/student/\\?cours=${r.id}`));
+  assert.equal((await admin.post('cours.php', { action: 'cours_supprimer', id: r.id })).ok, true);
+  avantMail = readFileSync(mailFile, 'utf-8').length;
+  r = await admin.post('cours.php', { action: 'cours_enregistrer', groupe: gid, debut: `${J} 09:00`, duree: 30, informer: false });
+  assert.equal(r.ok, true);
+  assert.equal(readFileSync(mailFile, 'utf-8').slice(avantMail).includes('Nouveau cours'), false);
+  assert.equal((await admin.post('cours.php', { action: 'cours_supprimer', id: r.id })).ok, true);
+
   // Cours accordé (à placer par l'élève)
   r = await admin.post('cours.php', { action: 'cours_enregistrer', groupe: gid, a_placer: true, duree: 60 });
   assert.equal(r.ok, true);

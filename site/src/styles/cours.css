@@ -115,6 +115,7 @@ table.mois a.puce.demande { background: #eaf1f8; color: #2c5178; border: 1px das
 .cours-page form.edition .titre-rang { font-weight: 700; color: var(--principal); }
 .cours-page form.edition .boutons { display: flex; gap: 1.2em; align-items: center; justify-content: space-between; margin-top: 0.3em; }
 .cours-page form.edition button.annuler { font-size: 0.8em; }
+.cours-page form.edition .boutons .envoi { display: inline-flex; align-items: center; gap: 1em; }
 .cours-page button.retirer { border: none; background: none; font-size: 1.3em; line-height: 1; color: #a33; cursor: pointer; padding: 0 0.2em; }
 
 /* Suppression / annulation / refus : à l'écart, avec confirmation */
@@ -143,7 +144,7 @@ table.mois a.puce.demande { background: #eaf1f8; color: #2c5178; border: 1px das
 .cours-page form.ligne .bouton { margin-left: auto; }
 .cours-page form.ligne .message { flex-basis: 100%; margin: 0; }
 /* Liste des élèves (issue #20) : filtre, onglets actifs/inactifs/tous, cases, menu Action */
-.cours-page .liste-eleves input[type=checkbox], .cours-page .liste-eleves input[type=radio] { width: 1.35em; height: 1.35em; accent-color: var(--principal); }
+.cours-page input[type=checkbox] { width: 1.35em; height: 1.35em; accent-color: var(--principal); }   /* cases de toutes les pages des cours */
 .cours-page .barre-eleves { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5em 1em; margin: 0.4em 0 0.5em; }
 .cours-page .barre-eleves label.case { display: inline-flex; align-items: center; gap: 0.4em; }
 .cours-page .barre-eleves .compte { color: #777; min-width: 5.5em; }
