@@ -142,6 +142,35 @@ table.mois a.puce.demande { background: #eaf1f8; color: #2c5178; border: 1px das
 .cours-page form.ligne label { display: inline-flex; align-items: center; gap: 0.4em; }
 .cours-page form.ligne .bouton { margin-left: auto; }
 .cours-page form.ligne .message { flex-basis: 100%; margin: 0; }
+/* Liste des élèves (issue #20) : filtre, onglets actifs/inactifs/tous, cases, menu Action */
+.cours-page .liste-eleves input[type=checkbox], .cours-page .liste-eleves input[type=radio] { width: 1.35em; height: 1.35em; accent-color: var(--principal); }
+.cours-page .barre-eleves { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5em 1em; margin: 0.4em 0 0.5em; }
+.cours-page .barre-eleves label.case { display: inline-flex; align-items: center; gap: 0.4em; }
+.cours-page .barre-eleves .compte { color: #777; min-width: 5.5em; }
+.cours-page .barre-eleves .message { flex-basis: 100%; margin: 0; }
+.cours-page .onglets { display: inline-flex; border: 1px solid #aaa; border-radius: 4px; overflow: hidden; }
+.cours-page .onglets label { padding: 0.2em 0.9em; cursor: pointer; }
+.cours-page .onglets label + label { border-left: 1px solid #aaa; }
+.cours-page .onglets input { display: none; }
+.cours-page .onglets label:has(input:checked) { background: var(--principal); color: #fff; }
+.cours-page .onglets label:hover:not(:has(input:checked)) { color: var(--survol); }
+.cours-page ul.eleves { list-style: none; padding: 0; margin: 0; border-top: 2px solid var(--principal); }
+.cours-page ul.eleves li { display: grid; grid-template-columns: 1.8em 10em 1fr 5em 5.5em; align-items: center; gap: 0.5em; padding: 0.3em; border-bottom: 1px solid #e2e2e2; }
+.cours-page ul.eleves li:hover { background: #f7f9fb; }
+.cours-page ul.eleves li.inactif { color: #999; }
+.cours-page ul.eleves li.nouveau { background: #fff3c4; }
+.cours-page ul.eleves li.vide { display: block; }
+.cours-page ul.eleves .email { overflow-wrap: anywhere; }
+.cours-page ul.eleves .genre { color: #666; font-size: 0.92em; }
+.cours-page ul.eleves mark { background: #fff0a8; color: inherit; }
+.cours-page .statut { display: inline-block; text-align: center; width: 4.8em; padding: 0.2em 0 0.12em; line-height: 1.2; border: 1px solid currentColor; border-radius: 1em; font-size: 0.88em; }
+.cours-page .statut.actif { color: var(--principal); }
+.cours-page .statut.inactif { color: #999; }
+.cours-page h3.sous-rubrique { color: var(--principal); font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.06em; margin: 1.6em 0 0.2em; border-bottom: 1px solid #ddd; }
+.cours-page form.ligne.simple { background: none; border: none; padding: 0.3em 0; }
+.cours-page form.ligne.simple .envoi { display: inline-flex; align-items: center; gap: 1em; margin-left: auto; }
+.cours-page form.ligne.simple .envoi .bouton { margin-left: 0; }
+.cours-page .barre-eleves input.filtre { width: 17em; }
 .cours-page .eleves-groupe { display: flex; flex-wrap: wrap; gap: 0.2em 1em; }
 
 /* Disponibilités : une ligne par jour, créneaux en regard */

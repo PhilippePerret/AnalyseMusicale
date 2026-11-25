@@ -21,20 +21,42 @@ import '../../../styles/cours.css';
       </table>
 
       <h2 class="rubrique">Élèves</h2>
-      <table class="liste">
-        <thead><tr><th>Élève</th><th>Adresse</th><th>Depuis le</th><th></th></tr></thead>
-        <tbody id="eleves"></tbody>
-      </table>
-      <form class="ligne" id="formEleve">
-        <label>Adresse e-mail <input type="email" name="email" required maxlength="200" size="20"></label>
-        <label>Pseudo <input type="text" name="pseudo" maxlength="60" size="12"></label>
-        <label>S’adresser à
-          <select name="genre"><option value="F">une femme</option><option value="H">un homme</option><option value="N" selected>non précisé</option></select>
-        </label>
-        <label class="case"><input type="checkbox" name="bienvenue" checked> Envoyer le mail de bienvenue</label>
-        <button class="bouton">Inscrire comme élève</button>
-        <p class="message" hidden></p>
-      </form>
+      <div class="liste-eleves">
+        <div class="barre-eleves">
+          <input type="search" id="filtreEleves" placeholder="Filtrer (mail, pseudo, genre…)" class="filtre" autocomplete="off">
+          <span class="onglets" id="ongletsEleves">
+            <label><input type="radio" name="statut" value="actif" checked>actifs</label><label><input type="radio" name="statut" value="inactif">inactifs</label><label><input type="radio" name="statut" value="">tous</label>
+          </span>
+        </div>
+        <ul class="eleves" id="eleves"></ul>
+        <div class="barre-eleves" id="actionsEleves">
+          <label class="case"><input type="checkbox" id="toutCocher"> tout cocher</label>
+          <span class="compte" id="nbCoches"></span>
+          <select id="actionEleves">
+            <option value="">Action…</option><option value="modifier">Modifier</option><option value="contacter">Contacter</option>
+            <option value="inactif">Rendre inactif</option><option value="actif">Rendre actif</option><option value="supprimer">Supprimer…</option>
+          </select>
+          <button type="button" class="bouton" id="appliquerEleves">Appliquer</button>
+          <button type="button" class="confirmer" id="confirmerSuppression" hidden>Confirmer la suppression</button>
+          <p class="message" hidden></p>
+        </div>
+
+        <h3 class="sous-rubrique" id="titreFormEleve">Nouvel élève</h3>
+        <form class="ligne simple" id="formEleve">
+          <input type="hidden" name="id" value="0">
+          <label>Adresse e-mail <input type="email" name="email" required maxlength="200" size="20"></label>
+          <label>Pseudo <input type="text" name="pseudo" maxlength="60" size="12"></label>
+          <label>Lui parler en tant que
+            <select name="genre"><option value="F">une femme</option><option value="H">un homme</option><option value="N" selected>non précisé</option></select>
+          </label>
+          <span class="envoi">
+            <label class="case" id="caseBienvenue"><input type="checkbox" name="bienvenue" checked> Envoyer le mail de bienvenue</label>
+            <button type="button" class="bouton annuler" id="annulerEleve" hidden>Annuler</button>
+            <button class="bouton" id="boutonEleve">Inscrire comme élève</button>
+          </span>
+          <p class="message" hidden></p>
+        </form>
+      </div>
 
       <h2 class="rubrique">Groupes</h2>
       <table class="liste">

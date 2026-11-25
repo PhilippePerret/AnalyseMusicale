@@ -1,4 +1,4 @@
-// Gestion des cours (page /cours/admin/, issue #13) : demandes de cours, élèves, groupes, lieux mémorisés.
+// Gestion des cours (page /cours/admin/, issue #13) : demandes de cours, élèves (liste issue #20), groupes, lieux mémorisés.
 // Données et actions : /api/cours.php (administrateur).
 
 const JOURS = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
@@ -13,6 +13,7 @@ let etat = null;
 const ERREURS = {
   email: 'Adresse e-mail invalide.',
   existe: 'Cette personne est déjà élève.',
+  email_pris: 'Cette adresse appartient déjà à un autre compte.',
   nom: 'Le nom du groupe est obligatoire.',
   eleves: 'Choisir au moins un élève.',
   lieu: 'Nom et lien (ou adresse) obligatoires.',
@@ -67,26 +68,152 @@ function rendreDemandes() {
   }).join('') || '<tr><td colspan="5" class="vide">Aucune demande pour le moment.</td></tr>';
 }
 
-// --- Élèves ---
+// --- Élèves (issue #20) : liste filtrable, cases à cocher, menu Action ---
+
+const GENRES = { F: 'femme', H: 'homme', N: '—' };
+const coches = new Set();   // ids des élèves cochés (conservés d'un rendu à l'autre)
+let nouvelEleve = 0;        // id de l'élève qui vient d'être inscrit (mis en évidence)
+
+// Filtre « fuzzy » : les caractères saisis apparaissent dans l'ordre
+function positions(texte, q) {
+  const t = texte.toLowerCase();
+  const pos = [];
+  let i = 0;
+  for (const c of q.toLowerCase().replace(/\s+/g, '')) {
+    i = t.indexOf(c, i);
+    if (i < 0) return null;
+    pos.push(i++);
+  }
+  return pos;
+}
+function surligner(texte, q) {
+  const pos = q ? positions(texte, q) : null;
+  if (!pos) return esc(texte);
+  return [...texte].map((c, k) => pos.includes(k) ? `<mark>${esc(c)}</mark>` : esc(c)).join('');
+}
+const texteEleve = (e) => `${e.pseudo} ${e.email} ${GENRES[e.genre] || ''} ${e.actif ? 'actif' : 'inactif'}`;
+
+function elevesVisibles() {
+  const q = $('filtreEleves').value.trim();
+  const statut = document.querySelector('#ongletsEleves input:checked').value;
+  return etat.eleves.filter((e) => (!statut || (statut === 'actif') === e.actif) && (!q || positions(texteEleve(e), q)));
+}
 
 function rendreEleves() {
-  $('eleves').innerHTML = etat.eleves.map((e) => `<tr>
-    <td>${esc(e.pseudo || '—')}</td><td class="email">${esc(e.email)}</td><td>${date(e.cree_le)}</td>
-    <td class="action">${supprimer('eleve', e.id, 'Retirer des élèves')}</td></tr>`).join('')
-    || '<tr><td colspan="4" class="vide">Aucun élève pour le moment.</td></tr>';
+  const ids = new Set(etat.eleves.map((e) => e.id));
+  [...coches].forEach((id) => { if (!ids.has(id)) coches.delete(id); });
+  const q = $('filtreEleves').value.trim();
+  const liste = elevesVisibles();
+  $('eleves').innerHTML = liste.map((e) => `<li class="${e.actif ? '' : 'inactif'}${e.id === nouvelEleve ? ' nouveau' : ''}">
+    <input type="checkbox" class="coche" value="${e.id}"${coches.has(e.id) ? ' checked' : ''}>
+    <span>${surligner(e.pseudo || '—', q)}</span><span class="email">${surligner(e.email, q)}</span>
+    <span class="genre">${GENRES[e.genre] || '—'}</span>
+    <span class="statut ${e.actif ? 'actif' : 'inactif'}">${e.actif ? 'actif' : 'inactif'}</span></li>`).join('')
+    || `<li class="vide">${etat.eleves.length ? 'Aucun élève ne correspond.' : 'Aucun élève pour le moment.'}</li>`;
+  majCoches();
   $('elevesGroupe').innerHTML = etat.eleves.map((e) => `<label><input type="checkbox" name="eleves" value="${e.id}"> ${esc(e.pseudo || e.email)}</label>`).join('');
 }
+
+function majCoches() {
+  const n = coches.size;
+  $('nbCoches').textContent = n ? `${n} coché${n > 1 ? 's' : ''}` : '';
+  const visibles = [...$('eleves').querySelectorAll('.coche')];
+  $('toutCocher').checked = visibles.length > 0 && visibles.every((c) => c.checked);
+  $('confirmerSuppression').hidden = true;
+}
+
+$('filtreEleves').addEventListener('input', rendreEleves);
+$('ongletsEleves').addEventListener('change', rendreEleves);
+$('eleves').addEventListener('change', (e) => {
+  if (!e.target.classList.contains('coche')) return;
+  const id = Number(e.target.value);
+  if (e.target.checked) coches.add(id); else coches.delete(id);
+  majCoches();
+});
+$('toutCocher').addEventListener('change', (e) => {
+  $('eleves').querySelectorAll('.coche').forEach((c) => {
+    c.checked = e.target.checked;
+    if (c.checked) coches.add(Number(c.value)); else coches.delete(Number(c.value));
+  });
+  majCoches();
+});
+
+// Formulaire : nouvel élève, ou modification de l'élève choisi par « Modifier »
+function editerEleve(el) {
+  const f = $('formEleve');
+  f.reset();
+  f.elements.id.value = el ? el.id : 0;
+  if (el) {
+    f.elements.email.value = el.email;
+    f.elements.pseudo.value = el.pseudo;
+    f.elements.genre.value = el.genre || 'N';
+  }
+  $('titreFormEleve').textContent = el ? 'Modifier l’élève' : 'Nouvel élève';
+  $('caseBienvenue').hidden = !!el;
+  $('annulerEleve').hidden = !el;
+  $('boutonEleve').textContent = el ? 'Enregistrer' : 'Inscrire comme élève';
+  message(f, '');
+  if (el) f.elements.email.focus();
+}
+$('annulerEleve').addEventListener('click', () => editerEleve(null));
 
 $('formEleve').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = Object.fromEntries(new FormData(e.target));
+  const id = Number(f.id);
+  if (id) {
+    const r = await api({ action: 'eleve_modifier', id, email: f.email, pseudo: f.pseudo, genre: f.genre });
+    if (!r.ok) return message(e.target, ERREURS[r.erreur] || 'Enregistrement impossible.');
+    editerEleve(null);
+    await charger();
+    return message(e.target, 'Élève modifié.', true);
+  }
   f.bienvenue = e.target.elements.bienvenue.checked;
   const r = await api({ action: 'eleve_ajouter', ...f });
   if (!r.ok) return message(e.target, ERREURS[r.erreur] || 'Inscription impossible.');
-  e.target.reset();
+  editerEleve(null);
+  // L'élève inscrit apparaît tout de suite dans la liste
+  $('filtreEleves').value = '';
+  document.querySelector('#ongletsEleves input[value=actif]').checked = true;
+  nouvelEleve = r.id;
   await charger();
+  setTimeout(() => { nouvelEleve = 0; $('eleves').querySelector('.nouveau')?.classList.remove('nouveau'); }, 2500);
   message(e.target, `${f.email} est inscrit comme élève${f.bienvenue ? ' : un mail de bienvenue lui est envoyé' : ' (sans mail de bienvenue)'}.`, true);
 });
+
+// Menu « Action » appliqué aux élèves cochés
+const barreActions = $('actionsEleves');
+$('appliquerEleves').addEventListener('click', async () => {
+  const action = $('actionEleves').value;
+  const choisis = etat.eleves.filter((e) => coches.has(e.id));
+  message(barreActions, '');
+  if (!action) return message(barreActions, 'Choisir une action.');
+  if (!choisis.length) return message(barreActions, 'Cocher au moins un élève.');
+  if (action === 'modifier' || action === 'contacter') {
+    if (choisis.length > 1) return message(barreActions, 'Cocher un seul élève pour cette action.');
+    const el = choisis[0];
+    if (action === 'modifier') return editerEleve(el);
+    return window.open(`/contact/?email=${encodeURIComponent(el.email)}&nom=${encodeURIComponent(el.pseudo)}`, '_blank');
+  }
+  if (action === 'supprimer') {
+    $('confirmerSuppression').textContent = `Confirmer la suppression de ${choisis.length > 1 ? `ces ${choisis.length} élèves` : 'cet élève'}`;
+    $('confirmerSuppression').hidden = false;
+    return;
+  }
+  const r = await api({ action: 'eleves_actif', ids: choisis.map((e) => e.id), actif: action === 'actif' });
+  if (!r.ok) return message(barreActions, 'Modification impossible.');
+  coches.clear();
+  await charger();
+  message(barreActions, `${choisis.length > 1 ? `${choisis.length} élèves rendus` : 'Élève rendu'} ${action}${choisis.length > 1 ? 's' : ''}.`, true);
+});
+$('confirmerSuppression').addEventListener('click', async () => {
+  const ids = [...coches];
+  for (const id of ids) await api({ action: 'eleve_retirer', id });
+  coches.clear();
+  await charger();
+  message(barreActions, `${ids.length > 1 ? `${ids.length} élèves supprimés` : 'Élève supprimé'}.`, true);
+});
+$('actionEleves').addEventListener('change', () => { $('confirmerSuppression').hidden = true; });
 
 // --- Groupes ---
 
@@ -162,7 +289,6 @@ $('contenu').addEventListener('click', async (e) => {
   if (!confirmer) return;
   const id = Number(confirmer.dataset.id);
   const actions = {
-    eleve: { action: 'eleve_retirer', id },
     groupe: { action: 'groupe_supprimer', id },
     lieu: { action: 'lieu_supprimer', id },
     demande: { action: 'demande_cours_supprimer', id },

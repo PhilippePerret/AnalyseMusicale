@@ -83,6 +83,10 @@ import { EMAIL, OBJETS_CONTACT } from '../../lib/site';
         var retour = document.getElementById('retourAdmin');
         var dernier = '';   // dernier texte produit par le mail-type (pour savoir si Phil l'a retouché)
         d.types.forEach(function (t) { menu.add(new Option(t.titre, t.id)); });
+        // Destinataire prérempli (?email=…&nom=…, action « Contacter » de la liste des élèves)
+        var params = new URLSearchParams(location.search);
+        if (params.get('email')) form.email.value = params.get('email');
+        if (params.get('nom')) nom.value = params.get('nom');
         function type() { return d.types.filter(function (t) { return t.id === menu.value; })[0]; }
         function produire() {
           var t = type();

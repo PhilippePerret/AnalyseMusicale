@@ -3,13 +3,14 @@
 // GET : état visible par l'élève connecté (ses groupes et leurs cours, créneaux occupés, disponibilités)
 //       ou par l'administrateur (tout).
 // POST JSON {action, …} : actions de l'élève (placer, demander, deplacer, annuler, rappels, definir_mdp)
-//       et de l'administrateur (eleve_ajouter, eleve_retirer, groupe_enregistrer, groupe_supprimer,
+//       et de l'administrateur (eleve_ajouter, eleve_modifier, eleves_actif, eleve_retirer, groupe_enregistrer, groupe_supprimer,
 //       cours_enregistrer, cours_supprimer, demande_repondre, demande_cours_supprimer, dispos_enregistrer, lieu_enregistrer, lieu_supprimer).
 require __DIR__ . '/_cours.php';
 
 $user = user_courant();
 $admin = est_admin($user);
 $student = student_de_user($user);
+if ($student && !$student['actif'] && !$admin) $student = null;   // élève inactif : aucun accès (issue #20)
 
 function erreur(string $code, int $http = 422): void { repondre(['ok' => false, 'erreur' => $code], $http); }
 
@@ -75,8 +76,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   if ($student) $reponse['rappels'] = rappels_student($student);
   if ($admin) {
     $reponse['lieux'] = db()->query('SELECT id, nom, valeur FROM lieux ORDER BY lower(nom)')->fetchAll();
-    $reponse['eleves'] = db()->query("SELECT s.id, u.email, u.pseudo, u.genre, s.cree_le FROM students s JOIN users u ON u.id = s.user_id
-      ORDER BY lower(COALESCE(NULLIF(u.pseudo, ''), u.email))")->fetchAll();
+    $reponse['eleves'] = array_map(function ($e) {
+      return ['id' => (int) $e['id'], 'email' => $e['email'], 'pseudo' => (string) $e['pseudo'], 'genre' => $e['genre'], 'actif' => (bool) $e['actif'], 'cree_le' => $e['cree_le']];
+    }, db()->query("SELECT s.id, u.email, u.pseudo, u.genre, s.actif, s.cree_le FROM students s JOIN users u ON u.id = s.user_id
+      ORDER BY lower(COALESCE(NULLIF(u.pseudo, ''), u.email))")->fetchAll());
     $reponse['demandes'] = array_map('demande_publique', db()->query('SELECT * FROM demandes_cours ORDER BY cree_le DESC')->fetchAll());
     $reponse['connaissances'] = CONNAISSANCES;
     $reponse['niveaux'] = NIVEAUX;
@@ -221,6 +224,30 @@ if ($action === 'eleve_ajouter') {
     brevo_mail($email, 'CAMI • Bienvenue dans les cours d’analyse', g($texte . signature_cours(), $u['genre']), NOTIFICATIONS);
   }
   repondre(['ok' => true, 'id' => $sid]);
+}
+
+if ($action === 'eleve_modifier') {   // adresse, pseudo, genre de l'élève (issue #20)
+  $sid = entier($e['id'] ?? 0);
+  $st = db()->prepare('SELECT user_id FROM students WHERE id = ?');
+  $st->execute([$sid]);
+  $uid = (int) $st->fetchColumn();
+  if (!$uid) erreur('eleve', 404);
+  $email = strtolower(trim((string) ($e['email'] ?? '')));
+  if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 200) erreur('email');
+  $st = db()->prepare('SELECT id FROM users WHERE email = ? AND id <> ?');
+  $st->execute([$email, $uid]);
+  if ($st->fetch()) erreur('email_pris', 409);
+  $genre = in_array($e['genre'] ?? '', ['F', 'H', 'N'], true) ? $e['genre'] : 'N';
+  db()->prepare('UPDATE users SET email = ?, pseudo = ?, genre = ? WHERE id = ?')->execute([$email, texte($e['pseudo'] ?? '', 60), $genre, $uid]);
+  repondre(['ok' => true]);
+}
+
+if ($action === 'eleves_actif') {   // élèves rendus actifs ou inactifs (issue #20)
+  $ids = array_values(array_filter(array_map('intval', (array) ($e['ids'] ?? []))));
+  if (!$ids) erreur('eleves');
+  $st = db()->prepare('UPDATE students SET actif = ? WHERE id = ?');
+  foreach ($ids as $sid) $st->execute([empty($e['actif']) ? 0 : 1, $sid]);
+  repondre(['ok' => true]);
 }
 
 if ($action === 'eleve_retirer') {

@@ -193,6 +193,7 @@ function migrer(PDO $pdo): void {
   $ajouts = [
     'seances' => ['partition' => "TEXT NOT NULL DEFAULT ''"],
     'users' => ['source' => "TEXT NOT NULL DEFAULT 'site'", 'cgu_le' => 'TEXT', 'vu_le' => 'TEXT'],
+    'students' => ['actif' => 'INTEGER NOT NULL DEFAULT 1'],   // 0 : élève inactif, sans accès à /cours/student/ (issue #20)
     'telechargements' => [
       'version' => "TEXT NOT NULL DEFAULT ''",
       'jeton' => 'TEXT',

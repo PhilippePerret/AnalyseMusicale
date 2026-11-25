@@ -541,8 +541,22 @@ test('cours : élèves, disponibilités, placement, demandes, rendez-vous régul
   assert.equal(recus.filter((m) => /de 11 h à 12 h/.test(m)).length, 1);
   assert.equal(recus.filter((m) => /de 16 h à 17 h/.test(m)).length, 1);
 
-  // Élève retiré : son groupe solo et ses cours supprimés
+  // Liste des élèves (issue #20) : actif par défaut, modification, inactif = aucun accès
   const idLea = (await cours(admin)).eleves.find((x) => x.email === 'eleve1@example.com').id;
+  const idMax = (await cours(admin)).eleves.find((x) => x.email === 'eleve2@example.com').id;
+  assert.equal((await cours(admin)).eleves.find((x) => x.id === idLea).actif, true);
+  assert.equal((await admin.post('cours.php', { action: 'eleve_modifier', id: idLea, email: 'eleve2@example.com', pseudo: 'Léa', genre: 'F' })).erreur, 'email_pris');
+  assert.equal((await admin.post('cours.php', { action: 'eleve_modifier', id: idMax, email: 'eleve2@example.com', pseudo: 'Maxime', genre: 'N' })).ok, true);
+  const max = (await cours(admin)).eleves.find((x) => x.id === idMax);
+  assert.equal(max.pseudo, 'Maxime');
+  assert.equal(max.genre, 'N');
+  assert.equal((await admin.post('cours.php', { action: 'eleves_actif', ids: [idLea], actif: false })).ok, true);
+  assert.equal((await cours(admin)).eleves.find((x) => x.id === idLea).actif, false);
+  assert.equal((await cours(eleve)).acces, false);
+  assert.equal((await admin.post('cours.php', { action: 'eleves_actif', ids: [idLea], actif: true })).ok, true);
+  assert.equal((await cours(eleve)).acces, true);
+
+  // Élève retiré : son groupe solo et ses cours supprimés
   assert.equal((await admin.post('cours.php', { action: 'eleve_retirer', id: idLea })).ok, true);
   const apres = await cours(admin);
   assert.equal(apres.groupes.some((g) => g.id === gid), false);
