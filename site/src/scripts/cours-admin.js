@@ -80,11 +80,12 @@ function rendreEleves() {
 $('formEleve').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = Object.fromEntries(new FormData(e.target));
+  f.bienvenue = e.target.elements.bienvenue.checked;
   const r = await api({ action: 'eleve_ajouter', ...f });
   if (!r.ok) return message(e.target, ERREURS[r.erreur] || 'Inscription impossible.');
   e.target.reset();
   await charger();
-  message(e.target, `${f.email} est inscrit comme élève : un mail de bienvenue lui est envoyé.`, true);
+  message(e.target, `${f.email} est inscrit comme élève${f.bienvenue ? ' : un mail de bienvenue lui est envoyé' : ' (sans mail de bienvenue)'}.`, true);
 });
 
 // --- Groupes ---

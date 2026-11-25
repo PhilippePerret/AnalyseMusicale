@@ -444,6 +444,11 @@ test('cours : élèves, disponibilités, placement, demandes, rendez-vous régul
   r = await admin.post('cours.php', { action: 'eleve_ajouter', email: 'Eleve1@example.com', pseudo: 'Léa', genre: 'F' });
   assert.equal(r.ok, true);
   assert.equal((await admin.post('cours.php', { action: 'eleve_ajouter', email: 'eleve1@example.com' })).erreur, 'existe');
+  // Case « Envoyer le mail de bienvenue » décochée : aucun mail (issue #19)
+  r = await admin.post('cours.php', { action: 'eleve_ajouter', email: 'sansmail@example.com', bienvenue: false });
+  assert.equal(r.ok, true);
+  assert.equal(readFileSync(mailFile, 'utf-8').includes('sansmail@example.com'), false);
+  assert.equal((await admin.post('cours.php', { action: 'eleve_retirer', id: r.id })).ok, true);
   const jeton = [...readFileSync(mailFile, 'utf-8').matchAll(/cours\/student\/\?jeton=([0-9a-f]{32})/g)].pop()[1];
   assert.match(readFileSync(mailFile, 'utf-8'), /inscrite comme élève/);
   const eleve = client();

@@ -216,7 +216,10 @@ if ($action === 'eleve_ajouter') {
     ? "Pour accéder à votre calendrier, choisissez d’abord votre mot de passe en cliquant sur ce lien :\n" . SITE . "/cours/student/?jeton=$jeton\n\n"
       . "Votre identifiant est votre adresse e-mail : $email\n"
     : "Identifiez-vous avec votre adresse e-mail ($email) et votre mot de passe habituel du site.\n";
-  brevo_mail($email, 'CAMI • Bienvenue dans les cours d’analyse', g($texte . signature_cours(), $u['genre']), NOTIFICATIONS);
+  // Case « Envoyer le mail de bienvenue » (cochée par défaut, issue #19)
+  if (!array_key_exists('bienvenue', $e) || !empty($e['bienvenue'])) {
+    brevo_mail($email, 'CAMI • Bienvenue dans les cours d’analyse', g($texte . signature_cours(), $u['genre']), NOTIFICATIONS);
+  }
   repondre(['ok' => true, 'id' => $sid]);
 }
 
