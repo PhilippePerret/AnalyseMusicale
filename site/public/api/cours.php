@@ -28,12 +28,15 @@ function groupe_public(array $g, bool $admin): array {
   ];
 }
 
-function cours_public(array $c): array {
-  return [
+// « Travail effectué » : lisible par le professeur SEUL, jamais transmis à l'élève
+function cours_public(array $c, bool $admin): array {
+  $r = [
     'id' => (int) $c['id'], 'groupe' => (int) $c['groupe_id'], 'debut' => $c['debut'], 'duree' => (int) $c['duree'],
-    'statut' => $c['statut'], 'lieu' => $c['lieu'], 'oeuvres' => $c['oeuvres'], 'programme' => $c['programme'], 'travail' => $c['travail'],
+    'statut' => $c['statut'], 'lieu' => $c['lieu'], 'oeuvres' => $c['oeuvres'], 'programme' => $c['programme'],
     'raison' => $c['raison'], 'serie' => $c['serie'],
   ];
+  if ($admin) $r['travail'] = $c['travail'];
+  return $r;
 }
 
 // --- GET ---
@@ -52,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $cours = [];
   $occupes = [];
   foreach (db()->query('SELECT * FROM cours ORDER BY debut') as $c) {
-    if (in_array((int) $c['groupe_id'], $ids, true)) $cours[] = cours_public($c);
+    if (in_array((int) $c['groupe_id'], $ids, true)) $cours[] = cours_public($c, $admin);
     elseif (in_array($c['statut'], ['place', 'demande'], true)) $occupes[] = ['debut' => $c['debut'], 'duree' => (int) $c['duree']];
   }
 
