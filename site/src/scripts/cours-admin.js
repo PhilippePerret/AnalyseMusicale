@@ -177,11 +177,16 @@ $('formEleve').addEventListener('submit', async (e) => {
   editerEleve(null);
   // L'élève inscrit apparaît tout de suite dans la liste
   $('filtreEleves').value = '';
-  document.querySelector(`#ongletsEleves input[value=${f.actif === '1' ? 'actif' : 'inactif'}]`).checked = true;
+  // Onglet affiché gardé s'il montre le nouvel élève, sinon « tous » (les autres élèves restent visibles)
+  const onglet = document.querySelector('#ongletsEleves input:checked').value;
+  if (onglet && onglet !== (f.actif === '1' ? 'actif' : 'inactif')) document.querySelector('#ongletsEleves input[value=""]').checked = true;
   nouvelEleve = r.id;
   await charger();
   setTimeout(() => { nouvelEleve = 0; $('eleves').querySelector('.nouveau')?.classList.remove('nouveau'); }, 2500);
-  message(e.target, `${f.email} est inscrit comme élève${f.bienvenue ? ' : un mail de bienvenue lui est envoyé' : ' (sans mail de bienvenue)'}.`, true);
+  const e_ = f.genre === 'F' ? 'e' : '';
+  message(e.target, f.bienvenue && f.actif === '1'
+    ? `L’élève a été ajouté${e_}, un mail de bienvenue lui a été envoyé.`
+    : `L’élève a été ajouté${e_} (sans mail de bienvenue).`, true);
 });
 
 // Menu « Action » appliqué aux élèves cochés
