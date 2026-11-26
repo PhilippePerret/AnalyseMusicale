@@ -226,6 +226,17 @@ test('téléchargement : fichier absent ou inconnu refusé, commande de débloca
   assert.deepEqual(await demande('../cami.sqlite'), { ok: false, error: 'plateforme' });
   assert.deepEqual(await demande('https://github.com/PhilippePerret/TableAnalyse-nodejs/releases/download/v2.1.6/Table-Analyse-2.1.6.dmg'), { ok: false, error: 'plateforme' });
   assert.ok(readFileSync(mailFile, 'utf-8').includes('xattr -dr com.apple.quarantine "/Applications/Table Analyse.app"'));
+  // Version HTML (multipart/alternative) : texte demandé, bouton du lien, commande, notes
+  const mails = readFileSync(mailFile, 'utf-8');
+  assert.match(mails, /Content-Type: multipart\/alternative/);
+  const b64 = [...mails.matchAll(/Content-Type: text\/html; charset=UTF-8\r?\nContent-Transfer-Encoding: base64\r?\n\r?\n([A-Za-z0-9+\/=\r\n]+)/g)].map((m) => m[1]);
+  assert.ok(b64.length, 'partie HTML');
+  const html = Buffer.from(b64[0].replace(/\s/g, ''), 'base64').toString('utf-8');
+  assert.ok(html.includes('Vous avez demandé à télécharger l’application <b>Table d’analyse</b>, voici le lien de téléchargement. Merci de votre intérêt.'));
+  assert.match(html, /<a href="https:\/\/www\.analyse-musicale\.fr\/api\/telecharger\.php\?jeton=[0-9a-f]{32}"[^>]*>Télécharger la Table d’analyse<\/a>/);
+  assert.ok(html.includes('xattr -dr com.apple.quarantine &quot;/Applications/Table Analyse.app&quot;'));
+  assert.ok(html.includes('(2) Lancez l’application Terminal.app avec Spotlight'));
+  assert.ok(!/macOS|2\.1\.6/.test(html), 'ni plateforme ni version');
 });
 
 test('téléchargement direct d’un visiteur identifié enregistré', { skip }, async () => {

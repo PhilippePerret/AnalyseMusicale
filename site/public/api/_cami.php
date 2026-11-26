@@ -385,13 +385,21 @@ function g(string $texte, string $genre): string {
 }
 
 // $piece : pièce jointe facultative ['nom' => …, 'type' => …, 'contenu' => …]
-function envoyer_mail(string $a, string $sujet, string $corps, ?array $piece = null, string $repondre_a = ''): bool {
+// +$html+ : version HTML du message (le texte +$corps+ reste la version
+// de secours des messageries sans HTML)
+function envoyer_mail(string $a, string $sujet, string $corps, ?array $piece = null, string $repondre_a = '', ?string $html = null): bool {
   $entetes = [
     'From: ' . mb_encode_mimeheader('CAMI — Classe d’Analyse Musicale', 'UTF-8') . ' <' . EXPEDITEUR . '>',
     'MIME-Version: 1.0',
   ];
   if ($repondre_a !== '') $entetes[] = 'Reply-To: ' . $repondre_a;
-  if ($piece === null) {
+  if ($piece === null && $html !== null) {
+    $frontiere = 'cami-' . bin2hex(random_bytes(12));
+    $entetes[] = 'Content-Type: multipart/alternative; boundary="' . $frontiere . '"';
+    $corps = "--$frontiere\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n$corps\r\n"
+      . "--$frontiere\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n"
+      . chunk_split(base64_encode($html)) . "--$frontiere--\r\n";
+  } elseif ($piece === null) {
     $entetes[] = 'Content-Type: text/plain; charset=UTF-8';
     $entetes[] = 'Content-Transfer-Encoding: 8bit';
   } else {
