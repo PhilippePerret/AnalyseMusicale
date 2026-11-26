@@ -1,7 +1,7 @@
 <?php
 // Annonces Facebook.
 // Mac de l'administrateur (en-tête X-Cami-Cle) :
-//   GET : travail à faire {verifier [{id, nom, url}], publier [{annonce, id, nom, url, texte}], a_faire} ;
+//   GET : travail à faire {verifier [{id, nom, url}], publier [{annonce, id, nom, url, texte}], a_faire, prochaines [« AAAA-MM-JJ HH:MM »]} ;
 //   POST JSON {groupe, verification: existant | introuvable} ou {annonce, groupe, publication: ok | echec, detail?}.
 // Administrateur (session) :
 //   GET : état {annonces, groupes, maintenant} ;

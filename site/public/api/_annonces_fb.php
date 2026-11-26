@@ -261,7 +261,11 @@ function travail_fb(): array {
         'texte' => texte_pour_groupe_fb($a['texte'], $g['nom'])];
     }
   }
-  return ['verifier' => $verifier, 'publier' => $publier, 'a_faire' => count($verifier) + count($publier)];
+  // Échéances à venir (programmation du Mac : scripts/annonces-fb/planifier.py)
+  $prochaines = array_values(array_unique(array_map(fn($a) => $a['echeance'],
+    array_filter(annonces_fb(), fn($a) => $a['echeance'] !== null && !echeance_due($a)))));
+  sort($prochaines);
+  return ['verifier' => $verifier, 'publier' => $publier, 'a_faire' => count($verifier) + count($publier), 'prochaines' => $prochaines];
 }
 
 // Résultat renvoyé par le Mac

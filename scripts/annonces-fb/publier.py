@@ -2,6 +2,7 @@
 # Publication des annonces Facebook dans Chrome, piloté par AppleScript (sans Claude).
 # Lit le travail (~/.cami/travail-fb.json, écrit par informer-groupes-fb.command) : groupes à vérifier, publications dues.
 # Chaque résultat est renvoyé AUSSITÔT au site (rapporter.py) : une publication réussie n'est jamais refaite.
+# Chrome travaille masqué : on peut utiliser le Mac pendant l'envoi.
 # Prérequis Chrome (une fois) : Affichage > Développeur > « Autoriser JavaScript à partir des Apple Events ».
 # Sécurité anti-doublon : dès que « Publier » a été cliqué, le résultat est « ok » (au pire « non confirmée »), jamais « échec ».
 import json, os, subprocess, sys, time
@@ -165,9 +166,15 @@ def normal(t):
     return ' '.join(t.split())
 
 
+def masquer_chrome():
+    subprocess.run(['osascript', '-e', 'tell application "System Events" to set visible of process "Google Chrome" to false'],
+                   capture_output=True)
+
+
 def ouvrir(fenetre, url):
-    osa('ouvrir', fenetre, url)
-    time.sleep(1)
+    # Navigation par la page elle-même : Chrome reste masqué (« set URL » d'AppleScript le ramène au premier plan)
+    js(fenetre, 'location.href = %s; "ok"' % json.dumps(url))
+    time.sleep(1.5)
     return attendre(fenetre, ETAT_PAGE, 20)
 
 
@@ -225,6 +232,9 @@ def main():
     travail = json.load(open(TRAVAIL))
     verifier_liste, publier_liste = travail.get('verifier', []), travail.get('publier', [])
     fenetre = osa('fenetre')
+    osa('ouvrir', fenetre, 'https://www.facebook.com/')   # seule ouverture par AppleScript, puis Chrome masqué
+    time.sleep(2)
+    masquer_chrome()
     introuvables = set()
     try:
         for i, g in enumerate(verifier_liste, 1):

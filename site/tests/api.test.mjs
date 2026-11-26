@@ -741,7 +741,9 @@ test('annonces Facebook : groupes, plusieurs annonces, programmation, avis, clé
   assert.deepEqual(a1.noms_groupes, ['Harmonie', 'Musiciens']);
   assert.equal(a1.exemple, 'Bonjour Harmonie !');
   assert.deepEqual(r.annonces.find((a) => a.id === id2).noms_groupes, ['Musiciens']);
-  assert.equal((await mac()).a_faire, 0);
+  t = await mac();
+  assert.equal(t.a_faire, 0);
+  assert.deepEqual(t.prochaines, ['2099-01-05 10:00', '2099-01-05 11:00']);   // programmation du Mac
 
   // Échéances arrivées : un mail d'avis citant les deux annonces, avant-dernier envoi signalé pour la répétée
   let avant = readFileSync(mailFile, 'utf-8').length;
