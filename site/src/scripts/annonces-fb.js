@@ -1,12 +1,15 @@
-// Page /admin/annonces/ : annonce Facebook aux groupes (API /api/annonces-fb.php, administrateur seulement).
+// Page /admin/annonces/ : annonces Facebook aux groupes (API /api/annonces-fb.php, administrateur seulement).
+// Liste des annonces → clic : détail (informations, exemple personnalisé, groupes) → Éditer : formulaire.
 
 const API = '/api/annonces-fb.php';
 const $ = (id) => document.getElementById(id);
 const ERREURS = {
   texte: 'Texte de l’annonce requis.',
+  groupes: 'Au moins un groupe requis.',
   programmation: 'Date ET heure requises pour programmer l’envoi.',
   passe: 'L’envoi programmé doit être dans le futur.',
   repetition: 'Répétition invalide (au moins 2 fois).',
+  introuvable: 'Annonce introuvable (terminée ou supprimée entre-temps).',
   nom: 'Nom du groupe requis.',
   url: 'URL invalide : adresse du type https://www.facebook.com/groups/…',
   existe: 'Ce groupe est déjà dans la liste.',
@@ -17,11 +20,13 @@ const ETATS = { a_verifier: ['attente', 'à vérifier'], existant: ['ok', 'exist
 const formAnnonce = $('formAnnonce');
 const formGroupe = $('formGroupe');
 const panneauGroupes = formGroupe.closest('.panneau');
-const panneauEnvoi = $('panneauEnvoi');
 let etat = null;
+let choisie = 0;     // annonce affichée en détail
+let editee = null;   // null : formulaire fermé ; 0 : nouvelle annonce ; n : annonce n
 
 // « 2026-11-20 14:05 » → « 20/11/2026 à 14:05 »
 const dateHeure = (d) => `${d.slice(0, 10).split('-').reverse().join('/')} à ${d.slice(11, 16)}`;
+const pluriel = (n, mot) => `${n} ${mot}${n > 1 ? 's' : ''}`;
 
 function el(tag, classe, texte) {
   const e = document.createElement(tag);
@@ -45,24 +50,122 @@ async function poster(donnees) {
       headers: { 'X-Cami': '1', 'Content-Type': 'application/json' },
       body: JSON.stringify(donnees),
     })).json();
-    if (r.ok) { etat = r; afficherGroupes(); afficherEtat(); }
+    if (r.ok) { etat = r; afficher(); }
     return r;
   } catch {
     return { ok: false };
   }
 }
 
+const annonce = (id) => etat.annonces.find((a) => +a.id === +id);
+
+function prochainEnvoi(a) {
+  if (!a.echeance) return 'non programmée';
+  return a.echeance <= etat.maintenant ? 'à envoyer (en attente de « Informer les groupes FB »)' : dateHeure(a.echeance);
+}
+
+function repetition(a) {
+  if (!+a.repeter) return 'aucune';
+  return `tous les ${+a.repeter_n > 1 ? a.repeter_n + ' ' : ''}${a.repeter_unite}, envoi ${a.numero || 1} sur ${a.repeter_fois}`;
+}
+
+function extrait(a) {
+  const t = a.texte.replace(/\s+/g, ' ').trim();
+  return t.length > 80 ? `${t.slice(0, 80)}…` : t;
+}
+
+// Liste des annonces
+function afficherAnnonces() {
+  const corps = $('annonces');
+  corps.replaceChildren(...etat.annonces.map((a) => {
+    const tr = el('tr', +a.id === choisie ? 'choisie' : '');
+    tr.append(el('td', 'date', prochainEnvoi(a)), el('td', 'extrait', extrait(a)), el('td', 'repetition', repetition(a)),
+      el('td', 'nb', String(a.groupes.length)));
+    if (a.echecs.length) tr.classList.add('echec');
+    tr.addEventListener('click', () => { choisie = +a.id; fermerForm(); afficher(); });
+    return tr;
+  }));
+  if (!etat.annonces.length) {
+    const tr = el('tr');
+    const td = el('td', 'vide', 'Aucune annonce programmée.');
+    td.colSpan = 4;
+    tr.append(td);
+    corps.append(tr);
+  }
+}
+
+function info(dl, terme, valeur) {
+  const dd = el('dd');
+  if (valeur instanceof Node) dd.append(valeur); else dd.textContent = valeur;
+  dl.append(el('dt', '', terme), dd);
+}
+
+// Détail de l'annonce choisie
+function afficherDetail() {
+  const a = annonce(choisie);
+  $('detail').hidden = !a || editee !== null;
+  if (!a) return;
+  const dl = $('infos');
+  dl.replaceChildren();
+  info(dl, 'Prochain envoi', prochainEnvoi(a));
+  info(dl, 'Programmation', a.mode === 'date' ? `le ${dateHeure(a.programmee_le)}` : 'au prochain clic sur « Informer les groupes FB »');
+  info(dl, 'Répétition', repetition(a));
+  if (a.dernier_envoi_le) info(dl, 'Dernier envoi', `le ${dateHeure(a.dernier_envoi_le)} (${pluriel(+a.dernier_envoi_groupes, 'groupe')})`);
+  info(dl, `Groupes (${a.groupes.length})`, a.noms_groupes.join(', '));
+  if (a.echecs.length) info(dl, 'À retenter', a.echecs.map((e) => e.nom + (e.detail ? ` (${e.detail})` : '')).join(', '));
+  info(dl, a.exemple_groupe ? `Exemple (${a.exemple_groupe})` : 'Exemple', el('div', 'exemple', a.exemple));
+  $('supprimerAnnonce').hidden = false;
+  $('confirmerSuppression').hidden = true;
+}
+
+// Cases des groupes du formulaire
+function afficherChoixGroupes(coches) {
+  $('choixGroupes').replaceChildren(...etat.groupes.map((g) => {
+    const label = el('label', `case${g.etat === 'introuvable' ? ' introuvable' : ''}`);
+    const c = el('input');
+    c.type = 'checkbox';
+    c.value = g.id;
+    c.checked = coches.includes(+g.id);
+    c.addEventListener('change', majTous);
+    label.append(c, ` ${g.nom}${g.etat === 'introuvable' ? ' (introuvable)' : ''}`);
+    return label;
+  }));
+  majTous();
+}
+
+function majTous() {
+  const cases = [...$('choixGroupes').querySelectorAll('input')];
+  $('tousGroupes').checked = cases.length > 0 && cases.every((c) => c.checked);
+}
+
+function ouvrirForm(id) {
+  editee = id;
+  const a = id ? annonce(id) : null;
+  const f = formAnnonce.elements;
+  $('titreForm').textContent = a ? 'MODIFIER L’ANNONCE' : 'NOUVELLE ANNONCE';
+  f.texte.value = a ? a.texte : '';
+  f.mode.value = a ? a.mode : 'clic';
+  f.date.value = a?.programmee_le ? a.programmee_le.slice(0, 10) : '';
+  f.heure.value = a?.programmee_le ? a.programmee_le.slice(11, 16) : '';
+  f.repeter.checked = a ? +a.repeter === 1 : false;
+  f.repeter_n.value = a ? a.repeter_n : 1;
+  f.repeter_unite.value = a ? a.repeter_unite : 'semaines';
+  f.repeter_fois.value = a ? a.repeter_fois : 2;
+  afficherChoixGroupes(a ? a.groupes : etat.groupes.filter((g) => g.etat !== 'introuvable').map((g) => +g.id));
+  message(formAnnonce, '');
+  formAnnonce.hidden = false;
+  afficherDetail();
+  f.texte.focus();
+}
+
+function fermerForm() {
+  editee = null;
+  formAnnonce.hidden = true;
+}
+
 // Ligne d'un groupe ; suppression : lien au bout de la ligne, puis confirmation
 function ligne(g) {
   const tr = el('tr');
-  const caseInput = el('input');
-  caseInput.type = 'checkbox';
-  caseInput.checked = +g.coche === 1 && g.etat !== 'introuvable';
-  caseInput.disabled = g.etat === 'introuvable';
-  caseInput.addEventListener('change', () => poster({ action: 'cocher', id: g.id, coche: caseInput.checked }));
-  const caseTd = el('td', 'case');
-  caseTd.append(caseInput);
-
   const tdNom = el('td', 'nom', g.nom);
   const lien = el('a', 'url', g.url.replace(/^https:\/\/www\./, ''));
   lien.href = g.url;
@@ -84,7 +187,7 @@ function ligne(g) {
   confirmer.addEventListener('click', () => poster({ action: 'supprimer', id: g.id }));
   tdSuppr.append(supprimer, confirmer);
 
-  tr.append(caseTd, tdNom, tdEtat, tdSuppr);
+  tr.append(tdNom, tdEtat, tdSuppr);
   return tr;
 }
 
@@ -94,48 +197,17 @@ function afficherGroupes() {
   if (!etat.groupes.length) {
     const tr = el('tr');
     const td = el('td', 'vide', 'Aucun groupe pour le moment.');
-    td.colSpan = 4;
+    td.colSpan = 3;
     tr.append(td);
     corps.append(tr);
   }
-  const cochables = etat.groupes.filter((g) => g.etat !== 'introuvable');
-  $('tousGroupes').checked = cochables.length > 0 && cochables.every((g) => +g.coche === 1);
 }
 
-// Dernier envoi, prochain envoi, échecs à retenter
-function afficherEtat() {
-  const a = etat.annonce;
-  const parties = [];
-  if (a.dernier_envoi_le) parties.push(`Dernier envoi le ${dateHeure(a.dernier_envoi_le)} (${a.dernier_envoi_groupes} groupe${a.dernier_envoi_groupes > 1 ? 's' : ''})`);
-  if (a.echeance) {
-    const numero = +a.repeter ? ` (envoi ${a.numero} sur ${a.repeter_fois})` : '';
-    parties.push(a.echeance <= maintenant()
-      ? `envoi en attente du clic sur « Informer les groupes FB »${numero}`
-      : `prochain envoi le ${dateHeure(a.echeance)}${numero}`);
-  } else if (a.dernier_envoi_le) parties.push('envois terminés');
-  let texte = parties.join(' — ');
-  texte = texte.charAt(0).toUpperCase() + texte.slice(1);
-  if (etat.echecs.length) texte += ` — à retenter : ${etat.echecs.map((e) => e.nom + (e.detail ? ` (${e.detail})` : '')).join(', ')}`;
-  $('etatAnnonce').textContent = texte;
-}
-
-function maintenant() {
-  const d = new Date();
-  const p = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
-}
-
-function remplir() {
-  const a = etat.annonce;
-  const el = formAnnonce.elements;
-  el.texte.value = a.texte;
-  el.mode.value = a.mode;
-  el.date.value = a.programmee_le ? a.programmee_le.slice(0, 10) : '';
-  el.heure.value = a.programmee_le ? a.programmee_le.slice(11, 16) : '';
-  el.repeter.checked = +a.repeter === 1;
-  el.repeter_n.value = a.repeter_n;
-  el.repeter_unite.value = a.repeter_unite;
-  el.repeter_fois.value = a.repeter_fois;
+function afficher() {
+  if (choisie && !annonce(choisie)) choisie = 0;
+  afficherAnnonces();
+  afficherDetail();
+  afficherGroupes();
 }
 
 // Page affichée seulement pour l'administrateur identifié ; sinon (ou sans PHP) : message d'accès
@@ -152,28 +224,41 @@ async function charger() {
   }
   etat = reponse;
   $('contenu').hidden = false;
-  remplir();
-  afficherGroupes();
-  afficherEtat();
+  afficher();
 }
+
+$('nouvelleAnnonce').addEventListener('click', () => { choisie = 0; ouvrirForm(0); afficherAnnonces(); });
+$('editer').addEventListener('click', () => ouvrirForm(choisie));
+$('annuler').addEventListener('click', () => { fermerForm(); afficherDetail(); });
+$('supprimerAnnonce').addEventListener('click', () => { $('supprimerAnnonce').hidden = true; $('confirmerSuppression').hidden = false; });
+$('confirmerSuppression').addEventListener('click', () => poster({ action: 'supprimer_annonce', id: choisie }));
+$('tousGroupes').addEventListener('change', (e) => {
+  for (const c of $('choixGroupes').querySelectorAll('input')) c.checked = e.target.checked;
+});
 
 formAnnonce.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const el = formAnnonce.elements;
-  const mode = el.mode.value;
-  if (mode === 'date' && (!el.date.value || !el.heure.value)) return message(panneauEnvoi, ERREURS.programmation);
+  const f = formAnnonce.elements;
+  const mode = f.mode.value;
+  if (mode === 'date' && (!f.date.value || !f.heure.value)) return message(formAnnonce, ERREURS.programmation);
+  const groupes = [...$('choixGroupes').querySelectorAll('input:checked')].map((c) => +c.value);
+  if (!groupes.length) return message(formAnnonce, ERREURS.groupes);
   const r = await poster({
     action: 'enregistrer',
-    texte: el.texte.value,
+    id: editee || 0,
+    texte: f.texte.value,
+    groupes,
     mode,
-    programmee_le: mode === 'date' ? `${el.date.value} ${el.heure.value}` : '',
-    repeter: el.repeter.checked,
-    repeter_n: Number(el.repeter_n.value),
-    repeter_unite: el.repeter_unite.value,
-    repeter_fois: Number(el.repeter_fois.value),
+    programmee_le: mode === 'date' ? `${f.date.value} ${f.heure.value}` : '',
+    repeter: f.repeter.checked,
+    repeter_n: Number(f.repeter_n.value),
+    repeter_unite: f.repeter_unite.value,
+    repeter_fois: Number(f.repeter_fois.value),
   });
-  if (r.ok) message(panneauEnvoi, 'Annonce enregistrée.', true);
-  else message(panneauEnvoi, ERREURS[r.erreur] || 'Enregistrement impossible.');
+  if (!r.ok) return message(formAnnonce, ERREURS[r.erreur] || 'Enregistrement impossible.');
+  choisie = +r.id;
+  fermerForm();
+  afficher();
 });
 
 formGroupe.addEventListener('submit', async (e) => {
@@ -181,14 +266,8 @@ formGroupe.addEventListener('submit', async (e) => {
   const r = await poster({ action: 'ajouter', nom: formGroupe.elements.nom.value, url: formGroupe.elements.url.value });
   if (!r.ok) return message(panneauGroupes, ERREURS[r.erreur] || 'Ajout impossible.');
   formGroupe.reset();
+  if (editee !== null) afficherChoixGroupes([...$('choixGroupes').querySelectorAll('input:checked')].map((c) => +c.value));
   message(panneauGroupes, 'Groupe ajouté : son existence sera vérifiée au prochain clic sur « Informer les groupes FB ».', true);
-});
-
-$('tousGroupes').addEventListener('change', async (e) => {
-  const coche = e.target.checked;
-  for (const g of etat.groupes.filter((x) => x.etat !== 'introuvable' && (+x.coche === 1) !== coche)) {
-    await poster({ action: 'cocher', id: g.id, coche });
-  }
 });
 
 charger();

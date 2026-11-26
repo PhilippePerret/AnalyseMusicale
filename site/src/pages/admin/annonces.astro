@@ -1,27 +1,78 @@
 ---
-// Annonce Facebook aux groupes : texte, groupes, programmation et répétition.
+// Annonces Facebook aux groupes (issue #26) : liste des annonces, détail, édition (texte, groupes, programmation, répétition).
 // Données et actions : /api/annonces-fb.php, par src/scripts/annonces-fb.js.
 // Publication : scripts/informer-groupes-fb.command (Mac de l'administrateur).
 import Base from '../../layouts/Base.astro';
 import '../../styles/admin.css';
 import { LIENS_ADMIN } from '../../lib/site';
 ---
-<Base title="Annonce Facebook" indexer={false} liensAdmin={LIENS_ADMIN.filter(([href]) => href !== '/admin/annonces/')}>
+<Base title="Annonces Facebook" indexer={false} liensAdmin={LIENS_ADMIN.filter(([href]) => href !== '/admin/annonces/')}>
   <div class="row admin annonces-fb">
-    <h1 class="titre-page">Annonce Facebook</h1>
+    <h1 class="titre-page">Annonces Facebook</h1>
 
     <p class="acces" id="acces" hidden>Page réservée à l’administrateur : <a href="/jeudis-analyse/?compte=connexion&retour=/admin/annonces/">s’identifier</a>.</p>
 
     <div id="contenu" hidden>
-      <form class="panneau" id="formAnnonce">
+      <div class="barre">
+        <h2 class="rubrique-admin">Annonces programmées</h2>
+        <button type="button" class="bouton" id="nouvelleAnnonce">Nouvelle annonce</button>
+      </div>
+      <table class="annonces">
+        <thead><tr><th>Prochain envoi</th><th>Annonce</th><th>Répétition</th><th>Groupes</th></tr></thead>
+        <tbody id="annonces"></tbody>
+      </table>
+
+      <!-- Détail de l'annonce choisie -->
+      <div class="panneau" id="detail" hidden>
+        <div class="titre-detail"><h3>ANNONCE</h3><button type="button" class="bouton" id="editer">Éditer</button></div>
+        <dl class="infos" id="infos"></dl>
+        <div class="zone-suppression">
+          <button type="button" class="lien-supprimer" id="supprimerAnnonce">Supprimer l’annonce…</button>
+          <button type="button" class="bouton confirmer" id="confirmerSuppression" hidden>Confirmer la suppression</button>
+        </div>
+      </div>
+
+      <!-- Création / édition -->
+      <form class="panneau" id="formAnnonce" hidden>
+        <h3 id="titreForm">NOUVELLE ANNONCE</h3>
         <label class="en-regard haut">Annonce <textarea name="texte" required rows="8" maxlength="10000"></textarea></label>
-        <p class="texte-seul">Publication en texte seul : aucune image, aucun aperçu de lien.</p>
+        <p class="texte-seul">Publication en texte seul : aucune image, aucun aperçu de lien. <code>{'{group}'}</code> : remplacé par le nom du groupe.</p>
+        <div class="en-regard haut">
+          <span>Groupes</span>
+          <div>
+            <label class="case"><input type="checkbox" id="tousGroupes"> tous</label>
+            <div class="choix-groupes" id="choixGroupes"></div>
+          </div>
+        </div>
+        <div class="en-regard haut">
+          <span>Envoi</span>
+          <div class="envoi">
+            <div class="ligne"><label><input type="radio" name="mode" value="clic" checked> au prochain clic sur « Informer les groupes FB »</label></div>
+            <div class="ligne">
+              <label><input type="radio" name="mode" value="date"> programmé le</label>
+              <input type="date" name="date" aria-label="Date d’envoi">
+              <label>à <input type="time" name="heure" step="300"></label>
+            </div>
+            <div class="ligne">
+              <label><input type="checkbox" name="repeter"> Répéter tous les</label>
+              <input type="number" class="nb" name="repeter_n" min="1" max="365" value="1" aria-label="Intervalle">
+              <select name="repeter_unite" aria-label="Unité">
+                <option value="jours">jours</option>
+                <option value="semaines" selected>semaines</option>
+                <option value="mois">mois</option>
+              </select>
+              <label><input type="number" class="nb" name="repeter_fois" min="2" max="100" value="2"> fois</label>
+            </div>
+          </div>
+        </div>
+        <p class="message" hidden></p>
+        <div class="boutons"><button type="button" class="bouton annuler" id="annuler">Annuler</button><button class="bouton">Enregistrer</button></div>
       </form>
 
       <h2 class="rubrique-admin">Groupes</h2>
       <div class="panneau">
         <table class="groupes">
-          <thead><tr><th class="case"><input type="checkbox" id="tousGroupes" title="Tout sélectionner"></th><th>Groupe</th><th>État</th><th></th></tr></thead>
+          <thead><tr><th>Groupe</th><th>État</th><th></th></tr></thead>
           <tbody id="groupes"></tbody>
         </table>
         <form class="ajout-groupe" id="formGroupe">
@@ -30,29 +81,6 @@ import { LIENS_ADMIN } from '../../lib/site';
           <button class="bouton">Ajouter le groupe</button>
         </form>
         <p class="message" hidden></p>
-      </div>
-
-      <h2 class="rubrique-admin">Envoi</h2>
-      <div class="panneau" id="panneauEnvoi">
-        <div class="ligne"><label><input type="radio" name="mode" value="clic" form="formAnnonce" checked> au prochain clic sur « Informer les groupes FB »</label></div>
-        <div class="ligne">
-          <label><input type="radio" name="mode" value="date" form="formAnnonce"> programmé le</label>
-          <input type="date" name="date" form="formAnnonce" aria-label="Date d’envoi">
-          <label>à <input type="time" name="heure" step="300" form="formAnnonce"></label>
-        </div>
-        <div class="ligne">
-          <label><input type="checkbox" name="repeter" form="formAnnonce"> Répéter tous les</label>
-          <input type="number" class="nb" name="repeter_n" min="1" max="365" value="1" form="formAnnonce" aria-label="Intervalle">
-          <select name="repeter_unite" form="formAnnonce" aria-label="Unité">
-            <option value="jours">jours</option>
-            <option value="semaines" selected>semaines</option>
-            <option value="mois">mois</option>
-          </select>
-          <label><input type="number" class="nb" name="repeter_fois" min="2" max="100" value="2" form="formAnnonce"> fois</label>
-        </div>
-        <p class="etat-annonce" id="etatAnnonce"></p>
-        <p class="message" hidden></p>
-        <div class="boutons"><span></span><button class="bouton" form="formAnnonce">Enregistrer</button></div>
       </div>
     </div>
   </div>
