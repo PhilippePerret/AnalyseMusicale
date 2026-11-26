@@ -131,12 +131,18 @@ VIDER = r'''(() => {
 })()'''
 
 RETIRER_APERCU = r'''(() => {
-  const d = document.querySelector('[role="dialog"]');
+  const d = [...document.querySelectorAll('[role="dialog"]')].find(x => x.querySelector('[contenteditable="true"][role="textbox"]'));
   if (!d) return '';
-  const b = [...d.querySelectorAll('[role="button"][aria-label]')].find(e => /aperçu|preview/i.test(e.getAttribute('aria-label')));
+  // « Supprimer l’aperçu du lien… » (et surtout pas « Modifier l’aperçu »)
+  const b = [...d.querySelectorAll('[role="button"][aria-label]')].find(e => /^Supprimer l.aperçu du lien|^Remove link preview/i.test(e.getAttribute('aria-label')));
   if (!b) return '';
   b.click();
   return 'retiré';
+})()'''
+
+APERCU_PRESENT = r'''(() => {
+  const d = [...document.querySelectorAll('[role="dialog"]')].find(x => x.querySelector('[contenteditable="true"][role="textbox"]'));
+  return d && [...d.querySelectorAll('[role="button"][aria-label]')].some(e => /^Supprimer l.aperçu du lien|^Remove link preview/i.test(e.getAttribute('aria-label'))) ? 'oui' : 'non';
 })()'''
 
 CLIC_PUBLIER = r'''(() => {
@@ -195,10 +201,16 @@ def publier(fenetre, p):
     else:
         js(fenetre, VIDER)
         return 'echec', 'texte non saisi correctement'
-    # Aperçu de lien : apparaît après la saisie
-    time.sleep(2.5)
-    js(fenetre, RETIRER_APERCU)
-    time.sleep(0.5)
+    # Aperçu de lien : apparaît quelques secondes après la saisie d'une adresse ; publication en texte seul
+    if 'http' in p['texte']:
+        if attendre(fenetre, RETIRER_APERCU, 8):
+            time.sleep(1)
+            if js(fenetre, APERCU_PRESENT) == 'oui':
+                js(fenetre, RETIRER_APERCU)
+                time.sleep(1)
+        if js(fenetre, APERCU_PRESENT) == 'oui':
+            js(fenetre, VIDER)
+            return 'echec', 'aperçu du lien impossible à supprimer'
     clic = js(fenetre, CLIC_PUBLIER)
     if clic != 'ok':
         js(fenetre, VIDER)
