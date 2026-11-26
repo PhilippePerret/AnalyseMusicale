@@ -24,7 +24,9 @@ printf '%s' "$TRAVAIL" > "$HOME/.cami/travail-fb.json"
 printf '%s' "$TRAVAIL" | python3 "$DOSSIER/liste.py"
 
 # Chrome ouvert (sinon l'extension Claude in Chrome est absente), le temps qu'elle se connecte
+CHROME_OUVERT_ICI=0
 if ! pgrep -xq "Google Chrome"; then
+  CHROME_OUVERT_ICI=1
   echo "Ouverture de Chrome…"
   open -ga "Google Chrome"
   sleep 8
@@ -39,20 +41,45 @@ $TRAVAIL
    La page du groupe s'affiche (nom du groupe visible) → lance : python3 $DOSSIER/rapporter.py <id> verification existant
    Sinon (contenu indisponible, page introuvable, lien cassé) → lance : python3 $DOSSIER/rapporter.py <id> verification introuvable
 2. Pour chaque élément de « publier » (annonce + groupe ; sauf groupes rapportés introuvables à l'étape 1) :
-   2.1. ouvre son URL, clique dans la zone de rédaction (« Écrivez quelque chose… », « Exprimez-vous… ») ;
-   2.2. saisis EXACTEMENT le texte « texte » de CET élément (propre à chaque groupe), retours à la ligne compris, sans rien ajouter ni retirer ;
-   2.3. publication en TEXTE SEUL : si Facebook ajoute un aperçu de lien ou une image, supprime-le (croix de l'aperçu) ;
-   2.4. clique sur « Publier » et vérifie que la publication est faite (ou soumise à l'approbation des administrateurs du groupe) ;
-   2.5. AUSSITÔT après (<id> : id du groupe ; <annonce> : champ « annonce » de l’élément) : python3 $DOSSIER/rapporter.py <id> publication <annonce> ok   (ajoute « en attente d'approbation » si c'est le cas)
+   2.1. ouvre son URL, clique sur l'invite de rédaction (« Écrivez quelque chose… », « Exprimez-vous… ») ;
+   2.2. ATTENDS que la fenêtre « Créer une publication » soit ouverte, repère sa zone de texte (élément « textbox » modifiable, avec find ou read_page) et clique DEDANS ;
+   2.3. saisis EXACTEMENT le texte « texte » de CET élément (propre à chaque groupe), retours à la ligne compris, sans rien ajouter ni retirer ;
+   2.4. VÉRIFIE (read_page ou capture) que le texte est bien dans la zone de texte de la fenêtre « Créer une publication ». Sinon : vide la zone, clique dedans et recommence (2 essais au plus, puis échec) ;
+   2.5. publication en TEXTE SEUL : si Facebook ajoute un aperçu de lien ou une image, supprime-le (croix de l'aperçu) ;
+   2.6. clique sur « Publier » et vérifie que la publication est faite (ou soumise à l'approbation des administrateurs du groupe) ;
+   2.7. AUSSITÔT après (<id> : id du groupe ; <annonce> : champ « annonce » de l’élément) : python3 $DOSSIER/rapporter.py <id> publication <annonce> ok   (ajoute « en attente d'approbation » si c'est le cas)
         En cas d'échec : python3 $DOSSIER/rapporter.py <id> publication <annonce> echec <raison courte>
-3. Une seule publication par élément de « publier » (un même groupe peut recevoir plusieurs annonces différentes). Aucune autre action sur Facebook (ni mention J'aime, ni commentaire, ni message).
-4. Termine par un compte rendu d'une ligne par élément : groupe, début de l'annonce — résultat.
+3. Un échec n'arrête JAMAIS le travail : rapporte-le, puis passe à l'élément suivant, jusqu'au dernier.
+4. Une seule publication par élément de « publier » (un même groupe peut recevoir plusieurs annonces différentes). Aucune autre action sur Facebook (ni mention J'aime, ni commentaire, ni message).
+5. Termine par un compte rendu d'une ligne par élément : groupe, début de l'annonce — résultat.
 EOF
 
 echo
 echo "Envoi en cours (Chrome) — résultats au fur et à mesure :"
 # Consigne par l'entrée standard : --allowedTools prend tous les arguments qui le suivent
 cd .. || exit 1   # racine du projet (MEMORY.md du projet)
+JOURNAL="$HOME/.cami/informer-groupes-fb.log"
+{ echo; echo "=== $(date '+%d/%m/%Y %H:%M')"; } >> "$JOURNAL"
 printf '%s' "$PROMPT" | claude -p --chrome \
-  --allowedTools "mcp__claude-in-chrome" "Bash(python3 $DOSSIER/rapporter.py:*)"
-fin "${PIPESTATUS[1]}"
+  --allowedTools "mcp__claude-in-chrome" "Bash(python3 $DOSSIER/rapporter.py:*)" | tee -a "$JOURNAL"
+CODE="${PIPESTATUS[1]}"
+
+# Chrome refermé s'il était fermé au départ
+[ "$CHROME_OUVERT_ICI" = "1" ] && osascript -e 'quit app "Google Chrome"' >/dev/null 2>&1
+
+# Bilan d'après le site : ce qui reste à faire (échecs compris)
+RESTE=$(curl -s -f -H "X-Cami-Cle: $(cat "$CLE_FICHIER")" -A "CAMI-annonces-fb" "$API")
+BILAN=$(printf '%s' "$RESTE" | python3 -c '
+import json, sys
+try:
+    t = json.load(sys.stdin)
+except Exception:
+    print("Bilan indisponible (le site ne répond pas)."); sys.exit()
+v, p = len(t.get("verifier", [])), len(t.get("publier", []))
+print("Tout est publié." if v + p == 0 else f"Reste à faire : {p} publication(s), {v} vérification(s) de groupe (relancer « Informer les groupes FB »).")
+')
+echo
+echo "BILAN : $BILAN" | tee -a "$JOURNAL"
+echo "Journal : $JOURNAL"
+osascript -e "display notification \"$BILAN\" with title \"Annonces Facebook\" sound name \"Glass\"" >/dev/null 2>&1
+fin "$CODE"
