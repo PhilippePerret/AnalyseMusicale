@@ -16,7 +16,7 @@ TRAVAIL=$(curl -s -f -H "X-Cami-Cle: $(cat "$CLE_FICHIER")" -A "CAMI-annonces-fb
 A_FAIRE=$(printf '%s' "$TRAVAIL" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("a_faire", 0))')
 if [ "$A_FAIRE" = "0" ]; then echo "Rien à envoyer aux groupes Facebook pour le moment."; fin 0; fi
 
-PROMPT=$(cat <<EOF
+IFS= read -r -d '' PROMPT <<EOF || true
 Tu publies des annonces dans des groupes Facebook avec Claude in Chrome (session Facebook de l'utilisateur déjà ouverte).
 Données (JSON) :
 $TRAVAIL
@@ -34,7 +34,6 @@ $TRAVAIL
 3. Une seule publication par élément de « publier » (un même groupe peut recevoir plusieurs annonces différentes). Aucune autre action sur Facebook (ni mention J'aime, ni commentaire, ni message).
 4. Termine par un compte rendu d'une ligne par élément : groupe, début de l'annonce — résultat.
 EOF
-)
 
 echo "Envoi aux groupes Facebook en cours (Chrome)…"
 echo
