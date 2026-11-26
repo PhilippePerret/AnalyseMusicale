@@ -31,15 +31,15 @@ $jeton = bin2hex(random_bytes(16));
 // Marche à suivre pour ouvrir l'application non signée (mail macOS seulement),
 // placée juste sous le lien de téléchargement
 function texte_deblocage_mac(): string {
-  return "VOUS DEVEZ DÉBLOQUER L’APPLICATION pour pouvoir l’utiliser (1) :\n"
+  return "VOUS DEVEZ DÉBLOQUER L’APPLICATION pour pouvoir l’utiliser(1) :\n"
     . "- ouvrez une fenêtre Terminal (2),\n"
     . "- copiez-collez le code : " . DEBLOCAGE_MAC . "\n"
     . "- pressez la touche Entrée.\n\n"
-    . "Vous pouvez maintenant ouvrir l’application et l’utiliser.\n\n"
+    . "Vous pouvez maintenant ouvrir l’application et l'utiliser.\n\n"
     . "(1) Apple contraint à payer un abonnement annuel de développeur pour « autoriser » les applications, "
     . "même lorsqu’elles sont fournies gratuitement. Table d’analyse doit donc être débloquée, une seule fois, "
     . "après avoir été placée dans le dossier Applications.\n"
-    . "(2) Trouvez l’application avec Spotlight : Cmd + Espace, commencez à taper « Termi », choisissez l’application Terminal.\n\n"
+    . "(2) Trouvez l’application avec Spotlight : Cmd + Espace, commencer à taper « Termi », choisir l’application Terminal.\n\n"
     . "Si vous rencontrez un problème, merci de nous en informer en répondant à ce message.\n\n";
 }
 
