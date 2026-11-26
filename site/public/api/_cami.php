@@ -333,13 +333,46 @@ function ajouter_presence(int $uid, string $jour): bool {
 
 const SYSTEMES = ['macOS', 'Windows', 'Linux'];
 
-// Fichier d'une Release GitHub de l'application
-function fichier_valide(string $fichier): bool {
-  return (bool) preg_match('#^https://github\.com/PhilippePerret/TableAnalyse-nodejs/releases/download/v[\d.]+/[\w.-]+$#', $fichier);
+// Fichiers téléchargeables, déposés par _scripts/publier.command de
+// l'application dans le dossier des données (hors du site publié) avec le
+// numéro de leur version (fichier « version »)
+const FICHIERS_TA = ['Table Analyse.dmg', 'Table Analyse.exe', 'Table Analyse.AppImage'];
+
+function dossier_ta(): string {
+  return dossier_donnees() . '/table-analyse';
 }
 
+function fichier_valide(string $fichier): bool {
+  return in_array($fichier, FICHIERS_TA, true);
+}
+
+function fichier_disponible(string $fichier): bool {
+  return fichier_valide($fichier) && is_file(dossier_ta() . '/' . $fichier);
+}
+
+// Version : celle des fichiers déposés ; ancienne demande (lien d'une
+// Release GitHub) : celle de son adresse
 function version_fichier(string $fichier): string {
-  return preg_match('#/download/v([\d.]+)/#', $fichier, $m) ? $m[1] : '';
+  if (preg_match('#/download/v([\d.]+)/#', $fichier, $m)) return $m[1];
+  $v = @file_get_contents(dossier_ta() . '/version');
+  return $v === false ? '' : trim($v);
+}
+
+// Envoi du fichier au navigateur, sous son nom (« Table Analyse.dmg »…)
+function servir_fichier_ta(string $fichier): void {
+  $chemin = dossier_ta() . '/' . $fichier;
+  if (!fichier_valide($fichier) || !is_file($chemin)) {
+    header('Location: /table-analyse/', true, 302);
+    exit;
+  }
+  @set_time_limit(0);
+  while (ob_get_level()) ob_end_clean();
+  header('Content-Type: application/octet-stream');
+  header('Content-Disposition: attachment; filename="' . $fichier . '"; filename*=UTF-8\'\'' . rawurlencode($fichier));
+  header('Content-Length: ' . filesize($chemin));
+  header('Cache-Control: no-store');
+  readfile($chemin);
+  exit;
 }
 
 // --- Mails ---

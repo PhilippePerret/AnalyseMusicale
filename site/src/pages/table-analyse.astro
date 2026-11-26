@@ -61,23 +61,14 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
   </div>
 
   <script is:inline>
-    // Dernière version publiée (Release GitHub de l'application) : numéro affiché
-    // et liens de téléchargement mis à jour. Sans réponse : valeurs du site gardées.
+    // Dernière version publiée (Release GitHub de l'application) : numéro
+    // affiché. Sans réponse : valeur du site gardée.
     (function () {
-      var EXTENSIONS = { macOS: /\.dmg$/, Windows: /\.exe$/, Linux: /\.AppImage$/ };
       fetch('https://api.github.com/repos/PhilippePerret/TableAnalyse-nodejs/releases/latest')
         .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
         .then(function (rel) {
           var version = String(rel.tag_name || '').replace(/^v/, '');
-          if (!version) return;
-          document.querySelectorAll('.version-table').forEach(function (e) { e.textContent = version; });
-          document.querySelectorAll('[data-systeme]').forEach(function (e) {
-            var motif = EXTENSIONS[e.dataset.systeme];
-            var fichier = (rel.assets || []).find(function (a) { return motif && motif.test(a.name); });
-            if (!fichier) return;
-            if (e.tagName === 'OPTION') e.value = fichier.browser_download_url;
-            else e.dataset.href = fichier.browser_download_url;
-          });
+          if (version) document.querySelectorAll('.version-table').forEach(function (e) { e.textContent = version; });
         })
         .catch(function () {});
     })();

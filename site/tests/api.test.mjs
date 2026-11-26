@@ -2,7 +2,7 @@
 // Ignorés si PHP n'est pas disponible.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync, mkdtempSync, writeFileSync, readdirSync } from 'node:fs';
+import { readFileSync, existsSync, mkdtempSync, mkdirSync, writeFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -179,7 +179,18 @@ test('adresse déjà confirmée : nouvelle inscription refusée ; piège à robo
 
 // --- Table d'analyse : lien de téléchargement suivi, page /admin/ ---
 
-const FICHIER_TA = 'https://github.com/PhilippePerret/TableAnalyse-nodejs/releases/download/v2.1.6/Table-Analyse-2.1.6.dmg';
+// Fichiers déposés par l'application dans le dossier des données (cf. dossier_ta)
+const FICHIER_TA = 'Table Analyse.dmg';
+const CONTENU_TA = 'contenu du dmg';
+mkdirSync(join(tmp, 'table-analyse'), { recursive: true });
+writeFileSync(join(tmp, 'table-analyse', FICHIER_TA), CONTENU_TA);
+writeFileSync(join(tmp, 'table-analyse', 'version'), '2.1.6\n');
+// Fichier envoyé sous son nom
+async function verifierFichierTA(rep) {
+  assert.equal(rep.status, 200);
+  assert.match(rep.headers.get('content-disposition'), /attachment; filename="Table Analyse\.dmg"/);
+  assert.equal(await rep.text(), CONTENU_TA);
+}
 const dernierLienTA = () => [...readFileSync(mailFile, 'utf-8').matchAll(/telecharger\.php\?jeton=([0-9a-f]{32})/g)].pop()?.[1];
 
 async function adminConnecte() {
@@ -201,9 +212,7 @@ test('téléchargement : adresse confirmée au premier clic sur le lien du mail'
   assert.equal(t.version, '2.1.6');
 
   const jeton = dernierLienTA();
-  const rep = await client().get(`/api/telecharger.php?jeton=${jeton}`);
-  assert.equal(rep.status, 302);
-  assert.equal(rep.headers.get('location'), FICHIER_TA);
+  await verifierFichierTA(await client().get(`/api/telecharger.php?jeton=${jeton}`));
   t = personne(await liste(admin), 'lecteur@example.com').telechargements[0];
   assert.match(t.telecharge_le, /^\d{4}-\d{2}-\d{2} /);
   assert.equal(readFileSync(mailFile, 'utf-8').match(/Version : 2\.1\.6/g).length, 2);   // avis de demande + avis de téléchargement
@@ -211,11 +220,18 @@ test('téléchargement : adresse confirmée au premier clic sur le lien du mail'
   assert.equal((await client().get('/api/telecharger.php?jeton=' + '0'.repeat(32))).headers.get('location'), '/table-analyse/');
 });
 
+test('téléchargement : fichier absent ou inconnu refusé, commande de déblocage macOS du mail', { skip }, async () => {
+  const demande = (fichier) => fetch(`${base}/telechargement.php`, { method: 'POST', body: new URLSearchParams({ email: 'autre@example.com', fichier, systeme: 'Linux' }) }).then((r) => r.json());
+  assert.deepEqual(await demande('Table Analyse.AppImage'), { ok: false, error: 'indisponible' });
+  assert.deepEqual(await demande('../cami.sqlite'), { ok: false, error: 'plateforme' });
+  assert.deepEqual(await demande('https://github.com/PhilippePerret/TableAnalyse-nodejs/releases/download/v2.1.6/Table-Analyse-2.1.6.dmg'), { ok: false, error: 'plateforme' });
+  assert.ok(readFileSync(mailFile, 'utf-8').includes('xattr -dr com.apple.quarantine "/Applications/Table d’analyse.app"'));
+});
+
 test('téléchargement direct d’un visiteur identifié enregistré', { skip }, async () => {
   const c = client();
   await c.post('compte.php', { action: 'connexion', email: 'membre@example.com', mdp: 'motdepasse' });
-  const rep = await c.get(`/api/telecharger.php?fichier=${encodeURIComponent(FICHIER_TA)}&systeme=macOS`);
-  assert.equal(rep.headers.get('location'), FICHIER_TA);
+  await verifierFichierTA(await c.get(`/api/telecharger.php?fichier=${encodeURIComponent(FICHIER_TA)}&systeme=macOS`));
   const p = personne(await liste(await adminConnecte()), 'membre@example.com');
   assert.equal(p.telechargements[0].systeme, 'macOS');
   assert.ok(p.telechargements[0].telecharge_le);

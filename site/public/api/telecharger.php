@@ -1,5 +1,5 @@
 <?php
-// Lien de téléchargement de la Table d'analyse → redirection vers le fichier (Release GitHub).
+// Lien de téléchargement de la Table d'analyse → fichier envoyé (« Table Analyse.<ext> », cf. servir_fichier_ta).
 // GET ?jeton=… : lien envoyé par mail ; le premier clic confirme l'adresse (telecharge_le), chaque clic est signalé.
 // GET ?fichier=…&systeme=… : visiteur identifié (liens directs de /table-analyse/), téléchargement enregistré.
 require __DIR__ . '/_brevo.php';
@@ -28,12 +28,14 @@ if ($jeton !== '') {
   }
   // Chaque téléchargement est signalé, même par un lien déjà utilisé
   signaler(array_merge($t, ['telecharge_le' => $maintenant]));
-  aller($t['fichier']);
+  // Ancienne demande : lien d'une Release GitHub
+  if (str_starts_with($t['fichier'], 'https://github.com/')) aller($t['fichier']);
+  servir_fichier_ta($t['fichier']);
 }
 
 $fichier = (string) ($_GET['fichier'] ?? '');
 $user = user_courant();
-if (!$user || !fichier_valide($fichier)) aller('/table-analyse/');
+if (!$user || !fichier_disponible($fichier)) aller('/table-analyse/');
 $t = [
   'email' => strtolower($user['email']),
   'systeme' => texte($_GET['systeme'] ?? '', 40),
@@ -44,4 +46,4 @@ $t = [
 db()->prepare('INSERT INTO telechargements (email, systeme, fichier, version, le, telecharge_le) VALUES (?, ?, ?, ?, ?, ?)')
   ->execute([$t['email'], $t['systeme'], $fichier, $t['version'], $maintenant, $maintenant]);
 signaler($t);
-aller($fichier);
+servir_fichier_ta($fichier);

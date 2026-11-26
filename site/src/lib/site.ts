@@ -17,24 +17,24 @@ export type ObjetContact = keyof typeof OBJETS_CONTACT;
 
 // Table d'analyse (page /table-analyse/) : version (mise à jour par
 // _scripts/publier.command de l'application) et fichiers à télécharger,
-// publiés dans la Release GitHub de cette version. Valeurs de secours :
-// la page affiche la dernière Release lue sur GitHub à l'ouverture ; vidéo de
-// démonstration (fichier local de public/, non proposée s'il est absent).
-export const TABLE_ANALYSE_VERSION = '2.3.1';
-const RELEASE = `https://github.com/PhilippePerret/TableAnalyse-nodejs/releases/download/v${TABLE_ANALYSE_VERSION}`;
+// déposés par ce script sur l'hébergement (dossier des données, servis par
+// api/telecharger.php). La page affiche la dernière version lue sur GitHub à
+// l'ouverture ; vidéo de démonstration (fichier local de public/, non
+// proposée s'il est absent).
+export const TABLE_ANALYSE_VERSION = '2.3.4';
 
 export const TABLE_ANALYSE = {
   version: TABLE_ANALYSE_VERSION,
   telechargements: [
-    { systeme: 'macOS',   fichier: `${RELEASE}/Table-Analyse-${TABLE_ANALYSE_VERSION}.dmg` },
-    { systeme: 'Windows', fichier: `${RELEASE}/Table-Analyse-${TABLE_ANALYSE_VERSION}.exe` },
-    { systeme: 'Linux',   fichier: `${RELEASE}/Table-Analyse-${TABLE_ANALYSE_VERSION}.AppImage` },
+    { systeme: 'macOS',   fichier: 'Table Analyse.dmg' },
+    { systeme: 'Windows', fichier: 'Table Analyse.exe' },
+    { systeme: 'Linux',   fichier: 'Table Analyse.AppImage' },
   ],
   demo: 'https://pub-232cc64dc0ba45a99cac609a6da2369e.r2.dev/table-analyse/premiere-utilisation.mp4',
   // Image affichée avant le lancement de la vidéo
   demoVignette: 'https://pub-232cc64dc0ba45a99cac609a6da2369e.r2.dev/table-analyse/premiere-utilisation.jpg',
   // Commande Terminal sortant l'application de la quarantaine (macOS, application non signée)
-  deblocageMac: 'xattr -dr com.apple.quarantine /Applications/Table*analyse.app',
+  deblocageMac: 'xattr -dr com.apple.quarantine "/Applications/Table d’analyse.app"',
 };
 
 // Liens de l'administrateur vers les cours (pages /admin/ et /cours/, en haut à droite)

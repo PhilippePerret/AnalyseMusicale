@@ -7,8 +7,7 @@
 require __DIR__ . '/api/_cami.php';
 
 // Commande Terminal sortant l'application de la quarantaine (macOS, application non signée)
-// (motif : nom de l'application « Table d’analyse.app », apostrophe et espace compris)
-const DEBLOCAGE_MAC = 'xattr -dr com.apple.quarantine /Applications/Table*analyse.app';
+const DEBLOCAGE_MAC = 'xattr -dr com.apple.quarantine "/Applications/Table d’analyse.app"';
 
 function reponse(bool $ok, string $error = ''): void {
   repondre(['ok' => $ok, 'error' => $error]);
@@ -22,10 +21,11 @@ if (trim($_POST['site_web'] ?? '') !== '') reponse(true);
 $email = strtolower(trim($_POST['email'] ?? ''));
 if (mb_strlen($email) > 200 || !filter_var($email, FILTER_VALIDATE_EMAIL)) reponse(false, 'email');
 
-// Fichier de la plateforme : dans une Release GitHub de l'application
+// Fichier de la plateforme : déposé dans le dossier des données (cf. dossier_ta)
 $fichier = (string) ($_POST['fichier'] ?? '');
 $systeme = texte($_POST['systeme'] ?? '', 40);
 if (!fichier_valide($fichier)) reponse(false, 'plateforme');
+if (!fichier_disponible($fichier)) reponse(false, 'indisponible');
 $jeton = bin2hex(random_bytes(16));
 
 // Marche à suivre pour ouvrir l'application non signée (mail macOS seulement),
