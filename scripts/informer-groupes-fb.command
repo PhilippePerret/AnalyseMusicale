@@ -41,12 +41,19 @@ $TRAVAIL
    La page du groupe s'affiche (nom du groupe visible) → lance : python3 $DOSSIER/rapporter.py <id> verification existant
    Sinon (contenu indisponible, page introuvable, lien cassé) → lance : python3 $DOSSIER/rapporter.py <id> verification introuvable
 2. Pour chaque élément de « publier » (annonce + groupe ; sauf groupes rapportés introuvables à l'étape 1) :
-   2.1. ouvre son URL, clique sur l'invite de rédaction (« Écrivez quelque chose… », « Exprimez-vous… ») ;
-   2.2. ATTENDS que la fenêtre « Créer une publication » soit ouverte, repère sa zone de texte (élément « textbox » modifiable, avec find ou read_page) et clique DEDANS ;
-   2.3. saisis EXACTEMENT le texte « texte » de CET élément (propre à chaque groupe), retours à la ligne compris, sans rien ajouter ni retirer ;
-   2.4. VÉRIFIE (read_page ou capture) que le texte est bien dans la zone de texte de la fenêtre « Créer une publication ». Sinon : vide la zone, clique dedans et recommence (2 essais au plus, puis échec) ;
-   2.5. publication en TEXTE SEUL : si Facebook ajoute un aperçu de lien ou une image, supprime-le (croix de l'aperçu) ;
-   2.6. clique sur « Publier » et vérifie que la publication est faite (ou soumise à l'approbation des administrateurs du groupe) ;
+   Méthode IMPOSÉE (outil javascript_tool, pas de recherche à l'œil ni de captures répétées) :
+   2.1. ouvre son URL (navigate). La page s'affiche tout de suite : AUCUNE attente supplémentaire.
+   2.2. javascript_tool : clic sur l'invite de rédaction, repérée par son texte :
+        const b = [...document.querySelectorAll('[role="button"]')].find(e => /Exprimez-vous|Écrivez quelque chose/.test(e.textContent)); if (b) { b.click(); 'ok' } else 'absent'
+        « absent » : fais défiler d'un écran (scroll) et relance une fois ; toujours absent → échec « invite de rédaction absente ».
+   2.3. javascript_tool : zone de texte de la fenêtre de publication (relance jusqu'à 5 fois, 1 seconde d'écart, le temps que la fenêtre s'ouvre) :
+        const t = document.querySelector('[role="dialog"] [contenteditable="true"][role="textbox"]'); if (t) { t.focus(); 'ok' } else 'absent'
+   2.4. saisis EXACTEMENT le texte « texte » de CET élément (computer, action type ; retour à la ligne = touche Entrée ; Maj+Entrée si Entrée publie), sans rien ajouter ni retirer ;
+   2.5. javascript_tool : vérification : document.querySelector('[role="dialog"] [contenteditable="true"][role="textbox"]').innerText
+        Le texte doit correspondre (aux espaces près). Sinon : vide la zone (Cmd+A puis Suppr), relance 2.3 et 2.4 (2 essais au plus, puis échec) ;
+   2.6. publication en TEXTE SEUL : si un aperçu de lien apparaît, supprime-le (croix de l'aperçu). Puis javascript_tool :
+        const p = [...document.querySelectorAll('[role="dialog"] [role="button"]')].find(e => e.getAttribute('aria-label') === 'Publier' || e.textContent.trim() === 'Publier'); if (p) { p.click(); 'ok' } else 'absent'
+        Vérifie ensuite (javascript_tool : la fenêtre [role="dialog"] de publication a disparu, ou message d'approbation) que la publication est faite ;
    2.7. AUSSITÔT après (<id> : id du groupe ; <annonce> : champ « annonce » de l’élément) : python3 $DOSSIER/rapporter.py <id> publication <annonce> ok   (ajoute « en attente d'approbation » si c'est le cas)
         En cas d'échec : python3 $DOSSIER/rapporter.py <id> publication <annonce> echec <raison courte>
 3. Un échec n'arrête JAMAIS le travail : rapporte-le, puis passe à l'élément suivant, jusqu'au dernier.
