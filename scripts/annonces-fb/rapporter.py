@@ -38,7 +38,7 @@ try:
             + ('publiée' if donnees['publication'] == 'ok' else 'ÉCHEC') + (f" — {donnees['detail']}" if donnees.get('detail') else '')
     if not reponse.get('ok'):
         ligne += ' (REFUSÉ PAR LE SITE)'
-    with open('/dev/tty', 'w') as tty:
+    with open(os.environ.get('CAMI_TTY_FB') or '/dev/tty', 'w') as tty:
         print(ligne, file=tty)
 except Exception:
     pass

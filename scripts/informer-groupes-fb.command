@@ -16,6 +16,9 @@ TRAVAIL=$(curl -s -f -H "X-Cami-Cle: $(cat "$CLE_FICHIER")" -A "CAMI-annonces-fb
 A_FAIRE=$(printf '%s' "$TRAVAIL" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("a_faire", 0))')
 if [ "$A_FAIRE" = "0" ]; then echo "Rien à envoyer aux groupes Facebook pour le moment."; fin 0; fi
 
+# Terminal de cette fenêtre : rapporter.py y affiche chaque résultat (le Bash de Claude n'a pas de terminal)
+export CAMI_TTY_FB="$(tty)"
+
 # Travail gardé pour rapporter.py (noms des groupes et des annonces dans le suivi affiché)
 printf '%s' "$TRAVAIL" > "$HOME/.cami/travail-fb.json"
 printf '%s' "$TRAVAIL" | python3 "$DOSSIER/liste.py"
