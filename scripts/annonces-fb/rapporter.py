@@ -26,8 +26,10 @@ requete = urllib.request.Request(API, data=json.dumps(donnees).encode(), method=
 reponse = json.load(urllib.request.urlopen(requete, timeout=30))
 print('enregistré' if reponse.get('ok') else 'REFUSÉ PAR LE SITE')
 
-# Suivi dans la fenêtre du Terminal (la sortie standard va à Claude)
+# Suivi dans la fenêtre du Terminal (la sortie standard va à Claude) ; publier.py affiche lui-même le sien
 try:
+    if os.environ.get('CAMI_SANS_SUIVI'):
+        raise StopIteration
     travail = json.load(open(os.path.expanduser('~/.cami/travail-fb.json')))
     noms = {g['id']: g['nom'] for g in travail.get('verifier', []) + travail.get('publier', [])}
     nom = noms.get(donnees['groupe'], f"groupe {donnees['groupe']}")
