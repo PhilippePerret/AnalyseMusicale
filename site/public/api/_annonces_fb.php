@@ -293,7 +293,8 @@ function aviser_annonce_fb(): int {
   if (!$dues) return 0;
   $liste = implode('', array_map(fn($a) => '- « ' . extrait_annonce_fb($a) . " »\n", $dues));
   envoyer_mail(ANNONCE_FB_AVIS, 'CAMI • Annonce Facebook à envoyer',
-    "Vous devez envoyer le message aux groupes Facebook. Bouton \"Informer les groupes FB\" sur SuperBoard\n\n$liste");
+    "Vous devez envoyer le message aux groupes Facebook. Bouton \"Informer les groupes FB\" sur SuperBoard\n\n$liste\n"
+    . 'Annonces : ' . ANNONCE_FB_PAGE . "\n");
   $st = db()->prepare('UPDATE annonces_fb SET avis_le = ? WHERE id = ?');
   foreach ($dues as $a) $st->execute([$a['echeance'], $a['id']]);
   return count($dues);
