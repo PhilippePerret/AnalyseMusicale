@@ -15,6 +15,7 @@ const TACHES = [
   'alertes des directs' => 'envoyer_alertes_directs',
   'rappels des cours' => 'envoyer_rappels_cours',
   'avis d’annonce Facebook' => 'aviser_annonce_fb',
+  'avis de fin de répétition Facebook' => 'aviser_fin_annonce_fb',
 ];
 
 foreach (TACHES as $nom => $tache) {

@@ -155,7 +155,7 @@ table.mois a.puce.demande { background: #eaf1f8; color: #2c5178; border: 1px das
 .cours-page .onglets label { font-size: 0.72em; padding: 0.25em 0.8em; cursor: pointer; }
 .cours-page .onglets label + label { border-left: 1px solid #aaa; }
 .cours-page .onglets input { display: none; }
-.cours-page .onglets label:has(input:checked) { background: var(--principal); color: #fff; }
+.cours-page .onglets label:has(input:checked) { background: var(--rouge-exergue); color: #fff; }   /* issue #24 : variante A */
 .cours-page .onglets label:hover:not(:has(input:checked)) { color: var(--survol); }
 .cours-page ul.eleves { list-style: none; padding: 0; margin: 0; border-top: 2px solid var(--principal); border-bottom: 2px solid var(--principal); }
 .cours-page ul.eleves li { display: grid; grid-template-columns: 1.8em 7em 21em 4.5em 5em; justify-content: start; align-items: center; gap: 0.5em 1em; padding: 0.3em; border-bottom: 1px solid #e2e2e2; }

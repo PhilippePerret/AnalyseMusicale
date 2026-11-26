@@ -726,6 +726,21 @@ test('annonce Facebook : groupes, programmation, avis, clé du Mac, publications
   const avis = readFileSync(mailFile, 'utf-8').slice(avant).match(/To: philippe\.perret@analyse-musicale\.fr[^]*?SuperBoard/g);
   assert.equal(avis.length, 1);
   assert.match(avis[0], /Vous devez envoyer le message aux groupes Facebook\. Bouton "Informer les groupes FB" sur SuperBoard/);
+
+  // Répétition en 2 fois : 1er envoi = avant-dernier, 2e = dernier → un mail de fin à chacun
+  const fins = () => readFileSync(mailFile, 'utf-8').slice(avant).match(/(?:Avant-dernier|Dernier) envoi de l'annonce Facebook[^]*?prolonger la répétition/g) || [];
+  assert.equal(fins().length, 1);
+  assert.match(fins()[0], /Avant-dernier envoi de l'annonce Facebook \(envoi 1 sur 2\)\.\nDernier envoi prévu le 12\/01\/2099 à 10:00/);
+  // 1er envoi publié (simulé : le serveur de test vit à l'heure réelle) → échéance suivante, envoi 2 sur 2
+  const pdo = spawnSync('php', ['-r', `$p = new PDO('sqlite:' . getenv('CAMI_DB')); $p->exec("UPDATE annonce_fb SET echeance = '2099-01-12 10:00', numero = 2 WHERE id = 1");`],
+    { env: { ...process.env, CAMI_DB: join(tmp, 'cami.sqlite') }, encoding: 'utf-8' });
+  assert.equal(pdo.status, 0, pdo.stderr);
+  taches('2099-01-12 09:55');
+  assert.equal(fins().length, 1);
+  taches('2099-01-12 10:00');
+  taches('2099-01-12 10:05');
+  assert.equal(fins().length, 2);
+  assert.match(fins()[1], /Dernier envoi de l'annonce Facebook \(envoi 2 sur 2\) : il termine la répétition/);
 });
 
 test('annonce Facebook : au prochain clic, publications, échec retenté, répétition', { skip }, async () => {
@@ -737,12 +752,14 @@ test('annonce Facebook : au prochain clic, publications, échec retenté, répé
   let r = await (await admin.get('/api/annonces-fb.php')).json();
   const [harmonie, musiciens] = r.groupes;
 
-  r = await admin.post('annonces-fb.php', { action: 'enregistrer', texte: 'Annonce', mode: 'clic', repeter: true, repeter_n: 2, repeter_unite: 'jours', repeter_fois: 2 });
+  r = await admin.post('annonces-fb.php', { action: 'enregistrer', texte: 'Annonce pour {group} ({group})', mode: 'clic', repeter: true, repeter_n: 2, repeter_unite: 'jours', repeter_fois: 2 });
   const echeance = r.annonce.echeance;
   assert.ok(echeance);
   let t = await mac();
-  assert.equal(t.texte, 'Annonce');
   assert.deepEqual(t.publier.map((g) => g.id).sort(), [harmonie.id, musiciens.id].sort());
+  // {group} → nom du groupe : un texte par groupe
+  assert.equal(t.publier.find((g) => g.id === harmonie.id).texte, 'Annonce pour Harmonie (Harmonie)');
+  assert.equal(t.publier.find((g) => g.id === musiciens.id).texte, 'Annonce pour Musiciens (Musiciens)');
 
   // Échec : retenté au clic suivant, signalé sur la page
   await mac({ groupe: harmonie.id, publication: 'ok' });

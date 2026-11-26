@@ -26,7 +26,7 @@ $TRAVAIL
    Sinon (contenu indisponible, page introuvable, lien cassé) → lance : python3 $DOSSIER/rapporter.py <id> verification introuvable
 2. Pour chaque groupe de « publier » (sauf ceux rapportés introuvables à l'étape 1) :
    2.1. ouvre son URL, clique dans la zone de rédaction (« Écrivez quelque chose… », « Exprimez-vous… ») ;
-   2.2. saisis EXACTEMENT le texte « texte » des données, retours à la ligne compris, sans rien ajouter ni retirer ;
+   2.2. saisis EXACTEMENT le texte « texte » de CE groupe (propre à chaque groupe), retours à la ligne compris, sans rien ajouter ni retirer ;
    2.3. publication en TEXTE SEUL : si Facebook ajoute un aperçu de lien ou une image, supprime-le (croix de l'aperçu) ;
    2.4. clique sur « Publier » et vérifie que la publication est faite (ou soumise à l'approbation des administrateurs du groupe) ;
    2.5. AUSSITÔT après : python3 $DOSSIER/rapporter.py <id> publication ok   (ajoute « en attente d'approbation » si c'est le cas)

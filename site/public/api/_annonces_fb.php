@@ -48,6 +48,9 @@ CREATE TABLE IF NOT EXISTS publications_fb (   -- résultat d'une publication : 
 );
 INSERT OR IGNORE INTO annonce_fb (id) VALUES (1);
 SQL);
+  $colonnes = db()->query('PRAGMA table_info(annonce_fb)')->fetchAll(PDO::FETCH_COLUMN, 1);
+  // échéance pour laquelle le mail de fin de répétition (avant-dernier, dernier envoi) est parti
+  if (!in_array('avis_fin_le', $colonnes, true)) db()->exec('ALTER TABLE annonce_fb ADD COLUMN avis_fin_le TEXT');
 }
 
 function annonce_fb_maintenant(): string {
@@ -155,7 +158,14 @@ function travail_fb(): array {
     array_filter(groupes_fb(), fn($g) => $g['etat'] === 'a_verifier')));
   $publier = echeance_due($a) ? array_values(array_map(fn($g) => ['id' => (int) $g['id'], 'nom' => $g['nom'], 'url' => $g['url']],
     array_filter(cibles_fb($a), fn($g) => $g['statut'] !== 'ok'))) : [];
-  return ['texte' => $a['texte'], 'verifier' => $verifier, 'publier' => $publier, 'a_faire' => count($verifier) + count($publier)];
+  foreach ($publier as &$g) $g['texte'] = texte_pour_groupe_fb($a['texte'], $g['nom']);
+  unset($g);
+  return ['verifier' => $verifier, 'publier' => $publier, 'a_faire' => count($verifier) + count($publier)];
+}
+
+// « {group} » → nom du groupe (issue #25)
+function texte_pour_groupe_fb(string $texte, string $nom): string {
+  return str_replace('{group}', $nom, $texte);
 }
 
 // Résultat renvoyé par le Mac
@@ -187,6 +197,29 @@ function aviser_annonce_fb(): int {
   envoyer_mail(ANNONCE_FB_AVIS, 'CAMI • Annonce Facebook à envoyer',
     "Vous devez envoyer le message aux groupes Facebook. Bouton \"Informer les groupes FB\" sur SuperBoard\n");
   db()->prepare('UPDATE annonce_fb SET avis_le = ? WHERE id = 1')->execute([$a['echeance']]);
+  return 1;
+}
+
+// Tâche périodique : mail à l'avant-dernier et au dernier envoi d'une répétition (pour la prolonger)
+function aviser_fin_annonce_fb(): int {
+  $a = annonce_fb();
+  $numero = (int) $a['numero'];
+  $fois = (int) $a['repeter_fois'];
+  if (!$a['repeter'] || !echeance_due($a) || $numero < $fois - 1 || $a['avis_fin_le'] === $a['echeance']) return 0;
+  $page = 'https://www.analyse-musicale.fr/admin/annonces/';
+  if ($numero < $fois) {
+    $d = new DateTime($a['echeance']);
+    $d->modify('+' . $a['repeter_n'] . ' ' . ANNONCE_FB_UNITES[$a['repeter_unite']]);
+    $sujet = 'CAMI • Annonce Facebook : avant-dernier envoi';
+    $corps = "Avant-dernier envoi de l'annonce Facebook (envoi $numero sur $fois).\n"
+      . 'Dernier envoi prévu le ' . $d->format('d/m/Y à H:i') . ".\n\nPour prolonger la répétition : $page\n";
+  } else {
+    $sujet = 'CAMI • Annonce Facebook : dernier envoi';
+    $corps = "Dernier envoi de l'annonce Facebook (envoi $numero sur $fois) : il termine la répétition.\n\n"
+      . "Pour prolonger la répétition : $page\n";
+  }
+  envoyer_mail(ANNONCE_FB_AVIS, $sujet, $corps);
+  db()->prepare('UPDATE annonce_fb SET avis_fin_le = ? WHERE id = 1')->execute([$a['echeance']]);
   return 1;
 }
 
