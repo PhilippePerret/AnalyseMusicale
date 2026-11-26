@@ -3,7 +3,7 @@
 # 1. publications déjà dues → informer-groupes-fb.command lancé tout de suite ;
 # 2. échéances d'aujourd'hui encore à venir → un LaunchAgent par heure (fr.analyse-musicale.annonces-fb.AAAAMMJJ-HHMM)
 #    qui lance informer-groupes-fb.command à l'heure dite, puis se retire.
-# Les agents des jours passés sont retirés. Journal : ~/.cami/annonces-fb-planification.log
+# Les agents des jours passés sont retirés. Journal : <projet>/journaux/annonces-fb-planification.log
 import datetime, json, os, plistlib, subprocess, time, urllib.request
 
 ICI = os.path.dirname(os.path.abspath(__file__))
@@ -12,11 +12,12 @@ API = os.environ.get('CAMI_API_FB', 'https://www.analyse-musicale.fr/api/annonce
 CLE = os.path.expanduser('~/.cami/annonces-fb.key')
 AGENTS = os.path.expanduser('~/Library/LaunchAgents')
 PREFIXE = 'fr.analyse-musicale.annonces-fb.'
-JOURNAL = os.path.expanduser('~/.cami/annonces-fb-planification.log')
+JOURNAL = os.path.join(os.path.dirname(os.path.dirname(ICI)), 'journaux', 'annonces-fb-planification.log')   # hors git
 UID = os.getuid()
 
 
 def noter(texte):
+    os.makedirs(os.path.dirname(JOURNAL), exist_ok=True)
     with open(JOURNAL, 'a') as j:
         j.write(f"{datetime.datetime.now():%d/%m/%Y %H:%M} : {texte}\n")
 
@@ -69,10 +70,14 @@ def main():
         noter(f"{len(t['publier'])} publication(s) déjà due(s) : envoi lancé")
         subprocess.run(['open', COMMANDE])
     maintenant = datetime.datetime.now()
+    programmes = 0
     for e in t.get('prochaines', []):
         quand = datetime.datetime.strptime(e, '%Y-%m-%d %H:%M')
         if quand.date() == aujourdhui and quand > maintenant and programmer(quand):
             noter(f"envoi programmé à {quand:%H:%M}")
+            programmes += 1
+    if not programmes and not t.get('publier'):
+        noter("aucun envoi aujourd'hui")
 
 
 if __name__ == '__main__':

@@ -17,3 +17,6 @@ site/public/telechargements/*
 !site/public/telechargements/demo-table-analyse.mp4
 .claude/MEMORY.md
 scripts/surveille-direct/
+
+# Journaux des scripts (annonces Facebook…)
+journaux/

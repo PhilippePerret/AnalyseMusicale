@@ -32,13 +32,17 @@ fi
 
 echo
 echo "Envoi en cours (Chrome, piloté par AppleScript) — résultats au fur et à mesure :"
-JOURNAL="$HOME/.cami/informer-groupes-fb.log"
+mkdir -p ../journaux   # journaux du projet (hors git)
+JOURNAL="$(cd .. && pwd)/journaux/annonces-fb-envois.log"
 { echo; echo "=== $(date '+%d/%m/%Y %H:%M')"; } >> "$JOURNAL"
 python3 -u "$DOSSIER/publier.py" | tee -a "$JOURNAL"
 CODE="${PIPESTATUS[0]}"
 
-# Chrome refermé s'il était fermé au départ
-[ "$CHROME_OUVERT_ICI" = "1" ] && osascript -e 'quit app "Google Chrome"' >/dev/null 2>&1
+# Chrome refermé s'il était fermé au départ, ou s'il ne reste aucune fenêtre ouverte
+FENETRES=$(osascript -e 'tell application "Google Chrome" to count windows' 2>/dev/null)
+if [ "$CHROME_OUVERT_ICI" = "1" ] || [ "$FENETRES" = "0" ]; then
+  osascript -e 'quit app "Google Chrome"' >/dev/null 2>&1
+fi
 
 # Bilan d'après le site : ce qui reste à faire (échecs compris)
 RESTE=$(curl -s -f -H "X-Cami-Cle: $(cat "$CLE_FICHIER")" -A "CAMI-annonces-fb" "$API")
