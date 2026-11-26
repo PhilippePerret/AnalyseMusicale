@@ -37,7 +37,7 @@ EOF
 
 echo "Envoi aux groupes Facebook en cours (Chrome)…"
 echo
-claude -p --chrome \
-  --allowedTools "mcp__claude-in-chrome" "Bash(python3 $DOSSIER/rapporter.py:*)" \
-  "$PROMPT"
-fin $?
+# Consigne par l'entrée standard : --allowedTools prend tous les arguments qui le suivent
+printf '%s' "$PROMPT" | claude -p --chrome \
+  --allowedTools "mcp__claude-in-chrome" "Bash(python3 $DOSSIER/rapporter.py:*)"
+fin "${PIPESTATUS[1]}"
