@@ -37,13 +37,7 @@ import { LIENS_ADMIN } from '../../lib/site';
         <h3 id="titreForm">NOUVELLE ANNONCE</h3>
         <label class="en-regard haut">Annonce <textarea name="texte" required rows="8" maxlength="10000"></textarea></label>
         <p class="texte-seul">Publication en texte seul : aucune image, aucun aperçu de lien. <code>{'{group}'}</code> : remplacé par le nom du groupe.</p>
-        <div class="en-regard haut">
-          <span>Groupes</span>
-          <div>
-            <label class="case"><input type="checkbox" id="tousGroupes"> tous</label>
-            <div class="choix-groupes" id="choixGroupes"></div>
-          </div>
-        </div>
+        <p class="texte-seul">Groupes : cocher dans la liste « Groupes » ci-dessous.</p>
         <div class="en-regard haut">
           <span>Envoi</span>
           <div class="envoi">
@@ -72,7 +66,7 @@ import { LIENS_ADMIN } from '../../lib/site';
       <h2 class="rubrique-admin">Groupes</h2>
       <div class="panneau">
         <table class="groupes">
-          <thead><tr><th>Groupe</th><th>État</th><th></th></tr></thead>
+          <thead><tr><th class="case"><input type="checkbox" id="tousGroupes" title="Tout sélectionner"></th><th>Groupe</th><th>État</th><th></th></tr></thead>
           <tbody id="groupes"></tbody>
         </table>
         <form class="ajout-groupe" id="formGroupe">

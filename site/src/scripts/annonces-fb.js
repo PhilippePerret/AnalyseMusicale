@@ -23,6 +23,7 @@ const panneauGroupes = formGroupe.closest('.panneau');
 let etat = null;
 let choisie = 0;     // annonce affichée en détail
 let editee = null;   // null : formulaire fermé ; 0 : nouvelle annonce ; n : annonce n
+let selection = new Set();   // groupes cochés pour l'annonce éditée
 
 // « 2026-11-20 14:05 » → « 20/11/2026 à 14:05 »
 const dateHeure = (d) => `${d.slice(0, 10).split('-').reverse().join('/')} à ${d.slice(11, 16)}`;
@@ -118,23 +119,9 @@ function afficherDetail() {
   $('confirmerSuppression').hidden = true;
 }
 
-// Cases des groupes du formulaire
-function afficherChoixGroupes(coches) {
-  $('choixGroupes').replaceChildren(...etat.groupes.map((g) => {
-    const label = el('label', `case${g.etat === 'introuvable' ? ' introuvable' : ''}`);
-    const c = el('input');
-    c.type = 'checkbox';
-    c.value = g.id;
-    c.checked = coches.includes(+g.id);
-    c.addEventListener('change', majTous);
-    label.append(c, ` ${g.nom}${g.etat === 'introuvable' ? ' (introuvable)' : ''}`);
-    return label;
-  }));
-  majTous();
-}
-
+// Cases de la liste « Groupes » : groupes de l'annonce éditée (visibles pendant l'édition seulement)
 function majTous() {
-  const cases = [...$('choixGroupes').querySelectorAll('input')];
+  const cases = [...$('groupes').querySelectorAll('input.choix:not(:disabled)')];
   $('tousGroupes').checked = cases.length > 0 && cases.every((c) => c.checked);
 }
 
@@ -151,9 +138,10 @@ function ouvrirForm(id) {
   f.repeter_n.value = a ? a.repeter_n : 1;
   f.repeter_unite.value = a ? a.repeter_unite : 'semaines';
   f.repeter_fois.value = a ? a.repeter_fois : 2;
-  afficherChoixGroupes(a ? a.groupes : etat.groupes.filter((g) => g.etat !== 'introuvable').map((g) => +g.id));
+  selection = new Set(a ? a.groupes.map(Number) : etat.groupes.filter((g) => g.etat !== 'introuvable').map((g) => +g.id));
   message(formAnnonce, '');
   formAnnonce.hidden = false;
+  afficherGroupes();
   afficherDetail();
   f.texte.focus();
 }
@@ -161,11 +149,22 @@ function ouvrirForm(id) {
 function fermerForm() {
   editee = null;
   formAnnonce.hidden = true;
+  afficherGroupes();
 }
 
 // Ligne d'un groupe ; suppression : lien au bout de la ligne, puis confirmation
 function ligne(g) {
   const tr = el('tr');
+  const caseInput = el('input', 'choix');
+  caseInput.type = 'checkbox';
+  caseInput.checked = selection.has(+g.id);
+  caseInput.disabled = editee === null;
+  caseInput.addEventListener('change', () => {
+    if (caseInput.checked) selection.add(+g.id); else selection.delete(+g.id);
+    majTous();
+  });
+  const caseTd = el('td', 'case');
+  caseTd.append(caseInput);
   const tdNom = el('td', 'nom', g.nom);
   const lien = el('a', 'url', g.url.replace(/^https:\/\/www\./, ''));
   lien.href = g.url;
@@ -187,7 +186,8 @@ function ligne(g) {
   confirmer.addEventListener('click', () => poster({ action: 'supprimer', id: g.id }));
   tdSuppr.append(supprimer, confirmer);
 
-  tr.append(tdNom, tdEtat, tdSuppr);
+  tr.dataset.id = g.id;
+  tr.append(caseTd, tdNom, tdEtat, tdSuppr);
   return tr;
 }
 
@@ -197,10 +197,13 @@ function afficherGroupes() {
   if (!etat.groupes.length) {
     const tr = el('tr');
     const td = el('td', 'vide', 'Aucun groupe pour le moment.');
-    td.colSpan = 3;
+    td.colSpan = 4;
     tr.append(td);
     corps.append(tr);
   }
+  corps.closest('table').classList.toggle('edition', editee !== null);
+  $('tousGroupes').disabled = editee === null;
+  majTous();
 }
 
 function afficher() {
@@ -233,7 +236,10 @@ $('annuler').addEventListener('click', () => { fermerForm(); afficherDetail(); }
 $('supprimerAnnonce').addEventListener('click', () => { $('supprimerAnnonce').hidden = true; $('confirmerSuppression').hidden = false; });
 $('confirmerSuppression').addEventListener('click', () => poster({ action: 'supprimer_annonce', id: choisie }));
 $('tousGroupes').addEventListener('change', (e) => {
-  for (const c of $('choixGroupes').querySelectorAll('input')) c.checked = e.target.checked;
+  for (const c of $('groupes').querySelectorAll('input.choix')) {
+    c.checked = e.target.checked;
+    if (c.checked) selection.add(+c.closest('tr').dataset.id); else selection.delete(+c.closest('tr').dataset.id);
+  }
 });
 
 formAnnonce.addEventListener('submit', async (e) => {
@@ -241,7 +247,7 @@ formAnnonce.addEventListener('submit', async (e) => {
   const f = formAnnonce.elements;
   const mode = f.mode.value;
   if (mode === 'date' && (!f.date.value || !f.heure.value)) return message(formAnnonce, ERREURS.programmation);
-  const groupes = [...$('choixGroupes').querySelectorAll('input:checked')].map((c) => +c.value);
+  const groupes = [...selection].filter((id) => etat.groupes.some((g) => +g.id === id));
   if (!groupes.length) return message(formAnnonce, ERREURS.groupes);
   const r = await poster({
     action: 'enregistrer',
@@ -266,7 +272,6 @@ formGroupe.addEventListener('submit', async (e) => {
   const r = await poster({ action: 'ajouter', nom: formGroupe.elements.nom.value, url: formGroupe.elements.url.value });
   if (!r.ok) return message(panneauGroupes, ERREURS[r.erreur] || 'Ajout impossible.');
   formGroupe.reset();
-  if (editee !== null) afficherChoixGroupes([...$('choixGroupes').querySelectorAll('input:checked')].map((c) => +c.value));
   message(panneauGroupes, 'Groupe ajouté : son existence sera vérifiée au prochain clic sur « Informer les groupes FB ».', true);
 });
 

@@ -111,6 +111,7 @@ h2.rubrique-admin { color: var(--principal); font-size: 1.2em; text-transform: u
 }
 
 /* Page /admin/annonces/ : annonces Facebook (issue #26) */
+.annonces-fb .barre { margin: 2em 0 0.6em; }
 .annonces-fb .barre h2 { margin: 0; }
 .annonces-fb table.annonces { width: 100%; border-collapse: collapse; }
 .annonces-fb table.annonces th { text-align: left; font-weight: 700; color: var(--principal); border-bottom: 2px solid var(--principal); padding: 0.2em 0.5em; }
@@ -129,9 +130,8 @@ h2.rubrique-admin { color: var(--principal); font-size: 1.2em; text-transform: u
 .annonces-fb .exemple { white-space: pre-wrap; background: #fff; border: 1px solid #e2e2e2; padding: 0.4em 0.6em; }
 .annonces-fb .zone-suppression { display: flex; align-items: center; gap: 0.8em; margin-top: 0.6em; padding-top: 0.5em; border-top: 1px dashed #ccc; }
 .annonces-fb .panneau div.en-regard { display: grid; grid-template-columns: 9.5em 1fr; gap: 0.8em; align-items: start; }
-.annonces-fb .choix-groupes { display: flex; flex-wrap: wrap; gap: 0.2em 1.4em; margin-top: 0.3em; }
-.annonces-fb label.case { display: inline-flex; align-items: center; gap: 0.4em; }
-.annonces-fb label.case.introuvable { color: #999; }
+.annonces-fb table.groupes .case { width: 1.8em; }
+.annonces-fb table.groupes:not(.edition) .case input { visibility: hidden; }   /* cases : seulement pendant l'édition, colonne fixe */
 .annonces-fb .envoi { display: grid; gap: 0.4em; }
 .annonces-fb button.annuler { font-size: 0.85em; }
 .annonces-fb .panneau p.texte-seul { margin: 0; padding-left: 10.3em; color: #777; font-size: 0.9em; font-style: italic; }
