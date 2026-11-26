@@ -60,8 +60,10 @@ echo "Envoi en cours (Chrome) — résultats au fur et à mesure :"
 cd .. || exit 1   # racine du projet (MEMORY.md du projet)
 JOURNAL="$HOME/.cami/informer-groupes-fb.log"
 { echo; echo "=== $(date '+%d/%m/%Y %H:%M')"; } >> "$JOURNAL"
-printf '%s' "$PROMPT" | claude -p --chrome \
-  --allowedTools "mcp__claude-in-chrome" "Bash(python3 $DOSSIER/rapporter.py:*)" | tee -a "$JOURNAL"
+# Actions de Claude affichées en direct (suivi.py)
+printf '%s' "$PROMPT" | claude -p --chrome --output-format stream-json --verbose \
+  --allowedTools "mcp__claude-in-chrome" "Bash(python3 $DOSSIER/rapporter.py:*)" \
+  | python3 -u "$DOSSIER/suivi.py" | tee -a "$JOURNAL"
 CODE="${PIPESTATUS[1]}"
 
 # Chrome refermé s'il était fermé au départ
