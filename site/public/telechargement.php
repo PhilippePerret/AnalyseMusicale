@@ -7,7 +7,8 @@
 require __DIR__ . '/api/_cami.php';
 
 // Commande Terminal sortant l'application de la quarantaine (macOS, application non signée)
-const DEBLOCAGE_MAC = 'xattr -dr com.apple.quarantine /Applications/Table-d-analyse.app';
+// (motif : nom de l'application « Table d’analyse.app », apostrophe et espace compris)
+const DEBLOCAGE_MAC = 'xattr -dr com.apple.quarantine /Applications/Table*analyse.app';
 
 function reponse(bool $ok, string $error = ''): void {
   repondre(['ok' => $ok, 'error' => $error]);
@@ -27,19 +28,19 @@ $systeme = texte($_POST['systeme'] ?? '', 40);
 if (!fichier_valide($fichier)) reponse(false, 'plateforme');
 $jeton = bin2hex(random_bytes(16));
 
-// Marche à suivre pour ouvrir l'application non signée (mail macOS seulement)
+// Marche à suivre pour ouvrir l'application non signée (mail macOS seulement),
+// placée juste sous le lien de téléchargement
 function texte_deblocage_mac(): string {
-  return "Apple contraignant de payer un abonnement annuel de développeur pour « autoriser » les applications, "
-    . "même lorsqu'on les fournit gratuitement, il est nécessaire de débloquer Table d’analyse (une seule fois) "
-    . "pour pouvoir l'utiliser. À cette fin :\n"
-    . "- ouvrez votre application Terminal (Cmd+Espace puis tapez \"Termi\"),\n"
+  return "VOUS DEVEZ DÉBLOQUER L’APPLICATION pour pouvoir l’utiliser (1) :\n"
+    . "- ouvrez une fenêtre Terminal (2),\n"
     . "- copiez-collez le code : " . DEBLOCAGE_MAC . "\n"
-    . "- pressez la touche Entrée\n"
-    . "- rejoignez le dossier /Applications\n"
-    . "- control-cliquez sur l'application (ou clic-droit)\n"
-    . "- choisissez le menu \"Ouvrir\"\n\n"
-    . "L'application devrait s'ouvrir sans problème. Si cependant vous en rencontrez, "
-    . "merci de nous en informer en répondant à ce message.\n\n";
+    . "- pressez la touche Entrée.\n\n"
+    . "Vous pouvez maintenant ouvrir l’application et l’utiliser.\n\n"
+    . "(1) Apple contraint à payer un abonnement annuel de développeur pour « autoriser » les applications, "
+    . "même lorsqu’elles sont fournies gratuitement. Table d’analyse doit donc être débloquée, une seule fois, "
+    . "après avoir été placée dans le dossier Applications.\n"
+    . "(2) Trouvez l’application avec Spotlight : Cmd + Espace, commencez à taper « Termi », choisissez l’application Terminal.\n\n"
+    . "Si vous rencontrez un problème, merci de nous en informer en répondant à ce message.\n\n";
 }
 
 // Marche à suivre quand l'antivirus bloque l'application non signée (mail Windows seulement)
