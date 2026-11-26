@@ -16,6 +16,17 @@ TRAVAIL=$(curl -s -f -H "X-Cami-Cle: $(cat "$CLE_FICHIER")" -A "CAMI-annonces-fb
 A_FAIRE=$(printf '%s' "$TRAVAIL" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("a_faire", 0))')
 if [ "$A_FAIRE" = "0" ]; then echo "Rien à envoyer aux groupes Facebook pour le moment."; fin 0; fi
 
+# Travail gardé pour rapporter.py (noms des groupes et des annonces dans le suivi affiché)
+printf '%s' "$TRAVAIL" > "$HOME/.cami/travail-fb.json"
+printf '%s' "$TRAVAIL" | python3 "$DOSSIER/liste.py"
+
+# Chrome ouvert (sinon l'extension Claude in Chrome est absente), le temps qu'elle se connecte
+if ! pgrep -xq "Google Chrome"; then
+  echo "Ouverture de Chrome…"
+  open -ga "Google Chrome"
+  sleep 8
+fi
+
 IFS= read -r -d '' PROMPT <<EOF || true
 Tu publies des annonces dans des groupes Facebook avec Claude in Chrome (session Facebook de l'utilisateur déjà ouverte).
 Données (JSON) :
@@ -35,9 +46,10 @@ $TRAVAIL
 4. Termine par un compte rendu d'une ligne par élément : groupe, début de l'annonce — résultat.
 EOF
 
-echo "Envoi aux groupes Facebook en cours (Chrome)…"
 echo
+echo "Envoi en cours (Chrome) — résultats au fur et à mesure :"
 # Consigne par l'entrée standard : --allowedTools prend tous les arguments qui le suivent
+cd .. || exit 1   # racine du projet (MEMORY.md du projet)
 printf '%s' "$PROMPT" | claude -p --chrome \
   --allowedTools "mcp__claude-in-chrome" "Bash(python3 $DOSSIER/rapporter.py:*)"
 fin "${PIPESTATUS[1]}"

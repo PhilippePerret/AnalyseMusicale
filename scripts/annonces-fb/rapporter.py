@@ -25,4 +25,21 @@ requete = urllib.request.Request(API, data=json.dumps(donnees).encode(), method=
 })
 reponse = json.load(urllib.request.urlopen(requete, timeout=30))
 print('enregistré' if reponse.get('ok') else 'REFUSÉ PAR LE SITE')
+
+# Suivi dans la fenêtre du Terminal (la sortie standard va à Claude)
+try:
+    travail = json.load(open(os.path.expanduser('~/.cami/travail-fb.json')))
+    noms = {g['id']: g['nom'] for g in travail.get('verifier', []) + travail.get('publier', [])}
+    nom = noms.get(donnees['groupe'], f"groupe {donnees['groupe']}")
+    if 'verification' in donnees:
+        ligne = f"{'✓' if donnees['verification'] == 'existant' else '✗'} {nom} : groupe {donnees['verification']}"
+    else:
+        ligne = f"{'✓' if donnees['publication'] == 'ok' else '✗'} {nom} (annonce {donnees['annonce']}) : " \
+            + ('publiée' if donnees['publication'] == 'ok' else 'ÉCHEC') + (f" — {donnees['detail']}" if donnees.get('detail') else '')
+    if not reponse.get('ok'):
+        ligne += ' (REFUSÉ PAR LE SITE)'
+    with open('/dev/tty', 'w') as tty:
+        print(ligne, file=tty)
+except Exception:
+    pass
 sys.exit(0 if reponse.get('ok') else 1)
