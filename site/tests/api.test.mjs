@@ -225,7 +225,7 @@ test('téléchargement : fichier absent ou inconnu refusé, commande de débloca
   assert.deepEqual(await demande('Table Analyse.AppImage'), { ok: false, error: 'indisponible' });
   assert.deepEqual(await demande('../cami.sqlite'), { ok: false, error: 'plateforme' });
   assert.deepEqual(await demande('https://github.com/PhilippePerret/TableAnalyse-nodejs/releases/download/v2.1.6/Table-Analyse-2.1.6.dmg'), { ok: false, error: 'plateforme' });
-  assert.ok(readFileSync(mailFile, 'utf-8').includes('xattr -dr com.apple.quarantine "/Applications/Table d’analyse.app"'));
+  assert.ok(readFileSync(mailFile, 'utf-8').includes('xattr -dr com.apple.quarantine "/Applications/Table Analyse.app"'));
 });
 
 test('téléchargement direct d’un visiteur identifié enregistré', { skip }, async () => {

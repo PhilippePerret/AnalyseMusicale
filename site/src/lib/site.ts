@@ -34,7 +34,7 @@ export const TABLE_ANALYSE = {
   // Image affichée avant le lancement de la vidéo
   demoVignette: 'https://pub-232cc64dc0ba45a99cac609a6da2369e.r2.dev/table-analyse/premiere-utilisation.jpg',
   // Commande Terminal sortant l'application de la quarantaine (macOS, application non signée)
-  deblocageMac: 'xattr -dr com.apple.quarantine "/Applications/Table d’analyse.app"',
+  deblocageMac: 'xattr -dr com.apple.quarantine "/Applications/Table Analyse.app"',
 };
 
 // Liens de l'administrateur vers les cours (pages /admin/ et /cours/, en haut à droite)

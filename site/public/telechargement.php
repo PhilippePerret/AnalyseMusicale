@@ -7,7 +7,7 @@
 require __DIR__ . '/api/_cami.php';
 
 // Commande Terminal sortant l'application de la quarantaine (macOS, application non signée)
-const DEBLOCAGE_MAC = 'xattr -dr com.apple.quarantine "/Applications/Table d’analyse.app"';
+const DEBLOCAGE_MAC = 'xattr -dr com.apple.quarantine "/Applications/Table Analyse.app"';
 
 function reponse(bool $ok, string $error = ''): void {
   repondre(['ok' => $ok, 'error' => $error]);
