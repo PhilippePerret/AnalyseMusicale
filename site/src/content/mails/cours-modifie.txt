@@ -1,0 +1,16 @@
+// Cours — horaire, durée, lieu ou groupe d'un cours modifié par Philippe
+// Variables : {pseudo}, {ancien} (ancien horaire ; vide si le cours n'était pas encore fixé), {quand} (nouvel horaire), {lieu}
+Objet : CAMI • Cours modifié
+Bonjour{if pseudo} {pseudo}{/if pseudo},
+
+{if ancien}Votre cours du {ancien} a été modifié.{/if ancien}{if !ancien}Votre cours a été fixé.{/if !ancien}
+
+Nouvel horaire : {quand}.
+{if lieu}
+
+Lieu : {lieu}
+{/if lieu}
+
+Philippe Perret
+Classe d’Analyse Musicale — {site}
+Vos cours : {site}/cours/student/

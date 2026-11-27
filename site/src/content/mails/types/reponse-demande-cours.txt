@@ -1,13 +1,7 @@
-<?php
-// Mails-types de l'administrateur (chargés depuis /contact/ quand il est identifié).
-// Variables : {nom} (champ « Nom » du formulaire), {url-cours} (page des cours).
-// Blocs conditionnels : {if condition} … {/if condition} (une case à cocher par condition).
-
-const MAILS_TYPES = [
-  'reponse-demande-cours' => [
-    'titre' => 'Réponse à une demande de cours',
-    'objet' => 'Classe d’analyse musicale — CAMI',
-    'corps' => <<<'TXT'
+// Mail-type proposé dans /contact/ (administration). Variables : {nom}, {url-cours} ;
+// blocs {if condition} … {/if condition} : une case à cocher par condition.
+Titre : Réponse à une demande de cours
+Objet : Classe d’analyse musicale — CAMI
 Bonjour {nom},
 
 Oui, vous pouvez tout à fait suivre des cours d’analyse musicale ponctuels avec la CAMI, donc avec moi.
@@ -36,6 +30,3 @@ Bien à vous,
 Philippe Perret
 —————————————————————————
 Cours d’analyse de la CAMI : {url-cours}
-TXT,
-  ],
-];

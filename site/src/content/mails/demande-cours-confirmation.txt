@@ -1,0 +1,17 @@
+// Formulaire /cours/demande/ — confirmation de l'adresse du demandeur
+// Variables : {nom}, {lien} (lien de confirmation)
+Objet : CAMI • Confirmez votre demande de cours
+Bonjour {nom},
+
+Merci pour votre demande de cours d’analyse musicale.
+
+Pour confirmer votre adresse, cliquez sur ce lien :
+
+{lien}
+
+Votre demande me sera transmise seulement après ce clic de confirmation.
+
+Si vous n’êtes pas à l’origine de cette demande, ignorez simplement ce message.
+
+Philippe Perret
+Classe d’Analyse Musicale — {site}

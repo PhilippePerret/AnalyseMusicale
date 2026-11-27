@@ -1,0 +1,5 @@
+// Formulaire /cours/demande/ — avis à Philippe, après confirmation de l'adresse
+// Variables : {nom}, {demande} (détail : adresse, fréquence, tranches horaires, connaissances)
+Objet : CAMI • Demande de cours — {nom}
+{demande}
+Demandes de cours : {site}/cours/admin/

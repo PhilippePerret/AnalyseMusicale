@@ -1,0 +1,6 @@
+// Cours — avis à Philippe : un élève a placé un cours accordé
+// Variables : {nom} (élève), {quand}
+Objet : CAMI • Cours placé par {nom}
+{nom} a placé son cours le {quand}.
+
+{site}/cours/student/

@@ -1,0 +1,6 @@
+// /contact/ (administration) — copie à Philippe d'un mail envoyé à une adresse
+// Variables : {objet}, {email} (destinataire), {message}
+Objet : Copie • {objet}
+Envoyé à : {email}
+
+{message}

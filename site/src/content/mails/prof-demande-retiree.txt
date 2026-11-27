@@ -1,0 +1,6 @@
+// Cours — avis à Philippe : un élève a retiré sa demande de cours
+// Variables : {nom} (élève), {quand}
+Objet : CAMI • Demande de cours retirée par {nom}
+{nom} a annulé sa demande de cours du {quand}.
+
+{site}/cours/student/

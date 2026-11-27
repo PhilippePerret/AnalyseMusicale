@@ -1,0 +1,6 @@
+// Cours — avis à Philippe : un élève a annulé un cours
+// Variables : {nom} (élève), {quand}
+Objet : CAMI • Cours annulé par {nom}
+{nom} a annulé son cours du {quand}.
+
+{site}/cours/student/

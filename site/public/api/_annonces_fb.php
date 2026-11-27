@@ -296,9 +296,8 @@ function aviser_annonce_fb(): int {
   $dues = array_filter(annonces_fb(), fn($a) => echeance_due($a) && $a['avis_le'] !== $a['echeance']);
   if (!$dues) return 0;
   $liste = implode('', array_map(fn($a) => '- « ' . extrait_annonce_fb($a) . " »\n", $dues));
-  envoyer_mail(ANNONCE_FB_AVIS, 'CAMI • Annonce Facebook à envoyer',
-    "Vous devez envoyer le message aux groupes Facebook. Bouton \"Informer les groupes FB\" sur SuperBoard\n\n$liste\n"
-    . 'Annonces : ' . ANNONCE_FB_PAGE . "\n");
+  [$objet, $corps] = mail_modele('prof-annonce-fb', ['liste' => rtrim($liste), 'page' => ANNONCE_FB_PAGE], null);
+  envoyer_mail(ANNONCE_FB_AVIS, $objet, $corps);
   $st = db()->prepare('UPDATE annonces_fb SET avis_le = ? WHERE id = ?');
   foreach ($dues as $a) $st->execute([$a['echeance'], $a['id']]);
   return count($dues);
@@ -315,13 +314,9 @@ function aviser_fin_annonce_fb(): int {
     if ($numero < $fois) {
       $d = new DateTime($a['echeance']);
       $d->modify('+' . $a['repeter_n'] . ' ' . ANNONCE_FB_UNITES[$a['repeter_unite']]);
-      $sujet = 'CAMI • Annonce Facebook : avant-dernier envoi';
-      $corps = "Avant-dernier envoi de l'annonce Facebook (envoi $numero sur $fois) :\n$nom\n"
-        . 'Dernier envoi prévu le ' . $d->format('d/m/Y à H:i') . ".\n\nPour prolonger la répétition : " . ANNONCE_FB_PAGE . "\n";
+      [$sujet, $corps] = mail_modele('prof-annonce-fb-avant-dernier', ['numero' => $numero, 'fois' => $fois, 'annonce' => $nom, 'dernier' => $d->format('d/m/Y à H:i'), 'page' => ANNONCE_FB_PAGE], null);
     } else {
-      $sujet = 'CAMI • Annonce Facebook : dernier envoi';
-      $corps = "Dernier envoi de l'annonce Facebook (envoi $numero sur $fois) : il termine la répétition.\n$nom\n\n"
-        . 'Pour prolonger la répétition : ' . ANNONCE_FB_PAGE . "\n";
+      [$sujet, $corps] = mail_modele('prof-annonce-fb-dernier', ['numero' => $numero, 'fois' => $fois, 'annonce' => $nom, 'page' => ANNONCE_FB_PAGE], null);
     }
     envoyer_mail(ANNONCE_FB_AVIS, $sujet, $corps);
     db()->prepare('UPDATE annonces_fb SET avis_fin_le = ? WHERE id = ?')->execute([$a['echeance'], $a['id']]);

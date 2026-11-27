@@ -1,0 +1,17 @@
+// Cours — un ou plusieurs cours supprimés par Philippe (case « Prévenir »)
+// Variables : {pseudo}, {quand} (si un seul cours), {liste} (si plusieurs : un cours par ligne)
+Objet : CAMI • Cours annulé
+Bonjour{if pseudo} {pseudo}{/if pseudo},
+
+{if liste}
+Ces cours sont annulés :
+
+{liste}
+{/if liste}
+{if !liste}
+Votre cours du {quand} est annulé.
+{/if !liste}
+
+Philippe Perret
+Classe d’Analyse Musicale — {site}
+Vos cours : {site}/cours/student/

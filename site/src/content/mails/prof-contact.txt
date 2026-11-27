@@ -1,0 +1,8 @@
+// Formulaire /contact/ — message d'un visiteur transmis à Philippe (Reply-To : le visiteur)
+// Variables : {nom}, {email}, {objet} (objet choisi dans le formulaire), {message}
+Objet : CAMI • {objet}
+Nom : {nom}
+E-mail : {email}
+Objet : {objet}
+
+{message}

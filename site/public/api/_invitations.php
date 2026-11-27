@@ -89,12 +89,11 @@ function envoyer_invitation(int $id): ?array {
   $liste = implode("\n", array_map(function ($d) use ($echecs) {
     return '  ' . $d['email'] . ' (' . $d['genre'] . ')' . (in_array($d['email'], $echecs, true) ? ' — ÉCHEC' : '');
   }, $adresses));
-  envoyer_mail(
-    NOTIFICATIONS,
-    '[Copie] ' . g($i['objet'], 'H'),
-    "Invitation envoyée le " . date('d/m/Y à H:i', strtotime($maintenant)) . " à {$envoyes} personne" . ($envoyes > 1 ? 's' : '') . " :\n{$liste}\n\n"
-      . "————————————————————\n\n" . g($i['message'], 'H') . "\n"
-  );
+  [$objet, $corps] = mail_modele('prof-copie-invitation', [
+    'objet' => g($i['objet'], 'H'), 'date' => date('d/m/Y à H:i', strtotime($maintenant)),
+    'nombre' => $envoyes . ' personne' . ($envoyes > 1 ? 's' : ''), 'liste' => $liste, 'message' => g($i['message'], 'H'),
+  ], null);
+  envoyer_mail(NOTIFICATIONS, $objet, $corps);
   $i = invitation($id);
   file_put_contents(
     dossier_sauvegarde_invitations() . '/' . $id . '-' . date('Y-m-d-His', strtotime($maintenant)) . '.json',

@@ -11,8 +11,8 @@ function aller(string $url): void {
 
 function signaler(array $t): void {
   brevo_ajouter($t['email'], 'telechargement');
-  envoyer_mail(NOTIFICATIONS, 'CAMI • Table d’analyse téléchargée',
-    "Adresse : {$t['email']}\nPlateforme : {$t['systeme']}\nVersion : {$t['version']}\nDate : {$t['telecharge_le']}\n");
+  [$objet, $corps] = mail_modele('prof-telechargement', ['email' => $t['email'], 'systeme' => $t['systeme'], 'version' => $t['version'], 'date' => $t['telecharge_le']], null);
+  envoyer_mail(NOTIFICATIONS, $objet, $corps);
 }
 
 $maintenant = date('Y-m-d H:i:s');

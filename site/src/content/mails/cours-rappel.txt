@@ -1,0 +1,20 @@
+// Cours — rappel avant un cours (délais réglés par l'élève)
+// Variables : {pseudo}, {date} (ex. jeudi 3 décembre 2026), {quand} (date, heure et durée), {lieu}, {oeuvres} (peuvent être vides)
+Objet : CAMI • Rappel : cours du {date}
+Bonjour{if pseudo} {pseudo}{/if pseudo},
+
+Petit rappel : votre cours d’analyse aura lieu le {quand}.
+{if lieu}
+
+Lieu : {lieu}
+{/if lieu}
+{if oeuvres}
+
+Œuvre(s) : {oeuvres}
+{/if oeuvres}
+
+Vous pouvez modifier les délais de ces rappels dans votre profil, sur la page de vos cours.
+
+Philippe Perret
+Classe d’Analyse Musicale — {site}
+Vos cours : {site}/cours/student/

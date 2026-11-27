@@ -1,0 +1,9 @@
+// Invitations — copie à Philippe d'une invitation envoyée
+// Variables : {objet}, {date} (ex. 27/11/2026 à 16:30), {nombre} (ex. 3 personnes), {liste} (une adresse par ligne), {message}
+Objet : [Copie] {objet}
+Invitation envoyée le {date} à {nombre} :
+{liste}
+
+————————————————————
+
+{message}

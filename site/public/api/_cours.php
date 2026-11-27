@@ -166,32 +166,28 @@ function armer_rappels(int $cid): void {
 
 // --- Mails ---
 
-function signature_cours(): string {
-  return "\nPhilippe Perret\nClasse d’Analyse Musicale — " . SITE . "\nVos cours : " . SITE . "/cours/student/\n";
-}
+// Modèles : src/content/mails/cours-*.txt (élèves) et prof-*.txt (avis à l'administrateur)
 
-function bonjour(array $e): string { return 'Bonjour' . ($e['pseudo'] ? ' ' . $e['pseudo'] : '') . ",\n\n"; }
-
-// Mail à chaque élève du groupe ; $texte peut contenir des marques genrées [m|f]
-function mail_groupe(int $gid, string $sujet, string $texte): void {
+// Mail à chaque élève du groupe (modèle + variables ; {pseudo} ajouté pour chacun)
+function mail_groupe(int $gid, string $modele, array $v): void {
   foreach (eleves_groupe($gid) as $e) {
-    brevo_mail($e['email'], $sujet, g(bonjour($e) . $texte . "\n" . signature_cours(), $e['genre']), NOTIFICATIONS);
+    [$sujet, $corps] = mail_modele($modele, $v + ['pseudo' => (string) $e['pseudo']], $e['genre']);
+    brevo_mail($e['email'], $sujet, $corps, NOTIFICATIONS);
   }
 }
 
-function mail_prof(string $sujet, string $texte, string $repondre_a = ''): void {
-  brevo_mail(NOTIFICATIONS, $sujet, $texte . "\n\n" . SITE . "/cours/student/\n", $repondre_a);
+function mail_prof(string $modele, array $v, string $repondre_a = ''): void {
+  [$sujet, $corps] = mail_modele($modele, $v);
+  brevo_mail(NOTIFICATIONS, $sujet, $corps, $repondre_a);
 }
-
-function lieu_fr(string $lieu): string { return $lieu !== '' ? "\nLieu : $lieu\n" : ''; }
 
 // --- Rappels (tâche périodique, _taches.php) ---
 
 function mail_rappel(array $c, array $e): array {
-  $texte = 'Petit rappel : votre cours d’analyse aura lieu le ' . quand_fr($c['debut'], (int) $c['duree']) . ".\n" . lieu_fr($c['lieu']);
-  if ($c['oeuvres'] !== '') $texte .= "\nŒuvre(s) : {$c['oeuvres']}\n";
-  $texte .= "\nVous pouvez modifier les délais de ces rappels dans votre profil, sur la page de vos cours.\n";
-  return ['CAMI • Rappel : cours du ' . date_fr(substr($c['debut'], 0, 10)), g(bonjour($e) . $texte . signature_cours(), $e['genre'])];
+  return mail_modele('cours-rappel', [
+    'pseudo' => (string) $e['pseudo'], 'date' => date_fr(substr($c['debut'], 0, 10)),
+    'quand' => quand_fr($c['debut'], (int) $c['duree']), 'lieu' => $c['lieu'], 'oeuvres' => $c['oeuvres'],
+  ], $e['genre']);
 }
 
 function envoyer_rappels_cours(): int {

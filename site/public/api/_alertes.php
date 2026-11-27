@@ -57,20 +57,17 @@ function destinataires_alertes(string $jour): array {
   return $liste;
 }
 
+// Modèle : alerte-direct (direct YouTube) ou alerte-zoom (séance Zoom), dans src/content/mails/
 function mail_alerte(array $seance, string $palier, string $email, array $d): array {
   $jour = $seance['jour'];
-  $corps = 'Bonjour' . ($d['pseudo'] !== '' ? ' ' . $d['pseudo'] : '') . ",\n\n"
-    . 'Ce message pour vous avertir que le prochain direct YouTube de Philippe Perret aura lieu le '
-    . date_fr($jour) . ' de ' . heure_fr($seance['debut']) . ' à ' . heure_fr($seance['fin']) . ".\n\n"
-    . "Pour le rejoindre, utilisez le lien depuis le Calendrier des Jeudis de l’analyse :\n" . SITE . "/jeudis-analyse/\n\n"
-    . "Pour avoir tous les renseignements sur ces directs, vous pouvez consulter cette page :\n" . SITE . "/jeudis-analyse/detail/\n\n";
-  if ($palier !== '1h') {
-    $corps .= "Si vous ne voulez plus recevoir d’alerte pour cette session, cliquez sur ce lien :\n" . lien_refus($email, $jour) . "\n\n";
-  }
-  $corps .= "Si vous ne voulez plus jamais recevoir d’alerte pour les « Jeudis de l’analyse », vous pouvez cliquer sur ce lien :\n" . lien_refus($email, '') . "\n\n"
-    . 'Merci de votre attention, en espérant vous compter parmi les ' . g('participant[|e]s', $d['genre']) . " de ce rendez-vous hebdomadaire.\n\n"
-    . "Bien à vous,\n\nL’administration de la CAMI\n" . SITE . "\n";
-  return ['🎼 Analyses musicales — Prochaine session Direct YouTube', $corps];
+  return mail_modele(($seance['diffusion'] ?? '') === 'zoom' ? 'alerte-zoom' : 'alerte-direct', [
+    'pseudo' => $d['pseudo'],
+    'date' => date_fr($jour),
+    'debut' => heure_fr($seance['debut']),
+    'fin' => heure_fr($seance['fin']),
+    'refus-session' => $palier !== '1h' ? lien_refus($email, $jour) : '',
+    'refus-tout' => lien_refus($email, ''),
+  ], $d['genre']);
 }
 
 // Séances à venir : palier le plus proche arrivé à échéance et pas encore traité (les plus lointains sont sautés)

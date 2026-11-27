@@ -386,6 +386,34 @@ function servir_fichier_ta(string $fichier): void {
 // --- Mails ---
 
 // Texte genré : [masculin|féminin] — « inscrit[|e] » ; N (discret) → masculin
+// Modèles des mails (fichiers modifiables : src/content/mails/, copiés dans api/mails/ au build).
+// Fichier : lignes « // » = commentaires ; 1re ligne « Objet : … » ; puis le corps.
+// {variable} remplacée ; blocs {if x} … {/if x} (gardés si x non vide), {if !x} … {/if !x} (si x vide) ;
+// marques genrées [masculin|féminin]. {site} toujours disponible. Renvoie [objet, corps].
+function mail_modele(string $nom, array $v = [], ?string $genre = 'N', string $ext = 'txt'): array {
+  $brut = (string) file_get_contents(__DIR__ . "/mails/$nom." . ($ext === 'html' ? 'html.txt' : $ext));   // .html publiés en .html.txt
+  $lignes = array_values(array_filter(explode("\n", str_replace("\r", '', $brut)), function ($l) { return strpos(ltrim($l), '//') !== 0; }));
+  $objet = '';
+  if ($lignes && preg_match('/^Objet\s*:\s*(.*)$/u', $lignes[0], $m)) { $objet = trim($m[1]); array_shift($lignes); }
+  $v += ['site' => SITE];
+  $remplir = function (string $t) use ($v, $genre): string {
+    do {
+      $avant = $t;
+      $garder = function ($m) use ($v) {
+        $plein = isset($v[$m[2]]) && $v[$m[2]] !== '' && $v[$m[2]] !== false && $v[$m[2]] !== null;
+        return ($m[1] === '!' ? !$plein : $plein) ? $m[3] : '';
+      };
+      // Balises seules sur leur ligne : lignes retirées avec elles ; sinon, dans la ligne
+      $t = preg_replace_callback('/^\{if (!?)([\w-]+)\}\n(.*?)^\{\/if \1\2\}(?:\n|$)/smu', $garder, $t);
+      $t = preg_replace_callback('/\{if (!?)([\w-]+)\}(.*?)\{\/if \1\2\}/su', $garder, $t);
+    } while ($t !== $avant);
+    $t = preg_replace_callback('/\{([\w-]+)\}/u', function ($m) use ($v) { return array_key_exists($m[1], $v) ? (string) $v[$m[1]] : $m[0]; }, $t);
+    return $genre === null ? $t : g($t, $genre);   // null : marques genrées laissées telles quelles (textes saisis)
+  };
+  $corps = preg_replace("/\n{3,}/", "\n\n", trim($remplir(implode("\n", $lignes)))) . "\n";
+  return [$remplir($objet), $corps];
+}
+
 function g(string $texte, string $genre): string {
   return preg_replace_callback('/\[([^\[\]|]*)\|([^\[\]|]*)\]/u', function ($m) use ($genre) {
     return $genre === 'F' ? $m[2] : $m[1];

@@ -1,0 +1,6 @@
+// Cours — avis à Philippe : un élève a déplacé un cours
+// Variables : {nom} (élève), {ancien} (ancien horaire), {quand} (nouvel horaire)
+Objet : CAMI • Cours déplacé par {nom}
+{nom} a déplacé son cours du {ancien} au {quand}.
+
+{site}/cours/student/

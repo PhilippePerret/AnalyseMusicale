@@ -147,9 +147,8 @@ if (!$admin) {
     db()->prepare("UPDATE cours SET debut = ?, statut = 'place' WHERE id = ?")->execute([$debut, $c['id']]);
     armer_rappels((int) $c['id']);
     $nom = nom_connecte($user);
-    mail_prof($action === 'placer' ? "CAMI • Cours placé par $nom" : "CAMI • Cours déplacé par $nom",
-      ($action === 'placer' ? "$nom a placé son cours le " : "$nom a déplacé son cours du " . quand_fr($c['debut'], (int) $c['duree']) . ' au ')
-      . quand_fr($debut, (int) $c['duree']) . '.', $user['email']);
+    mail_prof($action === 'placer' ? 'prof-cours-place' : 'prof-cours-deplace',
+      ['nom' => $nom, 'ancien' => $action === 'deplacer' ? quand_fr($c['debut'], (int) $c['duree']) : '', 'quand' => quand_fr($debut, (int) $c['duree'])], $user['email']);
     repondre(['ok' => true]);
   }
 
@@ -164,7 +163,7 @@ if (!$admin) {
     db()->prepare("INSERT INTO cours (groupe_id, debut, duree, statut, lieu, cree_le) VALUES (?, ?, ?, 'demande', ?, ?)")
       ->execute([$gid, $debut, $duree, groupe($gid)['lieu'], date('Y-m-d H:i:s')]);
     $nom = nom_connecte($user);
-    mail_prof("CAMI • Demande de cours de $nom", "$nom demande un cours le " . quand_fr($debut, $duree) . ".\n\nPour l’accepter ou la refuser :", $user['email']);
+    mail_prof('prof-cours-demande', ['nom' => $nom, 'quand' => quand_fr($debut, $duree)], $user['email']);
     repondre(['ok' => true]);
   }
 
@@ -175,8 +174,8 @@ if (!$admin) {
     db()->prepare('DELETE FROM cours WHERE id = ?')->execute([$c['id']]);
     if ($c['statut'] !== 'refuse') {
       $nom = nom_connecte($user);
-      mail_prof($c['statut'] === 'place' ? "CAMI • Cours annulé par $nom" : "CAMI • Demande de cours retirée par $nom",
-        "$nom a annulé " . ($c['statut'] === 'place' ? 'son cours' : 'sa demande de cours') . ' du ' . quand_fr($c['debut'], (int) $c['duree']) . '.', $user['email']);
+      mail_prof($c['statut'] === 'place' ? 'prof-cours-annule' : 'prof-demande-retiree',
+        ['nom' => $nom, 'quand' => quand_fr($c['debut'], (int) $c['duree'])], $user['email']);
     }
     repondre(['ok' => true]);
   }
@@ -216,16 +215,13 @@ if ($action === 'eleve_ajouter') {
   db()->prepare('INSERT INTO groupes (nom, solo, cree_le) VALUES (\'\', 1, ?)')->execute([date('Y-m-d H:i:s')]);
   db()->prepare('INSERT INTO groupe_eleves (groupe_id, student_id) VALUES (?, ?)')->execute([(int) db()->lastInsertId(), $sid]);
 
-  $texte = bonjour($u) . "Vous êtes désormais inscrit[|e] comme élève des cours d’analyse musicale de Philippe Perret.\n\n"
-    . "Votre calendrier de cours se trouve à l’adresse :\n" . SITE . "/cours/student/\n\n"
-    . "Vous y trouverez vos cours, vous pourrez y placer les cours qui vous sont accordés et demander un cours sur un créneau libre.\n\n";
-  $texte .= $jeton
-    ? "Pour accéder à votre calendrier, choisissez d’abord votre mot de passe en cliquant sur ce lien :\n" . SITE . "/cours/student/?jeton=$jeton\n\n"
-      . "Votre identifiant est votre adresse e-mail : $email\n"
-    : "Identifiez-vous avec votre adresse e-mail ($email) et votre mot de passe habituel du site.\n";
+  [$objet, $texte] = mail_modele('cours-bienvenue', [
+    'pseudo' => (string) $u['pseudo'], 'email' => $email,
+    'lien-mot-de-passe' => $jeton ? SITE . "/cours/student/?jeton=$jeton" : '',
+  ], $u['genre']);
   // Case « Envoyer le mail de bienvenue » (cochée par défaut, issue #19)
   if ($actif && (!array_key_exists('bienvenue', $e) || !empty($e['bienvenue']))) {   // élève inactif : aucun mail
-    brevo_mail($email, 'CAMI • Bienvenue dans les cours d’analyse', g($texte . signature_cours(), $u['genre']), NOTIFICATIONS);
+    brevo_mail($email, $objet, $texte, NOTIFICATIONS);
   }
   repondre(['ok' => true, 'id' => $sid]);
 }
@@ -345,8 +341,7 @@ if ($action === 'cours_enregistrer') {
     armer_rappels($id);
     $change = $ancien['debut'] !== $debut || (int) $ancien['duree'] !== $duree || $ancien['lieu'] !== $lieu || (int) $ancien['groupe_id'] !== $gid;
     if ($change && $statut === 'place' && strtotime($debut) > maintenant_cours()) {
-      mail_groupe($gid, 'CAMI • Cours modifié', ($ancien['debut'] ? 'Votre cours du ' . quand_fr($ancien['debut'], (int) $ancien['duree']) . ' a été modifié.' : 'Votre cours a été fixé.')
-        . "\n\nNouvel horaire : " . quand_fr($debut, $duree) . ".\n" . lieu_fr($lieu));
+      mail_groupe($gid, 'cours-modifie', ['ancien' => $ancien['debut'] ? quand_fr($ancien['debut'], (int) $ancien['duree']) : '', 'quand' => quand_fr($debut, $duree), 'lieu' => $lieu]);
     }
     repondre(['ok' => true, 'id' => $id]);
   }
@@ -360,15 +355,13 @@ if ($action === 'cours_enregistrer') {
   }
   // Case « Informer l'élève de ce cours » (cochée par défaut) : mail avec lien vers le cours
   $informer = !array_key_exists('informer', $e) || !empty($e['informer']);
-  $lien = "\nPour en prendre connaissance :\n" . SITE . '/cours/student/?cours=' . $ids[0] . "\n";
+  $lien = SITE . '/cours/student/?cours=' . $ids[0];
   if ($informer && $a_placer) {
-    mail_groupe($gid, 'CAMI • Un cours vous est accordé', "Un cours d’analyse de " . heure_fr(hhmm($duree)) . " vous est accordé.\n\n"
-      . "Vous pouvez dès maintenant le placer sur un créneau libre de votre calendrier de cours :\n" . SITE . '/cours/student/?cours=' . $ids[0] . "\n");
+    mail_groupe($gid, 'cours-accorde', ['duree' => heure_fr(hhmm($duree)), 'lien' => $lien]);
   } elseif ($informer && count($debuts) > 1) {
-    mail_groupe($gid, 'CAMI • Vos prochains cours', "Vos prochains cours d’analyse sont fixés :\n\n"
-      . implode("\n", array_map(function ($d) use ($duree) { return '- ' . quand_fr($d, $duree); }, $debuts)) . "\n" . lieu_fr($lieu) . $lien);
+    mail_groupe($gid, 'cours-prochains', ['liste' => implode("\n", array_map(function ($d) use ($duree) { return '- ' . quand_fr($d, $duree); }, $debuts)), 'lieu' => $lieu, 'lien' => $lien]);
   } elseif ($informer) {
-    mail_groupe($gid, 'CAMI • Nouveau cours', 'Votre prochain cours d’analyse est fixé le ' . quand_fr($debut, $duree) . ".\n" . lieu_fr($lieu) . $lien);
+    mail_groupe($gid, 'cours-nouveau', ['quand' => quand_fr($debut, $duree), 'lieu' => $lieu, 'lien' => $lien]);
   }
   repondre(['ok' => true, 'id' => $ids[0], 'nombre' => count($ids)]);
 }
@@ -388,7 +381,7 @@ if ($action === 'cours_supprimer') {
     if (in_array($x['statut'], ['place', 'demande'], true) && strtotime($x['debut']) > maintenant_cours()) $annonces[] = quand_fr($x['debut'], (int) $x['duree']);
   }
   if ($annonces && !empty($e['prevenir'])) {
-    mail_groupe((int) $c['groupe_id'], 'CAMI • Cours annulé', (count($annonces) > 1 ? "Ces cours sont annulés :\n\n- " . implode("\n- ", $annonces) : 'Votre cours du ' . $annonces[0] . ' est annulé.') . "\n");
+    mail_groupe((int) $c['groupe_id'], 'cours-annule', count($annonces) > 1 ? ['liste' => '- ' . implode("\n- ", $annonces)] : ['quand' => $annonces[0]]);
   }
   repondre(['ok' => true, 'nombre' => count($cibles)]);
 }
@@ -400,11 +393,10 @@ if ($action === 'demande_repondre') {
   if (!empty($e['accepter'])) {
     db()->prepare("UPDATE cours SET statut = 'place', raison = '' WHERE id = ?")->execute([$c['id']]);
     armer_rappels((int) $c['id']);
-    mail_groupe((int) $c['groupe_id'], 'CAMI • Demande de cours acceptée', 'Votre demande de cours du ' . quand_fr($c['debut'], (int) $c['duree']) . " est acceptée.\n" . lieu_fr($c['lieu']));
+    mail_groupe((int) $c['groupe_id'], 'cours-demande-acceptee', ['quand' => quand_fr($c['debut'], (int) $c['duree']), 'lieu' => $c['lieu']]);
   } else {
     db()->prepare("UPDATE cours SET statut = 'refuse', raison = ? WHERE id = ?")->execute([$raison, $c['id']]);
-    mail_groupe((int) $c['groupe_id'], 'CAMI • Demande de cours refusée', 'Votre demande de cours du ' . quand_fr($c['debut'], (int) $c['duree']) . ' ne peut malheureusement pas être acceptée.'
-      . ($raison !== '' ? "\n\nRaison : $raison" : '') . "\n\nVous pouvez demander un autre créneau sur votre calendrier de cours.\n");
+    mail_groupe((int) $c['groupe_id'], 'cours-demande-refusee', ['quand' => quand_fr($c['debut'], (int) $c['duree']), 'raison' => $raison]);
   }
   repondre(['ok' => true]);
 }

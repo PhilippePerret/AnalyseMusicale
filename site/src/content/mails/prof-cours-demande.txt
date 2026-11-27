@@ -1,0 +1,7 @@
+// Cours — avis à Philippe : un élève demande un cours depuis son calendrier
+// Variables : {nom} (élève), {quand}
+Objet : CAMI • Demande de cours de {nom}
+{nom} demande un cours le {quand}.
+
+Pour l’accepter ou la refuser :
+{site}/cours/student/

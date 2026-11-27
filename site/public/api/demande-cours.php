@@ -18,7 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     exit;
   }
   db()->prepare('UPDATE demandes_cours SET jeton = NULL, confirmee_le = ? WHERE id = ?')->execute([date('Y-m-d H:i:s'), $d['id']]);
-  brevo_mail(NOTIFICATIONS, 'CAMI • Demande de cours — ' . $d['nom'], demande_texte($d) . "\nDemandes de cours : " . SITE . "/cours/admin/\n", $d['email']);
+  [$objet, $corps] = mail_modele('prof-demande-cours', ['nom' => $d['nom'], 'demande' => demande_texte($d)], null);
+  brevo_mail(NOTIFICATIONS, $objet, $corps, $d['email']);
   header('Location: /cours/demande/?confirmation=ok', true, 303);
   exit;
 }
@@ -59,10 +60,6 @@ db()->prepare('INSERT INTO demandes_cours (nom, email, frequence, creneaux, nive
   ->execute([$nom, $email, $frequence, json_encode($creneaux), json_encode($niveaux), $jeton, date('Y-m-d H:i:s')]);
 
 $lien = SITE . '/api/demande-cours.php?jeton=' . $jeton;
-brevo_mail($email, 'CAMI • Confirmez votre demande de cours', "Bonjour $nom,\n\n"
-  . "Merci pour votre demande de cours d’analyse musicale.\n\n"
-  . "Pour confirmer votre adresse, cliquez sur ce lien :\n\n$lien\n\n"
-  . "Votre demande me sera transmise seulement après ce clic de confirmation.\n\n"
-  . "Si vous n’êtes pas à l’origine de cette demande, ignorez simplement ce message.\n\n"
-  . "Philippe Perret\nClasse d’Analyse Musicale — " . SITE . "\n");
+[$objet, $corps] = mail_modele('demande-cours-confirmation', ['nom' => $nom, 'lien' => $lien], null);
+brevo_mail($email, $objet, $corps);
 repondre(['ok' => true]);

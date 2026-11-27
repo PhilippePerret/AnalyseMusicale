@@ -1,0 +1,37 @@
+// Table d'analyse — lien de téléchargement envoyé au demandeur (version texte ;
+// la version mise en page est telechargement-lien.html : modifier les deux)
+// Variables : {lien} (lien de téléchargement), {mac} / {windows} (non vides selon la plateforme),
+//   {commande-mac} (commande Terminal de déblocage)
+Objet : Votre lien de téléchargement de la Table d’analyse
+Bonjour,
+
+Vous avez demandé à télécharger l’application Table d’analyse, voici le lien de téléchargement. Merci de votre intérêt.
+
+{lien}
+
+{if mac}
+VOUS DEVEZ DÉBLOQUER L’APPLICATION pour pouvoir l’utiliser(1) :
+- ouvrez une fenêtre Terminal (2),
+- copiez-collez le code : {commande-mac}
+- pressez la touche Entrée.
+
+Vous pouvez maintenant ouvrir l’application et l'utiliser.
+
+(1) Apple contraint à payer un abonnement annuel de développeur pour « autoriser » les applications, même lorsqu’elles sont fournies gratuitement. Table d’analyse doit donc être débloquée, une seule fois, après avoir été placée dans le dossier Applications.
+(2) Lancez l’application Terminal.app avec Spotlight : Cmd + Espace, commencer à taper « Termi », choisir l’application Terminal.
+
+{/if mac}
+{if windows}
+Table d’analyse n'étant pas « signée » (signature payante), Windows ou votre antivirus peuvent la bloquer ou la placer en quarantaine (confinement). Dans ce cas :
+- si Windows affiche « Windows a protégé votre ordinateur », cliquez sur « Informations complémentaires » puis sur « Exécuter quand même »,
+- si votre antivirus a confiné l'application, ouvrez-le, rendez-vous dans sa zone de quarantaine (ou de confinement), demandez-lui d'en sortir Table d’analyse (« Restaurer », « Autoriser ») et ajoutez-la à ses exceptions.
+
+L'application devrait alors s'ouvrir sans problème.
+
+{/if windows}
+Si vous rencontrez un problème, merci de nous en informer en répondant à ce message.
+
+Bonnes analyses !
+
+Philippe Perret
+Classe d’Analyse Musicale — {site}

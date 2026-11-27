@@ -1,0 +1,13 @@
+// Cours — un cours à placer est accordé à l'élève
+// Variables : {pseudo}, {duree} (ex. 1 h), {lien} (lien vers le cours dans le calendrier)
+Objet : CAMI • Un cours vous est accordé
+Bonjour{if pseudo} {pseudo}{/if pseudo},
+
+Un cours d’analyse de {duree} vous est accordé.
+
+Vous pouvez dès maintenant le placer sur un créneau libre de votre calendrier de cours :
+{lien}
+
+Philippe Perret
+Classe d’Analyse Musicale — {site}
+Vos cours : {site}/cours/student/

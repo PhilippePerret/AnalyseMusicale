@@ -1,0 +1,25 @@
+// Cours — bienvenue d'un nouvel élève (case « Envoyer le mail de bienvenue »)
+// Variables : {pseudo} (peut être vide), {email}, {lien-mot-de-passe} (vide si l'élève a déjà un compte sur le site)
+Objet : CAMI • Bienvenue dans les cours d’analyse
+Bonjour{if pseudo} {pseudo}{/if pseudo},
+
+Vous êtes désormais inscrit[|e] comme élève des cours d’analyse musicale de Philippe Perret.
+
+Votre calendrier de cours se trouve à l’adresse :
+{site}/cours/student/
+
+Vous y trouverez vos cours, vous pourrez y placer les cours qui vous sont accordés et demander un cours sur un créneau libre.
+
+{if lien-mot-de-passe}
+Pour accéder à votre calendrier, choisissez d’abord votre mot de passe en cliquant sur ce lien :
+{lien-mot-de-passe}
+
+Votre identifiant est votre adresse e-mail : {email}
+{/if lien-mot-de-passe}
+{if !lien-mot-de-passe}
+Identifiez-vous avec votre adresse e-mail ({email}) et votre mot de passe habituel du site.
+{/if !lien-mot-de-passe}
+
+Philippe Perret
+Classe d’Analyse Musicale — {site}
+Vos cours : {site}/cours/student/

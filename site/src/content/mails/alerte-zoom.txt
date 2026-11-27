@@ -1,0 +1,29 @@
+// Jeudis de l'analyse — alerte d'une séance sur Zoom (3 jours, 1 jour et 1 heure avant)
+// Variables : {pseudo} (peut être vide), {date} (ex. jeudi 3 décembre 2026), {debut}, {fin} (ex. 19 h),
+//   {refus-session} (lien « plus d'alerte pour cette session » ; vide pour l'alerte d'1 heure avant),
+//   {refus-tout} (lien « plus jamais d'alerte »)
+Objet : 🎼 Analyses musicales — Prochaine session Zoom
+Bonjour{if pseudo} {pseudo}{/if pseudo},
+
+Ce message pour vous avertir que la prochaine session d’analyses musicales improvisées aura lieu sur Zoom le {date} de {debut} à {fin}.
+
+Pour obtenir le lien Zoom, cliquez sur « J’assisterai à cette session » dans le Calendrier des Jeudis de l’analyse :
+{site}/jeudis-analyse/
+
+Pour avoir tous les renseignements sur ces sessions, vous pouvez consulter cette page :
+{site}/jeudis-analyse/detail/
+
+{if refus-session}
+Si vous ne voulez plus recevoir d’alerte pour cette session, cliquez sur ce lien :
+{refus-session}
+
+{/if refus-session}
+Si vous ne voulez plus jamais recevoir d’alerte pour les « Jeudis de l’analyse », vous pouvez cliquer sur ce lien :
+{refus-tout}
+
+Merci de votre attention, en espérant vous compter parmi les participant[|e]s de ce rendez-vous hebdomadaire.
+
+Bien à vous,
+
+L’administration de la CAMI
+{site}

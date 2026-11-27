@@ -1,0 +1,19 @@
+// Cours — plusieurs cours fixés d'un coup (récurrence)
+// Variables : {pseudo}, {liste} (un cours par ligne), {lieu}, {lien} (lien vers le premier cours)
+Objet : CAMI • Vos prochains cours
+Bonjour{if pseudo} {pseudo}{/if pseudo},
+
+Vos prochains cours d’analyse sont fixés :
+
+{liste}
+{if lieu}
+
+Lieu : {lieu}
+{/if lieu}
+
+Pour en prendre connaissance :
+{lien}
+
+Philippe Perret
+Classe d’Analyse Musicale — {site}
+Vos cours : {site}/cours/student/

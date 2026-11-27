@@ -1,0 +1,14 @@
+// Cours — demande de cours de l'élève acceptée
+// Variables : {pseudo}, {quand}, {lieu}
+Objet : CAMI • Demande de cours acceptée
+Bonjour{if pseudo} {pseudo}{/if pseudo},
+
+Votre demande de cours du {quand} est acceptée.
+{if lieu}
+
+Lieu : {lieu}
+{/if lieu}
+
+Philippe Perret
+Classe d’Analyse Musicale — {site}
+Vos cours : {site}/cours/student/

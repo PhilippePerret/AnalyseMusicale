@@ -1,0 +1,8 @@
+// Annonces Facebook — avis à Philippe : annonce(s) à envoyer
+// Variables : {liste} (une annonce par ligne), {page} (page des annonces)
+Objet : CAMI • Annonce Facebook à envoyer
+Vous devez envoyer le message aux groupes Facebook. Bouton "Informer les groupes FB" sur SuperBoard
+
+{liste}
+
+Annonces : {page}

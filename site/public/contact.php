@@ -2,8 +2,9 @@
 // Formulaire de contact de la Classe d'Analyse Musicale (CAMI).
 // Reçoit le POST de /contact/, envoie le message par mail() puis redirige.
 
+require __DIR__ . '/api/_cami.php';   // EXPEDITEUR, modèle du mail (src/content/mails/prof-contact.txt)
+
 const DESTINATAIRE = 'philippe.perret@analyse-musicale.fr';
-const EXPEDITEUR   = 'contact@analyse-musicale.fr';
 const OBJETS = [
   'renseignements' => 'Renseignements',
   'jeudis'         => 'Les Jeudis de l’analyse',
@@ -33,8 +34,8 @@ if ($nom === '' || $message === '' || mb_strlen($nom) > 120 || mb_strlen($messag
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) rediriger('erreur');
 $objet = OBJETS[$cle] ?? OBJETS['renseignements'];
 
-$sujet = mb_encode_mimeheader('CAMI • ' . $objet, 'UTF-8');
-$corps = "Nom : $nom\nE-mail : $email\nObjet : $objet\n\n$message\n";
+[$sujet, $corps] = mail_modele('prof-contact', ['nom' => $nom, 'email' => $email, 'objet' => $objet, 'message' => $message], null);
+$sujet = mb_encode_mimeheader($sujet, 'UTF-8');
 $entetes = implode("\r\n", [
   'From: ' . mb_encode_mimeheader('CAMI — site', 'UTF-8') . ' <' . EXPEDITEUR . '>',
   'Reply-To: ' . $email,

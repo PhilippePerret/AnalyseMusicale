@@ -1,0 +1,8 @@
+// Annonces Facebook — avis à Philippe : avant-dernier envoi d'une répétition
+// Variables : {numero}, {fois}, {annonce} (début du texte), {dernier} (date du dernier envoi), {page}
+Objet : CAMI • Annonce Facebook : avant-dernier envoi
+Avant-dernier envoi de l'annonce Facebook (envoi {numero} sur {fois}) :
+{annonce}
+Dernier envoi prévu le {dernier}.
+
+Pour prolonger la répétition : {page}

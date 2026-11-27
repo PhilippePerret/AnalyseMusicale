@@ -1,0 +1,11 @@
+// Modèles des mails envoyés par le site (un fichier par mail).
+//
+// - Les lignes commençant par « // » sont des commentaires (jamais envoyées).
+// - La première ligne « Objet : … » donne l'objet du mail ; la suite, son texte.
+// - {variable} : remplacée à l'envoi (variables listées en tête de chaque fichier).
+//   {site} est toujours disponible (https://www.analyse-musicale.fr).
+// - {if x} … {/if x} : texte gardé seulement si x n'est pas vide ;
+//   {if !x} … {/if !x} : texte gardé seulement si x est vide.
+// - [masculin|féminin] : choisi selon le genre du destinataire (ex. inscrit[|e]).
+// - Dossier types/ : mails-types proposés dans /contact/ (administration).
+// - Prise en compte à la mise en ligne suivante.

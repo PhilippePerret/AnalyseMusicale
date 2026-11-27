@@ -1,0 +1,7 @@
+// Table d'analyse — avis à Philippe : lien de téléchargement demandé
+// Variables : {email}, {systeme}, {version}, {date}
+Objet : CAMI • Demande de lien de la Table d’analyse
+Adresse : {email}
+Plateforme : {systeme}
+Version : {version}
+Date : {date}

@@ -1,0 +1,41 @@
+// Table d'analyse — lien de téléchargement, version mise en page (HTML) ; version texte : telechargement-lien.txt
+// Variables : {lien}, {mac} / {windows} (non vides selon la plateforme), {commande-mac}, {site}, {site-court}
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
+<body style="margin:0;padding:24px 0;background:#f4f5f6;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f6;"><tr><td align="center">
+<table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:8px;font-family:Helvetica,Arial,sans-serif;color:#222;">
+<tr><td style="padding:32px 36px 8px;">
+<p style="margin:0 0 18px;font-size:16px;">Bonjour,</p>
+<p style="margin:0 0 24px;font-size:16px;line-height:1.5;">Vous avez demandé à télécharger l’application <b>Table d’analyse</b>, voici le lien de téléchargement. Merci de votre intérêt.</p>
+<p style="margin:0 0 30px;text-align:center;"><a href="{lien}" style="display:inline-block;background:#48a45c;color:#ffffff;text-decoration:none;font-size:17px;font-weight:bold;padding:14px 34px;border-radius:6px;">Télécharger la Table d’analyse</a></p>
+</td></tr>
+{if mac}
+<tr><td style="padding:0 36px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fff8e6;border-left:4px solid #d18700;border-radius:4px;">
+<tr><td style="padding:18px 20px;font-size:15px;line-height:1.55;">
+<p style="margin:0 0 10px;font-weight:bold;color:#8a5a00;">VOUS DEVEZ DÉBLOQUER L’APPLICATION pour pouvoir l’utiliser<sup>(1)</sup> :</p>
+<ol style="margin:0 0 12px;padding-left:22px;"><li>ouvrez une fenêtre Terminal<sup>(2)</sup>,</li><li>copiez-collez le code :</li></ol>
+<div style="background:#1e1e1e;color:#e6e6e6;font-family:Menlo,Monaco,Consolas,monospace;font-size:13px;padding:12px 14px;border-radius:5px;margin:0 0 12px 22px;">{commande-mac}</div>
+<ol start="3" style="margin:0 0 12px;padding-left:22px;"><li>pressez la touche Entrée.</li></ol>
+<p style="margin:0;">Vous pouvez maintenant ouvrir l’application et l'utiliser.</p>
+</td></tr></table></td></tr>
+<tr><td style="padding:20px 36px 8px;font-size:12.5px;line-height:1.5;color:#777;">
+<p style="margin:0 0 6px;">(1) Apple contraint à payer un abonnement annuel de développeur pour « autoriser » les applications, même lorsqu’elles sont fournies gratuitement. Table d’analyse doit donc être débloquée, une seule fois, après avoir été placée dans le dossier Applications.</p>
+<p style="margin:0;">(2) Lancez l’application Terminal.app avec Spotlight : Cmd + Espace, commencer à taper « Termi », choisir l’application Terminal.</p></td></tr>
+{/if mac}
+{if windows}
+<tr><td style="padding:0 36px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fff8e6;border-left:4px solid #d18700;border-radius:4px;">
+<tr><td style="padding:18px 20px;font-size:15px;line-height:1.55;">
+<p style="margin:0 0 10px;">Table d’analyse n'étant pas « signée » (signature payante), Windows ou votre antivirus peuvent la bloquer ou la placer en quarantaine (confinement). Dans ce cas :</p>
+<ul style="margin:0 0 12px;padding-left:22px;">
+<li>si Windows affiche « Windows a protégé votre ordinateur », cliquez sur « Informations complémentaires » puis sur « Exécuter quand même »,</li>
+<li>si votre antivirus a confiné l'application, ouvrez-le, rendez-vous dans sa zone de quarantaine (ou de confinement), demandez-lui d'en sortir Table d’analyse (« Restaurer », « Autoriser ») et ajoutez-la à ses exceptions.</li></ul>
+<p style="margin:0;">L'application devrait alors s'ouvrir sans problème.</p>
+</td></tr></table></td></tr>
+{/if windows}
+<tr><td style="padding:20px 36px 32px;font-size:15px;line-height:1.5;">
+<p style="margin:0 0 14px;">Si vous rencontrez un problème, merci de nous en informer en répondant à ce message.</p>
+<p style="margin:0 0 14px;">Bonnes analyses !</p>
+<p style="margin:0;color:#3e4a54;">Philippe Perret<br><span style="font-size:13px;color:#777;">Classe d’Analyse Musicale — <a href="{site}" style="color:#3d6a96;">{site-court}</a></span></p>
+</td></tr></table></td></tr></table></body></html>

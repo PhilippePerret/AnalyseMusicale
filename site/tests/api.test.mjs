@@ -901,3 +901,28 @@ test('séance Zoom : lien de la salle montré aux seuls présents annoncés ; li
   assert.equal(s.youtube, 'https://www.youtube.com/watch?v=abc');
   assert.equal(s.compositeur, 'Bach');
 });
+
+test('modèles des mails (src/content/mails/) : chaque variable remplacée, chaque bloc {if} résolu, dossier protégé', { skip }, () => {
+  const dossier = join(DIST, 'api/mails');
+  assert.match(readFileSync(join(dossier, '.htaccess'), 'utf-8'), /Require all denied/);
+  const modeles = readdirSync(dossier).filter((f) => /\.(txt|html\.txt)$/.test(f) && f !== 'LISEZ-MOI.txt');
+  assert.ok(modeles.length >= 25);
+  for (const f of modeles) {
+    const nom = f.replace(/\.html\.txt$|\.txt$/, ''), ext = f.endsWith('.html.txt') ? 'html' : 'txt';
+    const texte = readFileSync(join(dossier, f), 'utf-8').split('\n').filter((l) => !l.trimStart().startsWith('//')).join('\n');
+    const noms = [...new Set([...texte.matchAll(/\{(?:if !?|\/if !?)?([\w-]+)\}/g)].map((m) => m[1]))];
+    for (const plein of [true, false]) {
+      const v = Object.fromEntries(noms.map((n) => [n, plein ? `«${n}»` : '']));
+      const r = spawnSync('php', ['-r', `require '${DIST}/api/_cami.php'; echo json_encode(mail_modele($argv[1], json_decode($argv[2], true), 'F', $argv[3]));`, nom, JSON.stringify(v), ext], { encoding: 'utf-8' });
+      const [objet, corps] = JSON.parse(r.stdout);
+      if (ext === 'txt') assert.ok(objet.length > 0, `${f} : objet`);
+      assert.doesNotMatch(objet + corps, /\{\/?if|\{[\w-]+\}|\[[^\]|]*\|[^\]|]*\]/, `${f} (${plein ? 'plein' : 'vide'})`);
+    }
+  }
+});
+
+test('alerte d’une séance Zoom : modèle alerte-zoom', { skip }, () => {
+  const r = spawnSync('php', ['-r', `require '${DIST}/api/_alertes.php'; [$o, $c] = mail_alerte(['jour' => '2026-12-03', 'debut' => '19:00', 'fin' => '22:00', 'diffusion' => 'zoom'], '3j', 'a@b.fr', ['pseudo' => '', 'genre' => 'F']); echo $o, "\\n", $c;`], { encoding: 'utf-8', env: { ...process.env, CAMI_DB: join(tmp, 'cami.sqlite') } });
+  assert.match(r.stdout, /Zoom/);
+  assert.doesNotMatch(r.stdout, /Direct YouTube/);
+});

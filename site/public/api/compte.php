@@ -54,11 +54,8 @@ if ($action === 'inscription') {
   }
 
   $lien = SITE . '/api/confirmer.php?jeton=' . $jeton;
-  $corps = g("Bonjour" . ($pseudo !== '' ? " $pseudo" : '') . ",\n\n"
-    . "Pour confirmer votre inscription aux Jeudis de l’analyse, cliquez sur ce lien :\n\n$lien\n\n"
-    . "Si vous n’êtes pas à l’origine de cette demande, ignorez simplement ce message.\n\n"
-    . "Philippe Perret\nClasse d’Analyse Musicale — " . SITE . "\n", $genre);
-  envoyer_mail($email, 'CAMI • Confirmez votre inscription', $corps);
+  [$objet, $corps] = mail_modele('inscription-confirmation', ['pseudo' => $pseudo, 'lien' => $lien], $genre);
+  envoyer_mail($email, $objet, $corps);
   repondre(['ok' => true, 'attente' => true]);
 }
 

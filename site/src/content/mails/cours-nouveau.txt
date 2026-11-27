@@ -1,0 +1,17 @@
+// Cours — un cours fixé par Philippe
+// Variables : {pseudo}, {quand}, {lieu}, {lien} (lien vers le cours)
+Objet : CAMI • Nouveau cours
+Bonjour{if pseudo} {pseudo}{/if pseudo},
+
+Votre prochain cours d’analyse est fixé le {quand}.
+{if lieu}
+
+Lieu : {lieu}
+{/if lieu}
+
+Pour en prendre connaissance :
+{lien}
+
+Philippe Perret
+Classe d’Analyse Musicale — {site}
+Vos cours : {site}/cours/student/

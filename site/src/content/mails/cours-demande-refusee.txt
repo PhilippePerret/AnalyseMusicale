@@ -1,0 +1,16 @@
+// Cours — demande de cours de l'élève refusée
+// Variables : {pseudo}, {quand}, {raison} (peut être vide)
+Objet : CAMI • Demande de cours refusée
+Bonjour{if pseudo} {pseudo}{/if pseudo},
+
+Votre demande de cours du {quand} ne peut malheureusement pas être acceptée.
+{if raison}
+
+Raison : {raison}
+{/if raison}
+
+Vous pouvez demander un autre créneau sur votre calendrier de cours.
+
+Philippe Perret
+Classe d’Analyse Musicale — {site}
+Vos cours : {site}/cours/student/
