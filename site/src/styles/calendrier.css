@@ -75,7 +75,8 @@ form.edition label.en-ligne { display: flex; gap: 0.6em; align-items: center; }
 form.edition input, form.edition select { font: inherit; font-size: 0.95em; padding: 0.3em 0.5em; border: 1px solid #aaa; border-radius: 3px; background: var(--fond); }
 form.edition .petit { width: 10em; }
 form.edition .petit input { width: 100%; }
-form.edition .grand { flex: 1 1 22em; }
+form.edition .grand { flex: 1 1 16em; }
+form.edition .petit.vignette { width: 12em; }
 form.edition .grand input { width: 100%; }
 form.edition .une-ligne { flex-wrap: nowrap; align-items: center; gap: 1.6em; }
 form.edition .une-ligne label.en-ligne { white-space: nowrap; }

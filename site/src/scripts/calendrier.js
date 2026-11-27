@@ -179,8 +179,8 @@ function editer(k, erreur = '') {
        <div class="rang">
          <label class="petit">Compositeur <input name="compositeur" value="${esc(s.compositeur)}" maxlength="80" placeholder="Chopin"></label>
          <label class="grand">Œuvre <input name="oeuvre" value="${esc(s.oeuvre)}" maxlength="200" placeholder="Sonate K. 545, 1^er^ mouvement"></label>
+         <label class="petit vignette">Titre vignette <input name="vignette" value="${esc(s.vignette)}" maxlength="40" required placeholder="Chopin"></label>
        </div>
-       <label class="en-ligne lien">Titre vignette <input name="vignette" value="${esc(s.vignette)}" maxlength="40" required placeholder="Chopin"></label>
        <div class="rang une-ligne">
          <label class="en-ligne">Analyste principal <input class="analyste" name="analyste" value="${esc(s.analyste)}" maxlength="80" required></label>
          ${menuHeures('debut', 'Début', s.debut, '21:00')}
