@@ -27,11 +27,13 @@ if ($youtube !== '' && !preg_match('#^https://[^\s"<>]+$#', $youtube)) repondre(
 $partition = trim((string) ($e['partition'] ?? ''));
 if ($partition !== '' && !preg_match('#^https?://[^\s"<>]+$#', $partition)) repondre(['ok' => false, 'erreur' => 'partition'], 422);
 $analyste = texte($e['analyste'] ?? '', 80) ?: 'Ph. Perret';
+$vignette = texte($e['vignette'] ?? '', 40);
+if ($vignette === '') repondre(['ok' => false, 'erreur' => 'vignette'], 422);
 
-db()->prepare('INSERT INTO seances (jour, compositeur, oeuvre, analyste, debut, fin, youtube, partition) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+db()->prepare('INSERT INTO seances (jour, compositeur, oeuvre, analyste, debut, fin, youtube, partition, vignette) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   ON CONFLICT(jour) DO UPDATE SET compositeur = excluded.compositeur, oeuvre = excluded.oeuvre,
-  analyste = excluded.analyste, debut = excluded.debut, fin = excluded.fin, youtube = excluded.youtube, partition = excluded.partition')
-  ->execute([$jour, texte($e['compositeur'] ?? '', 80), texte($e['oeuvre'] ?? '', 200), $analyste, $debut, $fin, mb_substr($youtube, 0, 300), mb_substr($partition, 0, 300)]);
+  analyste = excluded.analyste, debut = excluded.debut, fin = excluded.fin, youtube = excluded.youtube, partition = excluded.partition, vignette = excluded.vignette')
+  ->execute([$jour, texte($e['compositeur'] ?? '', 80), texte($e['oeuvre'] ?? '', 200), $analyste, $debut, $fin, mb_substr($youtube, 0, 300), mb_substr($partition, 0, 300), $vignette]);
 
 if (empty($e['creer_direct']) || $youtube !== '') repondre(['ok' => true]);
 

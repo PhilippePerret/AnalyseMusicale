@@ -44,7 +44,8 @@ CREATE TABLE IF NOT EXISTS seances (
   debut TEXT NOT NULL DEFAULT '19:00',
   fin TEXT NOT NULL DEFAULT '22:00',
   youtube TEXT NOT NULL DEFAULT '',
-  partition TEXT NOT NULL DEFAULT ''   -- URL de la partition
+  partition TEXT NOT NULL DEFAULT '',  -- URL de la partition
+  vignette TEXT NOT NULL DEFAULT ''    -- titre affiché dans la case du calendrier (issue #27)
 );
 CREATE TABLE IF NOT EXISTS telechargements (   -- Table d'analyse : demandes de lien et téléchargements
   id INTEGER PRIMARY KEY,
@@ -192,7 +193,7 @@ function db(): PDO {
 // Colonnes ajoutées après la création de la base
 function migrer(PDO $pdo): void {
   $ajouts = [
-    'seances' => ['partition' => "TEXT NOT NULL DEFAULT ''"],
+    'seances' => ['partition' => "TEXT NOT NULL DEFAULT ''", 'vignette' => "TEXT NOT NULL DEFAULT ''"],
     'users' => ['source' => "TEXT NOT NULL DEFAULT 'site'", 'cgu_le' => 'TEXT', 'vu_le' => 'TEXT'],
     'cours' => ['programme' => "TEXT NOT NULL DEFAULT ''"],
     'students' => ['actif' => 'INTEGER NOT NULL DEFAULT 1'],   // 0 : élève inactif, sans accès à /cours/student/ (issue #20)
@@ -214,6 +215,11 @@ function migrer(PDO $pdo): void {
   if ((int) $pdo->query('PRAGMA user_version')->fetchColumn() < 1) {
     $pdo->exec("UPDATE cours SET programme = travail, travail = '' WHERE programme = '' AND travail != ''");
     $pdo->exec('PRAGMA user_version = 1');
+  }
+  // Version 2 : titre de vignette des séances existantes = leur compositeur (issue #27)
+  if ((int) $pdo->query('PRAGMA user_version')->fetchColumn() < 2) {
+    $pdo->exec("UPDATE seances SET vignette = compositeur WHERE vignette = ''");
+    $pdo->exec('PRAGMA user_version = 2');
   }
 }
 

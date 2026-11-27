@@ -6,7 +6,7 @@
 
 const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const OEIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
-const DEFAUT = { compositeur: '', oeuvre: '', analyste: 'Ph. Perret', debut: '19:00', fin: '22:00', youtube: '', partition: '' };
+const DEFAUT = { compositeur: '', oeuvre: '', analyste: 'Ph. Perret', debut: '19:00', fin: '22:00', youtube: '', partition: '', vignette: '' };
 const HEURES = Array.from({ length: 15 }, (_, i) => `${String(9 + i).padStart(2, '0')}:00`);
 const MOIS_AVANT = 1, MOIS_APRES = 4;
 const STUDIO = 'https://studio.youtube.com/channel/UCX3XhJw9x1RsVx1s3GNYceA/livestreaming';   // directs de la chaîne
@@ -96,11 +96,11 @@ function caseJeudi(d) {
   // Du jour (toute la journée) ; sinon passée ou à venir
   const moment = k === aujourdhui() ? 'courant' : s.etat === 'apres' ? 'passe' : 'avenir';
   const cls = ['jeudi', 'seance', moment, k === prochain() ? 'prochain' : '', direct ? 'endirect' : ''].join(' ');
-  if (direct) return `<div class="${cls}" role="button" tabindex="0" data-k="${k}">${libelle}<span class="piece">${txt(s.compositeur || 'à venir')}</span><a class="pastille-direct" href="${esc(s.youtube)}" target="_blank" rel="noopener" title="Rejoindre l’analyse en direct"><i>●</i> DIRECT</a></div>`;
+  if (direct) return `<div class="${cls}" role="button" tabindex="0" data-k="${k}">${libelle}<span class="piece">${txt(s.vignette || s.compositeur || 'à venir')}</span><a class="pastille-direct" href="${esc(s.youtube)}" target="_blank" rel="noopener" title="Rejoindre l’analyse en direct"><i>●</i> DIRECT</a></div>`;
   let oeil = '';
   if (s.youtube && s.etat === 'apres') oeil = `<a class="oeil" href="${esc(s.youtube)}" target="_blank" rel="noopener" title="Revoir l’analyse">${OEIL}</a>`;
   if (s.youtube && s.etat === 'direct') oeil = `<a class="oeil" href="${esc(s.youtube)}" target="_blank" rel="noopener" title="Suivre l’analyse en direct">${OEIL}</a>`;
-  return `<div class="${cls}" role="button" tabindex="0" data-k="${k}">${libelle}<span class="piece">${txt(s.compositeur || 'à venir')}</span>${oeil}</div>`;
+  return `<div class="${cls}" role="button" tabindex="0" data-k="${k}">${libelle}<span class="piece">${txt(s.vignette || s.compositeur || 'à venir')}</span>${oeil}</div>`;
 }
 
 function rendreCalendrier() {
@@ -180,6 +180,7 @@ function editer(k, erreur = '') {
          <label class="petit">Compositeur <input name="compositeur" value="${esc(s.compositeur)}" maxlength="80" placeholder="Chopin"></label>
          <label class="grand">Œuvre <input name="oeuvre" value="${esc(s.oeuvre)}" maxlength="200" placeholder="Sonate K. 545, 1^er^ mouvement"></label>
        </div>
+       <label class="en-ligne lien">Titre vignette <input name="vignette" value="${esc(s.vignette)}" maxlength="40" required placeholder="Chopin"></label>
        <div class="rang une-ligne">
          <label class="en-ligne">Analyste principal <input class="analyste" name="analyste" value="${esc(s.analyste)}" maxlength="80" required></label>
          ${menuHeures('debut', 'Début', s.debut, '21:00')}
@@ -199,6 +200,7 @@ function editer(k, erreur = '') {
 }
 
 const ERREURS_SEANCE = {
+  vignette: 'Le titre vignette est obligatoire.',
   heures: 'L’heure de fin doit être après l’heure de début.',
   youtube: 'Le lien YouTube doit commencer par https://',
   partition: 'L’URL de la partition doit commencer par https:// (ou http://)',

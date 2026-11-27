@@ -101,20 +101,22 @@ test('administrateur : création, modification, contrôles, suppression', { skip
   await inscrireEtConfirmer(admin, 'philippe.perret@analyse-musicale.fr');
   assert.equal((await admin.etat()).user.admin, true);
 
-  let r = await admin.post('seance.php', { action: 'enregistrer', jour: JOUR, compositeur: 'Chopin', oeuvre: 'Prélude op. 28 n° 4', analyste: '', debut: '19:00', fin: '22:00', youtube: '' });
+  let r = await admin.post('seance.php', { action: 'enregistrer', vignette: 'Vignette', jour: JOUR, compositeur: 'Chopin', oeuvre: 'Prélude op. 28 n° 4', analyste: '', debut: '19:00', fin: '22:00', youtube: '' });
   assert.equal(r.ok, true);
   let s = (await admin.etat()).seances[JOUR];
   assert.equal(s.compositeur, 'Chopin');
+  assert.equal(s.vignette, 'Vignette');
+  assert.equal((await admin.post('seance.php', { action: 'enregistrer', jour: JOUR, vignette: '  ', debut: '19:00', fin: '22:00' })).erreur, 'vignette');
   assert.equal(s.analyste, 'Ph. Perret');
   assert.equal(s.etat, 'avant');
 
-  r = await admin.post('seance.php', { action: 'enregistrer', jour: JOUR, compositeur: 'Chopin', oeuvre: 'x', analyste: 'M. Dupont', debut: '20:00', fin: '23:00', youtube: 'https://youtube.com/live/abc' });
+  r = await admin.post('seance.php', { action: 'enregistrer', vignette: 'Vignette', jour: JOUR, compositeur: 'Chopin', oeuvre: 'x', analyste: 'M. Dupont', debut: '20:00', fin: '23:00', youtube: 'https://youtube.com/live/abc' });
   assert.equal(r.ok, true);
   s = (await admin.etat()).seances[JOUR];
   assert.equal(s.analyste, 'M. Dupont');
   assert.equal(s.fin, '23:00');
 
-  r = await admin.post('seance.php', { action: 'enregistrer', jour: JOUR, debut: '19:00', fin: '22:00', partition: 'https://imslp.org/partition.pdf' });
+  r = await admin.post('seance.php', { action: 'enregistrer', vignette: 'Vignette', jour: JOUR, debut: '19:00', fin: '22:00', partition: 'https://imslp.org/partition.pdf' });
   assert.equal((await admin.etat()).seances[JOUR].partition, 'https://imslp.org/partition.pdf');
   assert.equal((await admin.post('seance.php', { action: 'enregistrer', jour: JOUR, debut: '19:00', fin: '22:00', partition: 'javascript:x' })).erreur, 'partition');
 
@@ -124,13 +126,13 @@ test('administrateur : création, modification, contrôles, suppression', { skip
 
   // Direct YouTube demandé sans autorisation : séance enregistrée, avertissement
   const avecDirect = jeudiFutur(6);
-  r = await admin.post('seance.php', { action: 'enregistrer', jour: avecDirect, compositeur: 'Bach', debut: '19:00', fin: '22:00', creer_direct: true });
+  r = await admin.post('seance.php', { action: 'enregistrer', vignette: 'Vignette', jour: avecDirect, compositeur: 'Bach', debut: '19:00', fin: '22:00', creer_direct: true });
   assert.equal(r.ok, true);
   assert.equal(r.avertissement, 'youtube_non_autorise');
   assert.equal((await admin.etat()).seances[avecDirect].compositeur, 'Bach');
 
   const autre = jeudiFutur(5);
-  await admin.post('seance.php', { action: 'enregistrer', jour: autre, debut: '19:00', fin: '22:00' });
+  await admin.post('seance.php', { action: 'enregistrer', vignette: 'Vignette', jour: autre, debut: '19:00', fin: '22:00' });
   r = await admin.post('seance.php', { action: 'supprimer', jour: autre });
   assert.equal(r.ok, true);
   assert.equal((await admin.etat()).seances[autre], undefined);
@@ -393,7 +395,7 @@ test('invitations : enregistrement, programmation, envoi immédiat, envoi progra
 test('alertes des directs : 3 jours, 1 jour, 1 heure avant ; refus pour la session ou pour toujours', { skip }, async () => {
   const admin = await adminConnecte();
   const jour = jeudiFutur(6);
-  let r = await admin.post('seance.php', { action: 'enregistrer', jour, compositeur: 'Bach', oeuvre: 'Prélude', analyste: '', debut: '19:00', fin: '22:00', youtube: '' });
+  let r = await admin.post('seance.php', { action: 'enregistrer', vignette: 'Vignette', jour, compositeur: 'Bach', oeuvre: 'Prélude', analyste: '', debut: '19:00', fin: '22:00', youtube: '' });
   assert.equal(r.ok, true);
   await admin.post('personnes.php', { action: 'ajouter', comme: 'contact', email: 'contact-alerte@example.com', pseudo: 'Flo', genre: 'F' });
   const decale = (jours, heure) => { const d = new Date(`${jour}T12:00:00`); d.setDate(d.getDate() + jours); return `${d.toLocaleDateString('sv')} ${heure}`; };
