@@ -78,18 +78,22 @@ function yt_brut(string $texte): string {
   return preg_replace('/\^([^\^\s]+)\^/', '$1', $texte);
 }
 
+// Modèle modifiable : src/content/youtube/description-direct.txt (copié dans api/ au build).
+// Variables : {analyste} {oeuvre} {partition} {site} ; une ligne dont une variable est vide disparaît.
 function yt_description(array $s): string {
-  $analyste = $s['analyste'] === 'Ph. Perret' ? 'Philippe Perret' : yt_brut($s['analyste']);
-  $oeuvre = trim(yt_brut($s['compositeur']) . ($s['compositeur'] !== '' && $s['oeuvre'] !== '' ? ', ' : '') . yt_brut($s['oeuvre']));
-  $lignes = [
-    "Chaque jeudi (les « Jeudis de l'analyse ») est analysée en direct, par $analyste, une pièce de musique principalement classique.",
-    '',
-    'Détails : ' . SITE . '/jeudis-analyse/',
+  $valeurs = [
+    '{analyste}' => $s['analyste'] === 'Ph. Perret' ? 'Philippe Perret' : yt_brut($s['analyste']),
+    '{oeuvre}' => trim(yt_brut($s['compositeur']) . ($s['compositeur'] !== '' && $s['oeuvre'] !== '' ? ', ' : '') . yt_brut($s['oeuvre'])),
+    '{partition}' => $s['partition'],
+    '{site}' => SITE,
   ];
-  if ($oeuvre !== '') $lignes[] = "Œuvre présente : $oeuvre";
-  if ($s['partition'] !== '') $lignes[] = 'Partition : ' . $s['partition'];
-  $lignes[] = 'Philippe Perret : ' . SITE . '/pedagogue/';
-  return implode("\n", $lignes);
+  $lignes = [];
+  foreach (explode("\n", str_replace("\r", '', (string) file_get_contents(__DIR__ . '/description-direct.txt'))) as $ligne) {
+    $vide = false;
+    foreach ($valeurs as $cle => $valeur) if ($valeur === '' && strpos($ligne, $cle) !== false) $vide = true;
+    if (!$vide) $lignes[] = strtr($ligne, $valeurs);
+  }
+  return trim(implode("\n", $lignes));
 }
 
 // Crée le direct programmé de la séance ; renvoie son adresse permanente

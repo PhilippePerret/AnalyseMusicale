@@ -863,3 +863,15 @@ test('migration : le texte de l’ancien champ « Travail effectué » des cours
   assert.equal(r.status, 0, r.stderr);
   assert.deepEqual(JSON.parse(r.stdout.trim().split('\n').pop()), { programme: 'Mon programme', travail: '' });
 });
+
+test('description des directs YouTube tirée de src/content/youtube/description-direct.txt', { skip }, () => {
+  const php = (s) => spawnSync('php', ['-r', `const SITE = 'https://x.fr'; require '${DIST}/api/_youtube.php'; echo yt_description(${s});`], { encoding: 'utf-8' }).stdout;
+  const complet = php(`['analyste' => 'Ph. Perret', 'compositeur' => 'Bach', 'oeuvre' => 'Prélude 1^er^', 'partition' => 'https://p.fr/a.pdf']`);
+  assert.match(complet, /par Philippe Perret,/);
+  assert.match(complet, /Œuvre présente : Bach, Prélude 1er/);
+  assert.match(complet, /Partition : https:\/\/p\.fr\/a\.pdf/);
+  assert.match(complet, /Détails : https:\/\/x\.fr\/jeudis-analyse\//);
+  const sansPartition = php(`['analyste' => 'M. Dupont', 'compositeur' => '', 'oeuvre' => '', 'partition' => '']`);
+  assert.match(sansPartition, /par M\. Dupont,/);
+  assert.doesNotMatch(sansPartition, /Partition|Œuvre présente|\{/);
+});
