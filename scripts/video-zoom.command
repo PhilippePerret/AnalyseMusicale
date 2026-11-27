@@ -28,8 +28,12 @@ def date_longue(jour):
 
 brut = lambda t: re.sub(r'\^([^\^\s]+)\^', r'\1', t or '')
 
+print("Ce script permet de déposer une vidéo Zoom (jeudis de l'analyse) sur YouTube. La vidéo ne doit être déposée qu'une fois achevée (corrigée).")
+if input('Procéder à ce dépôt ? (Y/n) ').strip().lower() in ('n', 'non'):
+    fin('Dépôt abandonné.', 0)
+
 # 1. Séance
-etat = json.load(urllib.request.urlopen(SITE + '/api/etat.php'))
+etat =json.load(urllib.request.urlopen(SITE + '/api/etat.php'))
 seances = [s for s in etat['seances'].values() if s.get('diffusion') == 'zoom' and s['etat'] != 'avant' and not s['youtube']]
 seances.sort(key=lambda s: s['jour'], reverse=True)
 if not seances:
