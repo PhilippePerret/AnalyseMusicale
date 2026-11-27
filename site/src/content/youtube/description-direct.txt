@@ -1,7 +1,8 @@
 Chaque jeudi (les « Jeudis de l'analyse ») est analysée EN DIRECT une pièce de musique principalement classique, par Philippe Perret (auteur de « Initiation à l'analyse musicale » sur YouTube — près de 150 000 vues).
 
+Œuvre analysée : {oeuvre}
+
 Détails des jeudis : https://www.analyse-musicale.fr/jeudis-analyse/
-Œuvre analysée : Beethoven, 1er mouvement de la Sonate n°2 (Opus 2)
 Initiation à l'analyse musicale : https://www.youtube.com/watch?v=dT6RSHmyoN0
 
 Philippe Perret : https://www.analyse-musicale.fr/pedagogue/
