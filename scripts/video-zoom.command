@@ -29,8 +29,8 @@ def date_longue(jour):
 
 brut = lambda t: re.sub(r'\^([^\^\s]+)\^', r'\1', t or '')
 
-print("\033[34mCe script permet de déposer une vidéo Zoom (jeudis de l'analyse) sur YouTube. La vidéo ne doit être déposée qu'une fois achevée (corrigée).\033[0m\n")
-if input('\033[33mProcéder à ce dépôt ? (Y/n)\033[0m ').strip().lower() in ('n', 'non'):
+print("\033[38;5;33mCe script permet de déposer une vidéo Zoom (jeudis de l'analyse) sur YouTube. La vidéo ne doit être déposée qu'une fois achevée (corrigée).\033[0m\n")
+if input('\033[38;5;226mProcéder à ce dépôt ? (Y/n)\033[0m ').strip().lower() in ('n', 'non'):
     fin('Dépôt abandonné.', 0)
 
 # 1. Séance
