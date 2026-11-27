@@ -7,6 +7,7 @@
 # 4. lien de la vidéo enregistré dans la séance (œil « Revoir l'analyse » du calendrier).
 # Jeton YouTube lu sur le serveur (data/analyse_musicale/youtube.json), jamais gardé sur ce Mac.
 cd "$(dirname "$0")/.." || exit 1
+clear; clear
 PROGRAMME=$(cat <<'PYTHON'
 import json, os, re, subprocess, sys, urllib.parse, urllib.request, http.client
 from datetime import datetime
@@ -28,8 +29,8 @@ def date_longue(jour):
 
 brut = lambda t: re.sub(r'\^([^\^\s]+)\^', r'\1', t or '')
 
-print("Ce script permet de déposer une vidéo Zoom (jeudis de l'analyse) sur YouTube. La vidéo ne doit être déposée qu'une fois achevée (corrigée).")
-if input('Procéder à ce dépôt ? (Y/n) ').strip().lower() in ('n', 'non'):
+print("\033[34mCe script permet de déposer une vidéo Zoom (jeudis de l'analyse) sur YouTube. La vidéo ne doit être déposée qu'une fois achevée (corrigée).\033[0m\n")
+if input('\033[33mProcéder à ce dépôt ? (Y/n)\033[0m ').strip().lower() in ('n', 'non'):
     fin('Dépôt abandonné.', 0)
 
 # 1. Séance
