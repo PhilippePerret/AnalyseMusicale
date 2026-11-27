@@ -865,13 +865,39 @@ test('migration : le texte de l’ancien champ « Travail effectué » des cours
 });
 
 test('description des directs YouTube tirée de src/content/youtube/description-direct.txt', { skip }, () => {
+  const modele = readFileSync(join(DIST, '..', 'src/content/youtube/description-direct.txt'), 'utf-8').replace(/\r/g, '');
+  const attendu = (v) => modele.split('\n').filter((l) => !Object.entries(v).some(([k, x]) => x === '' && l.includes(k)))
+    .map((l) => Object.entries(v).reduce((t, [k, x]) => t.split(k).join(x), l)).join('\n').trim();
   const php = (s) => spawnSync('php', ['-r', `const SITE = 'https://x.fr'; require '${DIST}/api/_youtube.php'; echo yt_description(${s});`], { encoding: 'utf-8' }).stdout;
-  const complet = php(`['analyste' => 'Ph. Perret', 'compositeur' => 'Bach', 'oeuvre' => 'Prélude 1^er^', 'partition' => 'https://p.fr/a.pdf']`);
-  assert.match(complet, /par Philippe Perret,/);
-  assert.match(complet, /Œuvre présente : Bach, Prélude 1er/);
-  assert.match(complet, /Partition : https:\/\/p\.fr\/a\.pdf/);
-  assert.match(complet, /Détails : https:\/\/x\.fr\/jeudis-analyse\//);
-  const sansPartition = php(`['analyste' => 'M. Dupont', 'compositeur' => '', 'oeuvre' => '', 'partition' => '']`);
-  assert.match(sansPartition, /par M\. Dupont,/);
-  assert.doesNotMatch(sansPartition, /Partition|Œuvre présente|\{/);
+  assert.equal(php(`['analyste' => 'Ph. Perret', 'compositeur' => 'Bach', 'oeuvre' => 'Prélude 1^er^', 'partition' => 'https://p.fr/a.pdf']`),
+    attendu({ '{analyste}': 'Philippe Perret', '{oeuvre}': 'Bach, Prélude 1er', '{partition}': 'https://p.fr/a.pdf', '{site}': 'https://x.fr' }));
+  const vide = php(`['analyste' => 'M. Dupont', 'compositeur' => '', 'oeuvre' => '', 'partition' => '']`);
+  assert.equal(vide, attendu({ '{analyste}': 'M. Dupont', '{oeuvre}': '', '{partition}': '', '{site}': 'https://x.fr' }));
+  assert.doesNotMatch(vide, /\{(analyste|oeuvre|partition|site)\}/);
+});
+
+test('séance Zoom : lien de la salle montré aux seuls présents annoncés ; lien de la vidéo enregistré par _video_zoom.php', { skip }, async () => {
+  const admin = client();
+  assert.equal((await admin.post('compte.php', { action: 'connexion', email: 'philippe.perret@analyse-musicale.fr', mdp: 'motdepasse' })).ok, true);
+  const jour = jeudiFutur(9);
+  let r = await admin.post('seance.php', { action: 'enregistrer', jour, vignette: 'Improvisée', diffusion: 'zoom', debut: '19:00', fin: '22:00', creer_direct: true });
+  assert.equal(r.ok, true);
+  assert.equal(r.avertissement, undefined);   // pas de direct YouTube pour une séance Zoom
+  let s = (await admin.etat()).seances[jour];
+  assert.equal(s.diffusion, 'zoom');
+  assert.match(s.zoom, /^https:\/\/us06web\.zoom\.us\/j\/\d+$/);
+
+  const c = client();
+  await inscrireEtConfirmer(c, 'zoom@example.com');
+  assert.equal((await c.etat()).seances[jour].zoom, undefined);
+  assert.equal((await client().etat()).seances[jour].zoom, undefined);
+  await c.post('presence.php', { jour, present: true });
+  assert.match((await c.etat()).seances[jour].zoom, /zoom\.us/);
+
+  const cli = (entree) => spawnSync('php', [join(DIST, 'api/_video_zoom.php')], { input: JSON.stringify(entree), encoding: 'utf-8', env: { ...process.env, CAMI_DB: join(tmp, 'cami.sqlite') } });
+  assert.equal(cli({ jour, youtube: 'javascript:x' }).status, 1);
+  assert.equal(cli({ jour, youtube: 'https://www.youtube.com/watch?v=abc', compositeur: 'Bach', oeuvre: 'Prélude' }).status, 0);
+  s = (await c.etat()).seances[jour];
+  assert.equal(s.youtube, 'https://www.youtube.com/watch?v=abc');
+  assert.equal(s.compositeur, 'Bach');
 });

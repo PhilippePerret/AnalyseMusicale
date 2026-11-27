@@ -14,6 +14,7 @@ ini_set('log_errors', '1');
 const ADMINS     = ['philippe.perret@analyse-musicale.fr'];
 const EXPEDITEUR = 'contact@analyse-musicale.fr';
 const SITE       = 'https://www.analyse-musicale.fr';
+const ZOOM_LIEN  = 'https://us06web.zoom.us/j/81245761799';   // salle des séances Zoom (issue #28)
 const NOTIFICATIONS = 'philippe.perret@analyse-musicale.fr';   // reçoit les avis du site
 
 // Préférences (users.prefs, champ de bits)
@@ -45,7 +46,8 @@ CREATE TABLE IF NOT EXISTS seances (
   fin TEXT NOT NULL DEFAULT '22:00',
   youtube TEXT NOT NULL DEFAULT '',
   partition TEXT NOT NULL DEFAULT '',  -- URL de la partition
-  vignette TEXT NOT NULL DEFAULT ''    -- titre affiché dans la case du calendrier (issue #27)
+  vignette TEXT NOT NULL DEFAULT '',   -- titre affiché dans la case du calendrier (issue #27)
+  diffusion TEXT NOT NULL DEFAULT 'youtube'  -- youtube (direct) | zoom (issue #28)
 );
 CREATE TABLE IF NOT EXISTS telechargements (   -- Table d'analyse : demandes de lien et téléchargements
   id INTEGER PRIMARY KEY,
@@ -193,7 +195,7 @@ function db(): PDO {
 // Colonnes ajoutées après la création de la base
 function migrer(PDO $pdo): void {
   $ajouts = [
-    'seances' => ['partition' => "TEXT NOT NULL DEFAULT ''", 'vignette' => "TEXT NOT NULL DEFAULT ''"],
+    'seances' => ['partition' => "TEXT NOT NULL DEFAULT ''", 'vignette' => "TEXT NOT NULL DEFAULT ''", 'diffusion' => "TEXT NOT NULL DEFAULT 'youtube'"],
     'users' => ['source' => "TEXT NOT NULL DEFAULT 'site'", 'cgu_le' => 'TEXT', 'vu_le' => 'TEXT'],
     'cours' => ['programme' => "TEXT NOT NULL DEFAULT ''"],
     'students' => ['actif' => 'INTEGER NOT NULL DEFAULT 1'],   // 0 : élève inactif, sans accès à /cours/student/ (issue #20)

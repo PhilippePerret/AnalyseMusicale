@@ -6,7 +6,7 @@
 
 const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const OEIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
-const DEFAUT = { compositeur: '', oeuvre: '', analyste: 'Ph. Perret', debut: '19:00', fin: '22:00', youtube: '', partition: '', vignette: '' };
+const DEFAUT = { compositeur: '', oeuvre: '', analyste: 'Ph. Perret', debut: '19:00', fin: '22:00', youtube: '', partition: '', vignette: '', diffusion: 'youtube' };
 const HEURES = Array.from({ length: 15 }, (_, i) => `${String(9 + i).padStart(2, '0')}:00`);
 const MOIS_AVANT = 1, MOIS_APRES = 4;
 const STUDIO = 'https://studio.youtube.com/channel/UCX3XhJw9x1RsVx1s3GNYceA/livestreaming';   // directs de la chaîne
@@ -41,8 +41,10 @@ const admin = () => !!etat.user?.admin;
 let chargeLe = Date.now();
 const maintenant = () => new Date(new Date(etat.maintenant.replace(' ', 'T')).getTime() + Date.now() - chargeLe);
 // Pastille « DIRECT » : le jour même, de 30 minutes avant le début jusqu'à la fin, si le lien du direct existe
+// Lien pour suivre la séance : direct YouTube, ou salle Zoom (donnée aux seuls présents annoncés)
+const lienDirect = (s) => (s.diffusion === 'zoom' ? s.zoom : s.youtube);
 const pastilleDirect = (k, s) => {
-  if (!s.youtube || k !== aujourdhui()) return false;
+  if (!lienDirect(s) || k !== aujourdhui()) return false;
   const t = maintenant().getTime();
   return t >= new Date(`${k}T${s.debut}`).getTime() - 30 * 60000 && t < new Date(`${k}T${s.fin}`).getTime();
 };
@@ -96,10 +98,10 @@ function caseJeudi(d) {
   // Du jour (toute la journée) ; sinon passée ou à venir
   const moment = k === aujourdhui() ? 'courant' : s.etat === 'apres' ? 'passe' : 'avenir';
   const cls = ['jeudi', 'seance', moment, k === prochain() ? 'prochain' : '', direct ? 'endirect' : ''].join(' ');
-  if (direct) return `<div class="${cls}" role="button" tabindex="0" data-k="${k}">${libelle}<span class="piece">${txt(s.vignette || s.compositeur || 'à venir')}</span><a class="pastille-direct" href="${esc(s.youtube)}" target="_blank" rel="noopener" title="Rejoindre l’analyse en direct"><i>●</i> DIRECT</a></div>`;
+  if (direct) return `<div class="${cls}" role="button" tabindex="0" data-k="${k}">${libelle}<span class="piece">${txt(s.vignette || s.compositeur || 'à venir')}</span><a class="pastille-direct" href="${esc(lienDirect(s))}" target="_blank" rel="noopener" title="Rejoindre l’analyse en direct"><i>●</i> DIRECT</a></div>`;
   let oeil = '';
   if (s.youtube && s.etat === 'apres') oeil = `<a class="oeil" href="${esc(s.youtube)}" target="_blank" rel="noopener" title="Revoir l’analyse">${OEIL}</a>`;
-  if (s.youtube && s.etat === 'direct') oeil = `<a class="oeil" href="${esc(s.youtube)}" target="_blank" rel="noopener" title="Suivre l’analyse en direct">${OEIL}</a>`;
+  if (s.youtube && s.etat === 'direct' && s.diffusion !== 'zoom') oeil = `<a class="oeil" href="${esc(s.youtube)}" target="_blank" rel="noopener" title="Suivre l’analyse en direct">${OEIL}</a>`;
   return `<div class="${cls}" role="button" tabindex="0" data-k="${k}">${libelle}<span class="piece">${txt(s.vignette || s.compositeur || 'à venir')}</span>${oeil}</div>`;
 }
 
@@ -132,7 +134,18 @@ function afficherDetail(k) {
     return;
   }
   const actions = [];
-  if (s.etat === 'avant') {
+  if (s.diffusion === 'zoom' && s.etat !== 'apres') {
+    // Séance Zoom : lien de la salle montré aux seuls présents annoncés (issue #28)
+    if (!s.zoom) {
+      actions.push('<button class="bouton" data-action="present">J’assisterai à cette session</button>');
+      actions.push('<span class="vide">Cliquez pour obtenir le lien Zoom.</span>');
+    } else {
+      if (etat.presences.includes(k)) actions.push(`<span class="inscrit-ok">${g('✓ Vous serez présent[|e]')}</span>`);
+      actions.push(s.etat === 'direct'
+        ? `<a class="direct actif" href="${esc(s.zoom)}" target="_blank" rel="noopener">Rejoindre l’analyse sur Zoom</a>`
+        : '<span class="direct inactif" title="Disponible le jour et à l’heure de la séance">Rejoindre l’analyse sur Zoom</span>');
+    }
+  } else if (s.etat === 'avant') {
     actions.push(etat.presences.includes(k)
       ? `<span class="inscrit-ok">${g('✓ Vous serez présent[|e]')}</span>`
       : `<button class="bouton" data-action="present">J’assisterai à cette session</button>`);
@@ -146,13 +159,13 @@ function afficherDetail(k) {
   }
   const piece = s.compositeur || s.oeuvre
     ? `<strong>${txt(s.compositeur)}</strong>${s.compositeur && s.oeuvre ? ' — ' : ''}${txt(s.oeuvre)}`
-    : '<span class="vide">Pièce à venir</span>';
+    : `<span class="vide">${s.diffusion === 'zoom' ? 'Œuvre choisie pendant la séance' : 'Pièce à venir'}</span>`;
   $('detail').innerHTML =
     `${lienEditer}<div class="date">${dateLongue(k)}, ${heure(s.debut)} – ${heure(s.fin)}</div>
      <div>${piece}</div>
      <div>Analyste principal : ${txt(s.analyste)}</div>
      ${s.partition ? `<div><a href="${esc(s.partition)}" target="_blank" rel="noopener">Télécharger la partition</a></div>` : ''}
-     ${admin() ? `<div class="studio"><a href="${esc(lienStudio(s.youtube))}" target="_blank" rel="noopener">${s.youtube ? 'Ce direct dans YouTube Studio' : 'Les directs dans YouTube Studio'}</a></div>` : ''}
+     ${admin() && s.diffusion !== 'zoom' ? `<div class="studio"><a href="${esc(lienStudio(s.youtube))}" target="_blank" rel="noopener">${s.youtube ? 'Ce direct dans YouTube Studio' : 'Les directs dans YouTube Studio'}</a></div>` : ''}
      <div class="actions">${actions.join('')}</div>${msg}`;
 }
 
@@ -181,14 +194,18 @@ function editer(k, erreur = '') {
          <label class="grand">Œuvre <input name="oeuvre" value="${esc(s.oeuvre)}" maxlength="200" placeholder="Sonate K. 545, 1^er^ mouvement"></label>
          <label class="petit vignette">Titre vignette <input name="vignette" value="${esc(s.vignette)}" maxlength="40" required placeholder="Chopin"></label>
        </div>
+       <div class="rang une-ligne diffusion"><span>Diffusion</span>
+         <label class="en-ligne"><input type="radio" name="diffusion" value="youtube"${s.diffusion === 'zoom' ? '' : ' checked'}> Direct YouTube</label>
+         <label class="en-ligne"><input type="radio" name="diffusion" value="zoom"${s.diffusion === 'zoom' ? ' checked' : ''}> Zoom</label>
+       </div>
        <div class="rang une-ligne">
          <label class="en-ligne">Analyste principal <input class="analyste" name="analyste" value="${esc(s.analyste)}" maxlength="80" required></label>
          ${menuHeures('debut', 'Début', s.debut, '21:00')}
          ${menuHeures('fin', 'Fin', s.fin, '23:00')}
        </div>
-       <label class="en-ligne lien">Lien du direct YouTube <input type="url" name="youtube" value="${esc(s.youtube)}" maxlength="300" placeholder="https://www.youtube.com/live/…"></label>
+       <label class="en-ligne lien"><span class="libelle-youtube">${s.diffusion === 'zoom' ? 'Lien de la vidéo YouTube' : 'Lien du direct YouTube'}</span> <input type="url" name="youtube" value="${esc(s.youtube)}" maxlength="300" placeholder="https://www.youtube.com/live/…"></label>
        <label class="en-ligne lien">URL de la partition <input type="url" name="partition" value="${esc(s.partition)}" maxlength="300" placeholder="https://…"></label>
-       ${s.youtube ? '' : '<label class="case-direct"><input type="checkbox" name="creer_direct"> Créer le direct YouTube (programmé à l’heure de début)</label>'}
+       ${s.youtube ? '' : `<label class="case-direct${s.diffusion === 'zoom' ? ' inactive' : ''}"><input type="checkbox" name="creer_direct"${s.diffusion === 'zoom' ? ' disabled' : ''}> Créer le direct YouTube (programmé à l’heure de début)</label>`}
        <div class="aide">^texte^ = exposant (ex. 1^er^)</div>
        ${erreur ? `<p class="erreur">${erreur}</p>` : ''}
        <div class="boutons">
@@ -338,6 +355,14 @@ $('barreCompte').addEventListener('click', async (e) => {
 
 $('formConnexion').addEventListener('submit', (e) => { e.preventDefault(); seConnecter(e.target); });
 $('formInscription').addEventListener('submit', (e) => { e.preventDefault(); sInscrire(e.target); });
+// Édition : choix de la diffusion (Zoom : case « Créer le direct » inactive, libellé du lien adapté)
+$('detail').addEventListener('change', (e) => {
+  if (e.target.name !== 'diffusion') return;
+  const zoom = e.target.value === 'zoom', form = e.target.form;
+  form.querySelector('.libelle-youtube').textContent = zoom ? 'Lien de la vidéo YouTube' : 'Lien du direct YouTube';
+  const caseDirect = form.elements.creer_direct;
+  if (caseDirect) { caseDirect.disabled = zoom; if (zoom) caseDirect.checked = false; caseDirect.closest('label').classList.toggle('inactive', zoom); }
+});
 $('formInscription').addEventListener('change', (e) => { if (e.target.name === 'genre') { genre = e.target.value || 'N'; appliquerGenre(); } });
 // Passage connexion ↔ inscription : l'adresse et le mot de passe déjà saisis sont repris
 document.querySelectorAll('.fenetre .bascule').forEach((a) => a.addEventListener('click', (e) => {
