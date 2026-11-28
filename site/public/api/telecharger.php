@@ -23,9 +23,8 @@ if ($jeton !== '') {
   $st->execute([$jeton]);
   $t = preg_match('/^[0-9a-f]{32}$/', $jeton) ? ($st->fetch() ?: null) : null;
   if (!$t) aller('/table-analyse/');
-  if (!$t['telecharge_le']) {
-    db()->prepare('UPDATE telechargements SET telecharge_le = ? WHERE id = ?')->execute([$maintenant, $t['id']]);
-  }
+  // Premier clic : adresse confirmée ; chaque clic compte comme un téléchargement
+  db()->prepare('UPDATE telechargements SET telecharge_le = COALESCE(telecharge_le, ?), clics = clics + 1 WHERE id = ?')->execute([$maintenant, $t['id']]);
   // Chaque téléchargement est signalé, même par un lien déjà utilisé
   signaler(array_merge($t, ['telecharge_le' => $maintenant]));
   // Ancienne demande : lien d'une Release GitHub
@@ -43,7 +42,7 @@ $t = [
   'version' => version_fichier($fichier),
   'telecharge_le' => $maintenant,
 ];
-db()->prepare('INSERT INTO telechargements (email, systeme, fichier, version, le, telecharge_le) VALUES (?, ?, ?, ?, ?, ?)')
+db()->prepare('INSERT INTO telechargements (email, systeme, fichier, version, le, telecharge_le, clics) VALUES (?, ?, ?, ?, ?, ?, 1)')
   ->execute([$t['email'], $t['systeme'], $fichier, $t['version'], $maintenant, $maintenant]);
 signaler($t);
 servir_fichier_ta($fichier);

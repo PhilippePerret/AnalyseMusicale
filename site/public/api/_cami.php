@@ -59,7 +59,8 @@ CREATE TABLE IF NOT EXISTS telechargements (   -- Table d'analyse : demandes de 
   jeton TEXT,                       -- jeton du lien envoyé par mail
   telecharge_le TEXT,               -- premier clic sur le lien : adresse confirmée
   source TEXT NOT NULL DEFAULT 'site',  -- site | main (saisi par l'administrateur)
-  cgu_le TEXT                       -- acceptation des CGU
+  cgu_le TEXT,                      -- acceptation des CGU
+  clics INTEGER NOT NULL DEFAULT 0  -- téléchargements effectifs par ce lien (issue #29)
 );
 CREATE TABLE IF NOT EXISTS contacts (   -- adresses seules, saisies par l'administrateur
   id INTEGER PRIMARY KEY,
@@ -205,6 +206,7 @@ function migrer(PDO $pdo): void {
       'telecharge_le' => 'TEXT',
       'source' => "TEXT NOT NULL DEFAULT 'site'",
       'cgu_le' => 'TEXT',
+      'clics' => 'INTEGER NOT NULL DEFAULT 0',
     ],
   ];
   foreach ($ajouts as $table => $definitions) {
@@ -222,6 +224,11 @@ function migrer(PDO $pdo): void {
   if ((int) $pdo->query('PRAGMA user_version')->fetchColumn() < 2) {
     $pdo->exec("UPDATE seances SET vignette = compositeur WHERE vignette = ''");
     $pdo->exec('PRAGMA user_version = 2');
+  }
+  // Version 3 : un téléchargement compté pour chaque lien déjà utilisé (issue #29)
+  if ((int) $pdo->query('PRAGMA user_version')->fetchColumn() < 3) {
+    $pdo->exec('UPDATE telechargements SET clics = 1 WHERE telecharge_le IS NOT NULL AND clics = 0');
+    $pdo->exec('PRAGMA user_version = 3');
   }
 }
 

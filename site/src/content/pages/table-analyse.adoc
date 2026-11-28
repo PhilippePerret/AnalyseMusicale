@@ -17,11 +17,11 @@
 [[telechargement-application]]
 == Téléchargement
 
-[.compteur-telechargements]
-Depuis novembre 2026, l’application __Table d’Analyse__ a été téléchargée [.nb-telechargements]#…# fois.
-
 [.bloc-telechargement]
 .Télécharger l'application __Table d’Analyse__
 --
 @telechargement
 --
+
+[.compteur-telechargements]
+Depuis novembre 2026, l’application __Table d’Analyse__ a été téléchargée [.nb-telechargements]#…# fois.

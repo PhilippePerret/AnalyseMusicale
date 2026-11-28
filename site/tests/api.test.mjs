@@ -253,13 +253,17 @@ test('téléchargement direct d’un visiteur identifié enregistré', { skip },
   assert.equal((await client().get(`/api/telecharger.php?fichier=${encodeURIComponent(FICHIER_TA)}`)).headers.get('location'), '/table-analyse/');
 });
 
-test('nombre de téléchargements : seuls les téléchargements effectifs comptent (issue #29)', { skip }, async () => {
+test('nombre de téléchargements : chaque téléchargement effectif compte (issue #29)', { skip }, async () => {
   const nombre = async () => (await (await fetch(`${base}/api/telechargements.php`)).json()).nombre;
   const avant = await nombre();
   await fetch(`${base}/telechargement.php`, { method: 'POST', body: new URLSearchParams({ email: 'compte@example.com', fichier: FICHIER_TA, systeme: 'Linux' }) });
   assert.equal(await nombre(), avant);
-  await verifierFichierTA(await client().get(`/api/telecharger.php?jeton=${dernierLienTA()}`));
+  const jeton = dernierLienTA();
+  await verifierFichierTA(await client().get(`/api/telecharger.php?jeton=${jeton}`));
   assert.equal(await nombre(), avant + 1);
+  // Même lien réutilisé : chaque téléchargement compte
+  await verifierFichierTA(await client().get(`/api/telecharger.php?jeton=${jeton}`));
+  assert.equal(await nombre(), avant + 2);
 });
 
 test('liste des adresses refusée à un non-administrateur', { skip }, async () => {

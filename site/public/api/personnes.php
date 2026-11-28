@@ -115,7 +115,7 @@ if ($action === 'ajouter') {
     if (!in_array($systeme, SYSTEMES, true)) repondre(['ok' => false, 'erreur' => 'systeme'], 422);
     if (!preg_match('/^\d+(\.\d+){0,3}$/', $version)) repondre(['ok' => false, 'erreur' => 'version'], 422);
     if (!$d || $d->format('Y-m-d') !== $date || $date > date('Y-m-d')) repondre(['ok' => false, 'erreur' => 'date'], 422);
-    db()->prepare("INSERT INTO telechargements (email, systeme, fichier, version, le, telecharge_le, source) VALUES (?, ?, '', ?, ?, ?, 'main')")
+    db()->prepare("INSERT INTO telechargements (email, systeme, fichier, version, le, telecharge_le, source, clics) VALUES (?, ?, '', ?, ?, ?, 'main', 1)")
       ->execute([$email, $systeme, $version, $maintenant, $date]);
     brevo_ajouter($email, 'telechargement');
     repondre(['ok' => true]);
