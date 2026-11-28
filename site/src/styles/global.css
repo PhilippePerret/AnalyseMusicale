@@ -325,6 +325,7 @@ form.contact-form label.cgu > input { display: inline-block; margin: 0; width: 1
 form.contact-form p.version-courante { margin: 0; font-size: 0.9em; }
 form.contact-form p.consigne { margin: 0; text-align: left; hyphens: manual; }
 form.contact-form .ligne-envoi button { margin-left: auto; }
+.compteur-telechargements:not(.charge) { display: none; }
 video.demo { width: 100%; height: auto; border: 1px solid #aaaaaa; margin-bottom: 2em; }
 ul.telechargements { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 1em; }
 ul.telechargements a { display: inline-block; }

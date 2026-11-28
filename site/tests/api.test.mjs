@@ -253,6 +253,15 @@ test('téléchargement direct d’un visiteur identifié enregistré', { skip },
   assert.equal((await client().get(`/api/telecharger.php?fichier=${encodeURIComponent(FICHIER_TA)}`)).headers.get('location'), '/table-analyse/');
 });
 
+test('nombre de téléchargements : seuls les téléchargements effectifs comptent (issue #29)', { skip }, async () => {
+  const nombre = async () => (await (await fetch(`${base}/api/telechargements.php`)).json()).nombre;
+  const avant = await nombre();
+  await fetch(`${base}/telechargement.php`, { method: 'POST', body: new URLSearchParams({ email: 'compte@example.com', fichier: FICHIER_TA, systeme: 'Linux' }) });
+  assert.equal(await nombre(), avant);
+  await verifierFichierTA(await client().get(`/api/telecharger.php?jeton=${dernierLienTA()}`));
+  assert.equal(await nombre(), avant + 1);
+});
+
 test('liste des adresses refusée à un non-administrateur', { skip }, async () => {
   assert.equal((await client().get('/api/personnes.php')).status, 403);
   const c = client();
@@ -419,7 +428,7 @@ test('alertes des directs : 3 jours, 1 jour, 1 heure avant ; refus pour la sessi
   const flo = pour(mails, 'contact-alerte@example.com');
   assert.match(flo, /Bonjour Flo,/);
   assert.match(flo, /de 19 h à 22 h/);
-  assert.match(flo, /parmi les participantes/);
+  assert.doesNotMatch(flo, /\[[^\]\n]*\|[^\]\n]*\]/);   // marqueurs de genre résolus
   assert.match(pour(mails, 'lecteur@example.com'), /Bonjour,\n/);
   // Une seule fois par palier
   avant = readFileSync(mailFile, 'utf-8').length;

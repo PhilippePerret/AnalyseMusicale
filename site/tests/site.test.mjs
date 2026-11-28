@@ -193,3 +193,9 @@ test('pages /admin/ et /cours/ : liens cachés vers le calendrier des cours et l
   }
   assert.doesNotMatch(readFileSync(resolveLocal('/jeudis-analyse/'), 'utf-8'), /id="liensAdmin"/);
 });
+
+test('page Table d’analyse : nombre de téléchargements sous « Téléchargement » (issue #29)', () => {
+  const html = readFileSync(resolveLocal('/table-analyse/'), 'utf-8');
+  assert.match(html, /id="telechargement-application">Téléchargement<\/h2>[\s\S]*?class="paragraph compteur-telechargements"[\s\S]*?class="nb-telechargements"/);
+  assert.ok(html.includes("/api/telechargements.php"));
+});

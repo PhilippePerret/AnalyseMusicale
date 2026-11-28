@@ -73,6 +73,17 @@ const demo = disponible(TABLE_ANALYSE.demo) ? TABLE_ANALYSE.demo : null;
         .catch(function () {});
     })();
 
+    // Nombre de téléchargements (issue #29) : phrase affichée une fois le nombre reçu
+    (function () {
+      fetch('/api/telechargements.php')
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+        .then(function (res) {
+          document.querySelectorAll('.nb-telechargements').forEach(function (e) { e.textContent = res.nombre; });
+          document.querySelectorAll('.compteur-telechargements').forEach(function (e) { e.classList.add('charge'); });
+        })
+        .catch(function () {});
+    })();
+
     // Adresse + plateforme envoyées à /telechargement.php, qui envoie le lien par mail.
     (function () {
       var form = document.getElementById('telechargement');
