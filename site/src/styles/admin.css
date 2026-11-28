@@ -4,6 +4,7 @@
 .admin [hidden] { display: none !important; }
 .admin h1.titre-page { padding: 0; margin-bottom: 0.5em; }
 .admin .acces { font-size: 1.2em; }
+.admin p.legende-tba { margin: 0.3em 0 0; font-size: 0.85em; font-style: italic; color: #777; }
 .admin input, .admin select, .admin textarea {
   font: inherit;
   line-height: 1.25;

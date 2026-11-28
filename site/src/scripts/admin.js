@@ -52,7 +52,7 @@ function ligne(p) {
 
   const tdOrigine = el('td', 'origine');
   const telechargees = p.telechargements.filter((t) => t.telecharge_le);
-  if (telechargees.length) tdOrigine.append(el('span', 'badge ta', 'Table d’analyse'));
+  if (telechargees.length) tdOrigine.append(el('span', 'badge ta', 'TbA'));
   else if (p.telechargements.length) tdOrigine.append(el('span', 'badge attente', 'lien non utilisé'));
   if (p.inscription) {
     const i = p.inscription;
