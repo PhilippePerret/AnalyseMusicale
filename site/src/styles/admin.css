@@ -2,7 +2,7 @@
 
 .admin { font-size: 0.75em; }
 .admin [hidden] { display: none !important; }
-.admin h1.titre-page { padding: 0; }
+.admin h1.titre-page { padding: 0; margin-bottom: 0.5em; }
 .admin .acces { font-size: 1.2em; }
 .admin input, .admin select, .admin textarea {
   font: inherit;

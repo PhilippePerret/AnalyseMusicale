@@ -56,7 +56,7 @@ function ligne(p) {
   else if (p.telechargements.length) tdOrigine.append(el('span', 'badge attente', 'lien non utilisé'));
   if (p.inscription) {
     const i = p.inscription;
-    if (i.source === 'main') tdOrigine.append(el('span', 'badge main', 'inscrit (saisie)'));
+    if (i.source === 'main') tdOrigine.append(el('span', 'badge main', 'Ajouté'));
     else tdOrigine.append(el('span', i.confirme ? 'badge inscrit' : 'badge attente', i.confirme ? 'inscrit' : 'inscription non confirmée'));
   }
   if (p.contact) tdOrigine.append(el('span', 'badge main', 'email seul'));
